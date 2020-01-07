@@ -6,11 +6,7 @@ import org.stringtemplate.v4.STGroupFile;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.hhu.stups.codegenerator.GeneratorMode.C;
-import static de.hhu.stups.codegenerator.GeneratorMode.CLJ;
-import static de.hhu.stups.codegenerator.GeneratorMode.CPP;
-import static de.hhu.stups.codegenerator.GeneratorMode.JAVA;
-import static de.hhu.stups.codegenerator.GeneratorMode.PY;
+import static de.hhu.stups.codegenerator.GeneratorMode.*;
 
 /**
  * Created by fabian on 21.10.18.
@@ -25,6 +21,7 @@ public class CodeGeneratorUtils {
     private static final STGroup CPP_GROUP;
     private static final STGroup PYTHON_GROUP;
     private static final STGroup CLJ_GROUP;
+    private static final STGroup BXML_GROUP;
 
     private static final Map<GeneratorMode, STGroup> TEMPLATE_MAP = new HashMap<>();
 
@@ -34,11 +31,13 @@ public class CodeGeneratorUtils {
         CPP_GROUP = new STGroupFile("de/hhu/stups/codegenerator/CppTemplate.stg");
         PYTHON_GROUP = new STGroupFile("de/hhu/stups/codegenerator/PythonTemplate.stg");
         CLJ_GROUP = new STGroupFile("de/hhu/stups/codegenerator/ClojureTemplate.stg");
+        BXML_GROUP = new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg");
         TEMPLATE_MAP.put(JAVA, JAVA_GROUP);
         TEMPLATE_MAP.put(C, C_GROUP);
         TEMPLATE_MAP.put(CPP, CPP_GROUP);
         TEMPLATE_MAP.put(PY, PYTHON_GROUP);
         TEMPLATE_MAP.put(CLJ, CLJ_GROUP);
+        TEMPLATE_MAP.put(BXML, BXML_GROUP);
     }
 
     public static STGroup getGroup(GeneratorMode mode) {
