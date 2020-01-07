@@ -65,18 +65,28 @@ public class CodeGenerator {
 	*/
 	private static GeneratorMode getMode(String languageOption) {
 		GeneratorMode mode = null;
-		if("java".equals(languageOption)) {
-			mode = GeneratorMode.JAVA;
-		} else if("python".equals(languageOption)) {
-			mode = GeneratorMode.PY;
-		} else if("c".equals(languageOption)) {
-			mode = GeneratorMode.C;
-		} else if("cpp".equals(languageOption)) {
-			mode = GeneratorMode.CPP;
-		} else if("clojure".equals(languageOption)) {
-			mode = GeneratorMode.CLJ;
-		} else {
-			throw new RuntimeException("Wrong argument for language");
+		switch(languageOption)
+		{
+			case "java":
+				mode = GeneratorMode.JAVA;
+				break;
+			case "python":
+				mode = GeneratorMode.PY;
+				break;
+			case "c":
+				mode = GeneratorMode.C;
+				break;
+			case "cpp":
+				mode = GeneratorMode.CPP;
+				break;
+			case "clojure":
+				mode = GeneratorMode.CLJ;
+				break;
+			case "bxml":
+				mode = GeneratorMode.BXML;
+				break;
+			default:
+				throw new RuntimeException("Wrong argument for language");
 		}
 		return mode;
 	}
