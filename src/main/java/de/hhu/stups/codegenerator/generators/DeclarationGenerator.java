@@ -54,6 +54,7 @@ public class DeclarationGenerator {
     * This function generates code from the VARIABLES clause
     */
     public List<String> visitDeclarations(List<DeclarationNode> declarations) {
+
         return declarations.stream()
                 .map(this::generateGlobalDeclaration)
                 .collect(Collectors.toList());

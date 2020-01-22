@@ -29,6 +29,7 @@ public class TypeGenerator {
     private RecordStructGenerator recordStructGenerator;
 
     public TypeGenerator(final STGroup group, final NameHandler nameHandler, final MachineGenerator machineGenerator) {
+        System.out.println("Group: " + group);
         this.group = group;
         this.nameHandler = nameHandler;
         this.machineGenerator = machineGenerator;
@@ -39,6 +40,7 @@ public class TypeGenerator {
     * This function generates code for a type with the given type and the information whether the type is generated for casting an object
     */
     public String generate(BType type) {
+        System.out.println(type);
         if(type instanceof IntegerType) {
             return generateBInteger();
         } else if(type instanceof BoolType) {
@@ -58,6 +60,7 @@ public class TypeGenerator {
         } else if(type instanceof UntypedType) {
             return generateUntyped();
         }
+
         return "";
     }
 
@@ -66,6 +69,7 @@ public class TypeGenerator {
     */
     private String generateBInteger() {
         ST template = group.getInstanceOf("type");
+        System.out.println("Group: " + group +" template: " + template);
         TemplateHandler.add(template, "fromOtherMachine", false);
         TemplateHandler.add(template, "type", "BInteger");
         return template.render();
@@ -161,6 +165,7 @@ public class TypeGenerator {
     * This function generates code for untyped nodes.
     */
     private String generateUntyped() {
+        System.out.println(group);
         return group.getInstanceOf("void").render();
     }
 

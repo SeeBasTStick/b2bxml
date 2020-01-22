@@ -93,8 +93,7 @@ public class IdentifierGenerator {
             isAssigned = ((AssignSubstitutionNode) parent).getLeftSide().contains(node);
         } else if(parent instanceof ListSubstitutionNode) {
             isAssigned = ((ListSubstitutionNode) parent).getSubstitutions().stream()
-                    .map(n -> isAssigned(node, n))
-                    .anyMatch(val -> val);
+                    .anyMatch(n -> isAssigned(node, n));
         } else if(parent instanceof OperationCallSubstitutionNode) {
             isAssigned = ((OperationCallSubstitutionNode) parent).getAssignedVariables().contains(node);
         }

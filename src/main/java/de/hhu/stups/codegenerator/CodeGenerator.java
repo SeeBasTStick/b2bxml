@@ -65,8 +65,7 @@ public class CodeGenerator {
 	*/
 	private static GeneratorMode getMode(String languageOption) {
 		GeneratorMode mode = null;
-		switch(languageOption)
-		{
+		switch(languageOption) {
 			case "java":
 				mode = GeneratorMode.JAVA;
 				break;
@@ -139,7 +138,8 @@ public class CodeGenerator {
 			additionAsList[additionAsList.length - 1] = addition;
 		}
 		machineReferenceGenerator.generateIncludedMachines(project, pathAsList, mode, useBigInteger, minint, maxint, deferredSetSize);
-		paths.add(writeToFile(path, mode, useBigInteger, minint, maxint, deferredSetSize, project.getMainMachine(), addition != null ? Paths.get(String.join("/",additionAsList)) : null, isIncludedMachine));
+		paths.add(writeToFile(path, mode, useBigInteger, minint, maxint, deferredSetSize, project.getMainMachine(),
+				addition != null ? Paths.get(String.join("/",additionAsList)) : null, isIncludedMachine));
 		return paths;
 	}
 

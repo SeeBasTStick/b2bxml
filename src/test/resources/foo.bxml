@@ -1,0 +1,44 @@
+<Machine name='foo' type='abstraction'>
+    <Abstract_Variables>
+        <Id value='xx' typref='3603043417'/>
+    </Abstract_Variables>
+    <Invariant>
+        <Exp_Comparison op=':'>
+            <Id value='xx' typref='3603043417'/>
+            <Unary_Exp op='POW' typref='949986794'>
+                <Id value='INTEGER' typref='3603043417'/>
+            </Unary_Exp>
+        </Exp_Comparison>
+    </Invariant>
+    <Initialisation>
+        <Assignement_Sub>
+            <Variables>
+                <Id value='xx' typref='3603043417'/>
+            </Variables>
+            <Values>
+                <Nary_Exp op='{' typref='3603043417'>
+                    <Integer_Literal value='0' typref='2701647786'/>
+                    <Integer_Literal value='1' typref='2701647786'/>
+                </Nary_Exp>
+            </Values>
+        </Assignement_Sub>
+    </Initialisation>
+    <TypeInfos>
+        <Type id='3603043417'>
+            <Unary_Exp op='POW'>
+                <Id value='INTEGER'/>
+            </Unary_Exp>
+        </Type>
+        <Type id='949986794'>
+            <Unary_Exp op='POW'>
+                <Unary_Exp op='POW'>
+                    <Id value='INTEGER'/>
+                </Unary_Exp>
+            </Unary_Exp>
+        </Type>
+        <Type id='2701647786'>
+            <Id value='INTEGER'/>
+        </Type>
+    </TypeInfos>
+
+</Machine>

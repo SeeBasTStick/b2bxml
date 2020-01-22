@@ -108,7 +108,10 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	private boolean isIncludedMachine;
 
-	public MachineGenerator(GeneratorMode mode, boolean useBigInteger, String minint, String maxint, String deferredSetSize, Path addition, boolean isIncludedMachine) {
+	private TypeInfoGenerator typeInfoGenerator;
+
+	public MachineGenerator(GeneratorMode mode, boolean useBigInteger, String minint, String maxint,
+							String deferredSetSize, Path addition, boolean isIncludedMachine) {
 		this.currentGroup = CodeGeneratorUtils.getGroup(mode);
 		this.useBigInteger = useBigInteger;
 		if(addition != null) {
@@ -122,23 +125,32 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		this.parallelConstructHandler = new ParallelConstructHandler();
 		this.typeGenerator = new TypeGenerator(currentGroup, nameHandler, this);
 		this.importGenerator = new ImportGenerator(currentGroup, nameHandler, useBigInteger);
-		this.iterationConstructHandler = new IterationConstructHandler(currentGroup, this, nameHandler, typeGenerator, importGenerator);
+		this.iterationConstructHandler = new IterationConstructHandler(currentGroup, this, nameHandler,
+				typeGenerator, importGenerator);
 		this.deferredSetAnalyzer = new DeferredSetAnalyzer(Integer.parseInt(deferredSetSize));
-		this.declarationGenerator = new DeclarationGenerator(currentGroup, this, typeGenerator, importGenerator, nameHandler, deferredSetAnalyzer);
-        this.identifierGenerator = new IdentifierGenerator(currentGroup, this, nameHandler, parallelConstructHandler, declarationGenerator);
-		this.predicateGenerator = new PredicateGenerator(currentGroup, this, nameHandler, importGenerator, iterationConstructHandler);
-		this.recordStructGenerator = new RecordStructGenerator(currentGroup, this, typeGenerator, importGenerator, nameHandler);
+		this.declarationGenerator = new DeclarationGenerator(currentGroup, this, typeGenerator,
+				importGenerator, nameHandler, deferredSetAnalyzer);
+        this.identifierGenerator = new IdentifierGenerator(currentGroup, this, nameHandler,
+				parallelConstructHandler, declarationGenerator);
+		this.predicateGenerator = new PredicateGenerator(currentGroup, this, nameHandler,
+				importGenerator, iterationConstructHandler);
+		this.recordStructGenerator = new RecordStructGenerator(currentGroup, this, typeGenerator,
+				importGenerator, nameHandler);
 		this.recordStructAnalyzer = new RecordStructAnalyzer(recordStructGenerator);
-		this.expressionGenerator = new ExpressionGenerator(currentGroup, this, useBigInteger, minint, maxint, nameHandler, importGenerator,
-															declarationGenerator, identifierGenerator, typeGenerator, iterationConstructHandler, recordStructGenerator);
-		this.substitutionGenerator = new SubstitutionGenerator(currentGroup, this, nameHandler, typeGenerator,
-																expressionGenerator, identifierGenerator, iterationConstructHandler,
-																parallelConstructHandler, recordStructGenerator, declarationGenerator);
+		this.expressionGenerator = new ExpressionGenerator(currentGroup, this, useBigInteger, minint,
+				maxint, nameHandler, importGenerator, declarationGenerator, identifierGenerator, typeGenerator,
+				iterationConstructHandler, recordStructGenerator);
+		this.substitutionGenerator = new SubstitutionGenerator(currentGroup, this, nameHandler,
+				typeGenerator, expressionGenerator, identifierGenerator, iterationConstructHandler,
+				parallelConstructHandler, recordStructGenerator,
+				declarationGenerator);
 		this.operatorGenerator = new OperatorGenerator(predicateGenerator, expressionGenerator);
-		this.operationGenerator = new OperationGenerator(currentGroup, this, substitutionGenerator, declarationGenerator, identifierGenerator, nameHandler,
-															typeGenerator, recordStructGenerator);
+		this.operationGenerator = new OperationGenerator(currentGroup, this, substitutionGenerator,
+				declarationGenerator, identifierGenerator, nameHandler, typeGenerator, recordStructGenerator);
 		this.iterationConstructDepth = 0;
 		this.isIncludedMachine = isIncludedMachine;
+
+		this.typeInfoGenerator = new TypeInfoGenerator();
 	}
 
 	/*
@@ -152,7 +164,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		TemplateHandler.add(machine, "useBigInteger", useBigInteger);
 		TemplateHandler.add(machine, "addition", addition);
 		TemplateHandler.add(machine, "imports", importGenerator.getImports());
-		TemplateHandler.add(machine, "methods", generateMethods(node));
+		//TemplateHandler.add(machine, "methods", generateMethods(node));
 		TemplateHandler.add(machine, "includedMachines", importGenerator.generateMachineImports(node));
 		TemplateHandler.add(machine, "machine", nameHandler.handle(node.getName()));
 		generateBody(node, machine);
@@ -168,19 +180,22 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		operationGenerator.mapOperationsToMachine(node);
 	}
 
-	/*
+	/*types
 	* This function generates the whole body of a machine from the given AST node for the machine.
 	*/
 	private void generateBody(MachineNode node, ST machine) {
-		TemplateHandler.add(machine, "constants_declarations", declarationGenerator.generateConstantsDeclarations(node));
+	/*	TemplateHandler.add(machine, "constants_declarations", declarationGenerator.generateConstantsDeclarations(node));
 		TemplateHandler.add(machine, "enums", declarationGenerator.generateEnumDeclarations(node));
 		TemplateHandler.add(machine, "sets", declarationGenerator.generateSetDeclarations(node));
 		TemplateHandler.add(machine, "declarations", declarationGenerator.visitDeclarations(node.getVariables()));
 		TemplateHandler.add(machine, "includes", declarationGenerator.generateIncludes(node));
 		TemplateHandler.add(machine, "initialization", substitutionGenerator.visitInitialization(node));
-		TemplateHandler.add(machine, "operations", operationGenerator.visitOperations(node.getOperations(), node.getVariables().stream().map(DeclarationNode::getName).collect(Collectors.toList())));
-		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) : new ArrayList<>());
-		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());
+		TemplateHandler.add(machine, "operations", operationGenerator.visitOperations(node.getOperations(),
+				node.getVariables().stream().map(DeclarationNode::getName).collect(Collectors.toList())));
+		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
+				new ArrayList<>());
+		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());*/
+		TemplateHandler.add(machine, "typeInfos", typeInfoGenerator.generateTypeInfos());
 	}
 
 	/*
@@ -197,13 +212,15 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 	*/
 	private String generateGetter(DeclarationNode variable) {
 		ST getter = currentGroup.getInstanceOf("getter");
-		TemplateHandler.add(getter, "variable", nameHandler.handleIdentifier(variable.getName(), NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+		TemplateHandler.add(getter, "variable", nameHandler.handleIdentifier(variable.getName(),
+				NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 		TemplateHandler.add(getter, "returnType", typeGenerator.generate(variable.getType()));
 		return getter.render();
 	}
 
 	/*
-	* This function generates code for functions for programming languages where functions must be declared before implementation from the given AST node for the machine.
+	* This function generates code for functions for programming languages where functions must be declared before
+	* implementation from the given AST node for the machine.
 	*/
 	private List<String> generateMethods(MachineNode node) {
 		ST method = currentGroup.getInstanceOf("method");
@@ -219,7 +236,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 	}
 
 	/*
-	* This function generates code for a function for programming languages where functions must be declared before implementation from the given AST node for the machine.
+	* This function generates code for a function for programming languages where functions must be declared before
+	* implementation from the given AST node for the machine.
 	*/
 	private String generateMethod(OperationNode node) {
 		ST method = currentGroup.getInstanceOf("method");
@@ -271,17 +289,11 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		return expressionGenerator.visitQuantifiedExpressionNode(node);
 	}
 
-	/*
-	*
-	*/
 	@Override
 	public String visitQuantifiedPredicateNode(QuantifiedPredicateNode node, Void expected) {
 		return predicateGenerator.generateQuantifiedPredicateNode(node);
 	}
 
-	/*
-	*
-	*/
 	@Override
 	public String visitSetComprehensionNode(SetComprehensionNode node, Void expected) {
 		return expressionGenerator.visitSetComprehensionNode(node);
@@ -357,7 +369,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	@Override
 	public String visitLetSubstitution(LetSubstitutionNode node, Void expected) {
-		return substitutionGenerator.visitAnySubstitutionNode(new AnySubstitutionNode(node.getSourceCodePosition(), node.getLocalIdentifiers(), node.getPredicate(), node.getBody()));
+		return substitutionGenerator.visitAnySubstitutionNode(new AnySubstitutionNode(node.getSourceCodePosition(),
+				node.getLocalIdentifiers(), node.getPredicate(), node.getBody()));
 	}
 
 	@Override

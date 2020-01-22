@@ -1,0 +1,17 @@
+keywords() ::= <<Machine>>
+
+machine(type_infos, machine) ::= <<
+
+\<Machine name='<machine>' type='abstraction'>
+
+
+<type_infos>
+\</Machine>
+>>
+
+type_infos() ::= <<
+\<TypeInfos\>
+
+\</TypeInfos\>
+>>
+
