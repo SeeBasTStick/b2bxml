@@ -1,17 +1,23 @@
 keywords() ::= <<Machine>>
 
-machine(type_infos, machine) ::= <<
+machine(type_info, machine) ::= <<
 
 \<Machine name='<machine>' type='abstraction'>
 
 
-<type_infos>
+<type_info>
 \</Machine>
 >>
 
-type_infos() ::= <<
-\<TypeInfos\>
+type_info(types) ::= <<
+\<TypeInfos>
+<types; separator="\n">
+\</TypeInfos>
+>>
 
-\</TypeInfos\>
+type() ::= <<
+\</Type id='123'>
+
+\</Type>
 >>
 

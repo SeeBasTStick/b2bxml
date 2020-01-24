@@ -29,7 +29,6 @@ public class TypeGenerator {
     private RecordStructGenerator recordStructGenerator;
 
     public TypeGenerator(final STGroup group, final NameHandler nameHandler, final MachineGenerator machineGenerator) {
-        System.out.println("Group: " + group);
         this.group = group;
         this.nameHandler = nameHandler;
         this.machineGenerator = machineGenerator;

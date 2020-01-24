@@ -150,7 +150,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		this.iterationConstructDepth = 0;
 		this.isIncludedMachine = isIncludedMachine;
 
-		this.typeInfoGenerator = new TypeInfoGenerator();
+		this.typeInfoGenerator = new TypeInfoGenerator(nameHandler, currentGroup);
 	}
 
 	/*
@@ -195,7 +195,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
 				new ArrayList<>());
 		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());*/
-		TemplateHandler.add(machine, "typeInfos", typeInfoGenerator.generateTypeInfos());
+		TemplateHandler.add(machine, "type_info", typeInfoGenerator.generateTypeInfo(node.getVariables()));
 	}
 
 	/*
