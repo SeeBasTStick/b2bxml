@@ -24,6 +24,9 @@ public class TestBXML {
 
     @Test
     public void testExample() throws Exception {
-        testC("Mega");
+       // testC("Mega");
+        System.out.println("---------------------"
+        );
+        testC("foo");
     }
 }

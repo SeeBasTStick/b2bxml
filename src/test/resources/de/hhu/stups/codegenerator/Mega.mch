@@ -13,4 +13,3 @@ OPERATIONS
 
 	result  <-- res = result := ii
 END
-

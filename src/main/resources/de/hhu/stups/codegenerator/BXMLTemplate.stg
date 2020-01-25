@@ -15,8 +15,8 @@ type_info(types) ::= <<
 \</TypeInfos>
 >>
 
-type() ::= <<
-\</Type id='123'>
+type(id) ::= <<
+\</Type id='<id>'>
 
 \</Type>
 >>

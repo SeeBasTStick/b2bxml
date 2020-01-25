@@ -1,5 +1,7 @@
 package de.hhu.stups.codegenerator.analyzers;
 
+import de.prob.parser.ast.nodes.DeclarationNode;
+import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.nodes.expression.*;
 import de.prob.parser.ast.nodes.ltl.LTLBPredicateNode;
 import de.prob.parser.ast.nodes.ltl.LTLInfixOperatorNode;
@@ -7,13 +9,71 @@ import de.prob.parser.ast.nodes.ltl.LTLKeywordNode;
 import de.prob.parser.ast.nodes.ltl.LTLPrefixOperatorNode;
 import de.prob.parser.ast.nodes.predicate.*;
 import de.prob.parser.ast.nodes.substitution.*;
+import de.prob.parser.ast.types.BType;
+import de.prob.parser.ast.types.BasicType;
 import de.prob.parser.ast.visitors.AbstractVisitor;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
+    private Map<BType, Integer> variableType = new HashMap<>();
+    private Map<String, BType> nameType = new HashMap<>();
+
+
+    public void visitMachineNode(MachineNode node) {
+
+        node.getVariables().forEach(this::putInMap);
+
+        node.getConstants().forEach(this::putInMap);
+
+        if(node.getInitialisation() != null) {
+            visitSubstitutionNode(node.getInitialisation(), null);
+        }
+
+        if(node.getProperties() != null) {
+            visitPredicateNode(node.getProperties(), null);
+        }
+        if(node.getInvariant() != null) {
+            System.out.println(node.getInvariant());
+            visitPredicateNode(node.getInvariant(), null);
+        }
+
+       // node.getValues().forEach(substitution -> visitSubstitutionNode(substitution, null));
+
+        System.out.println(nameType);
+        System.out.println(variableType);
+    }
+
+    private void putInMap(DeclarationNode node){
+        if(node.getType() instanceof BasicType) {
+            nameType.put(node.getName(), node.getType());
+            if(!variableType.containsKey(node.getType()))
+            {
+                variableType.put(node.getType(), node.getType().hashCode());
+            }
+            System.out.println(node);
+        }
+    }
+
+
+    @Override
+    public Void visitIdentifierExprNode(IdentifierExprNode node, Void expected) {
+        nameType.put(node.getName(), node.getType());
+        if(!variableType.containsKey(node.getType()))
+        {
+            variableType.put(node.getType(), node.getType().hashCode());
+        }
+
+        return null;
+    }
 
     @Override
     public Void visitExprNode(ExprNode node, Void expected) {
+        System.out.println("Huhu");
+
         return null;
     }
 
@@ -23,14 +83,49 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
     }
 
     @Override
-    public Void visitIdentifierExprNode(IdentifierExprNode node, Void expected) {
+    public Void visitCastPredicateExpressionNode(CastPredicateExpressionNode node, Void expected) {
         return null;
     }
 
     @Override
-    public Void visitCastPredicateExpressionNode(CastPredicateExpressionNode node, Void expected) {
+    public Void visitLTLBPredicateNode(LTLBPredicateNode node, Void expected) {
         return null;
     }
+
+    @Override
+    public Void visitIdentifierPredicateNode(IdentifierPredicateNode node, Void expected) {
+        return null;
+    }
+
+    @Override
+    public Void visitPredicateOperatorNode(PredicateOperatorNode node, Void expected) {
+       node.getPredicateArguments().forEach(predicateNode -> visitPredicateNode(predicateNode, null));
+       return null;
+    }
+
+    @Override
+    public Void visitQuantifiedPredicateNode(QuantifiedPredicateNode node, Void expected) {
+        return null;
+    }
+
+    @Override
+    public Void visitLetPredicateNode(LetPredicateNode node, Void expected) {
+        return null;
+    }
+
+    @Override
+    public Void visitIfPredicateNode(IfPredicateNode node, Void expected) {
+        return null;
+    }
+
+    @Override
+    public Void visitPredicateOperatorWithExprArgs(PredicateOperatorWithExprArgsNode node, Void expected) {
+
+        System.out.println("node expression" + node.getExpressionNodes());
+        System.out.println("node oper "+    node.getOperator());
+        return null;
+    }
+
 
     @Override
     public Void visitQuantifiedExpressionNode(QuantifiedExpressionNode node, Void expected) {
@@ -47,10 +142,6 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
         return null;
     }
 
-    @Override
-    public Void visitPredicateOperatorWithExprArgs(PredicateOperatorWithExprArgsNode node, Void expected) {
-        return null;
-    }
 
     @Override
     public Void visitNumberNode(NumberNode node, Void expected) {
@@ -102,35 +193,6 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
         return null;
     }
 
-    @Override
-    public Void visitLTLBPredicateNode(LTLBPredicateNode node, Void expected) {
-        return null;
-    }
-
-    @Override
-    public Void visitIdentifierPredicateNode(IdentifierPredicateNode node, Void expected) {
-        return null;
-    }
-
-    @Override
-    public Void visitPredicateOperatorNode(PredicateOperatorNode node, Void expected) {
-        return null;
-    }
-
-    @Override
-    public Void visitQuantifiedPredicateNode(QuantifiedPredicateNode node, Void expected) {
-        return null;
-    }
-
-    @Override
-    public Void visitLetPredicateNode(LetPredicateNode node, Void expected) {
-        return null;
-    }
-
-    @Override
-    public Void visitIfPredicateNode(IfPredicateNode node, Void expected) {
-        return null;
-    }
 
     @Override
     public Void visitVarSubstitutionNode(VarSubstitutionNode node, Void expected) {

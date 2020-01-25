@@ -32,11 +32,12 @@ public class TypeInfoGenerator  {
 
     public String generateTyp(DeclarationNode variable)
     {
-        System.out.println("l");
         ST type = currentGroup.getInstanceOf("type");
         TemplateHandler.add(type, "id", nameHandler.handleIdentifier(variable.getName(),
                 NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 
         return type.render();
     }
+
+
 }

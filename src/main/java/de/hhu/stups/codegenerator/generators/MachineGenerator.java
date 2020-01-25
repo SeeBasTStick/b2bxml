@@ -4,6 +4,7 @@ import de.hhu.stups.codegenerator.CodeGeneratorUtils;
 import de.hhu.stups.codegenerator.GeneratorMode;
 import de.hhu.stups.codegenerator.analyzers.DeferredSetAnalyzer;
 import de.hhu.stups.codegenerator.analyzers.RecordStructAnalyzer;
+import de.hhu.stups.codegenerator.analyzers.VariableTypAnalyzer;
 import de.hhu.stups.codegenerator.handlers.IterationConstructHandler;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.ParallelConstructHandler;
@@ -108,6 +109,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	private boolean isIncludedMachine;
 
+	private VariableTypAnalyzer variableTypAnalyzer;
+
 	private TypeInfoGenerator typeInfoGenerator;
 
 	public MachineGenerator(GeneratorMode mode, boolean useBigInteger, String minint, String maxint,
@@ -150,6 +153,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		this.iterationConstructDepth = 0;
 		this.isIncludedMachine = isIncludedMachine;
 
+
+		this.variableTypAnalyzer = new VariableTypAnalyzer();
 		this.typeInfoGenerator = new TypeInfoGenerator(nameHandler, currentGroup);
 	}
 
@@ -159,6 +164,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 	public String generateMachine(MachineNode node) {
 		recordStructAnalyzer.visitMachineNode(node);
 		deferredSetAnalyzer.analyze(node.getDeferredSets(), node.getProperties());
+		variableTypAnalyzer.visitMachineNode(node);
+
 		initialize(node);
 		ST machine = currentGroup.getInstanceOf("machine");
 		TemplateHandler.add(machine, "useBigInteger", useBigInteger);
