@@ -1,12 +1,59 @@
 keywords() ::= <<Machine>>
 
-machine(type_info, machine) ::= <<
+machine(type_info, invariant, abstract_variables, operations, initialisation, machine) ::= <<
 
 \<Machine name='<machine>' type='abstraction'>
 
-
+<abstract_variables>
+<invariant>
+<initialisation>
+<operations>
 <type_info>
 \</Machine>
+>>
+
+abstract_variable(ids, attrs) ::= <<
+\<Abstract_Variables>
+<ids; separator="\n">
+\</Abstract_Variables>
+>>
+
+id(val, typref) ::= <<
+\<Id value='<val>' typref='<typref>'>
+>>
+
+invariant(binary_pred, exp_comparison, quantified_pred, unary_pred, nary_pred) ::= <<
+\<Invariant>
+<nary_pred>
+\</Invariant>
+>>
+
+nary_pred(op, binary_pred, exp_comparisons, quantified_pred, unary_pred, nary_pred) ::= <<
+\<Nary_Pred op='<op>'>
+<exp_comparisons; separator="\ņ">
+\</Nary_Pred>
+>>
+
+exp_comparision(op, unary_exp, binary_exp, ternary_exp, nary_exp, boolean_literal, boolean_exp, empty_set, empty_seq,
+id, integer_literal, quantified_exp, quantified_set, string_literal, struct, record, real_literal, record_field_access)
+::= <<
+\<Exp_Comparision op='<op>'>
+<id>
+<binary_exp>
+<integer_literal>
+\</Exp_Comparision>
+>>
+
+binary_exp(op, typref, unary_exp, binary_exp, ternary_exp, nary_exp, boolean_literal, boolean_exp, empty_set, empty_seq,
+id, integer_literal, quantified_exp, quantified_set, string_literal, struct, record, real_literal, record_field_access)
+::= <<
+\<Binary_Exp op='<op>' typref='<typref>'>
+<integer_literals; separator="\n">
+\</Binary_Exp>
+>>
+
+integer_literal(val, typref) ::=<<
+\<Integer_Literal value='<val>' typref='<typref>'>
 >>
 
 type_info(types) ::= <<

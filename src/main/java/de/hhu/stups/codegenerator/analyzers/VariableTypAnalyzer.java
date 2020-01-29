@@ -27,6 +27,8 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
         node.getVariables().forEach(this::putInMap);
 
+
+
         node.getConstants().forEach(this::putInMap);
 
         if(node.getInitialisation() != null) {
@@ -37,7 +39,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
             visitPredicateNode(node.getProperties(), null);
         }
         if(node.getInvariant() != null) {
-            System.out.println(node.getInvariant());
+            System.out.println("Moving to Invariant: " + node.getInvariant());
             visitPredicateNode(node.getInvariant(), null);
         }
 
@@ -72,7 +74,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
     @Override
     public Void visitExprNode(ExprNode node, Void expected) {
-        System.out.println("Huhu");
+        System.out.println(node);
 
         return null;
     }
@@ -120,9 +122,8 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
     @Override
     public Void visitPredicateOperatorWithExprArgs(PredicateOperatorWithExprArgsNode node, Void expected) {
-
-        System.out.println("node expression" + node.getExpressionNodes());
-        System.out.println("node oper "+    node.getOperator());
+        System.out.println("node expression" + node.getExpressionNodes() + "node oper "+    node.getOperator() + " node type " + node.getType());
+        node.getExpressionNodes().forEach(exprNode -> visitExprNode(exprNode, null));
         return null;
     }
 

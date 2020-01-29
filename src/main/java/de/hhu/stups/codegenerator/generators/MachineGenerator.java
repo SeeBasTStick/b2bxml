@@ -11,6 +11,7 @@ import de.hhu.stups.codegenerator.handlers.ParallelConstructHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.MachineNode;
+import de.prob.parser.ast.nodes.Node;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.expression.ExprNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
@@ -49,6 +50,7 @@ import de.prob.parser.ast.nodes.substitution.OperationCallSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.SkipSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.VarSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.WhileSubstitutionNode;
+import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.UntypedType;
 import de.prob.parser.ast.visitors.AbstractVisitor;
 import org.stringtemplate.v4.ST;
@@ -58,7 +60,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /*
@@ -113,6 +117,13 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	private TypeInfoGenerator typeInfoGenerator;
 
+	private AbstractVariablesGenerator abstractVariablesGenerator;
+
+	private HashMap<Integer, BType> nodeType;
+
+
+
+
 	public MachineGenerator(GeneratorMode mode, boolean useBigInteger, String minint, String maxint,
 							String deferredSetSize, Path addition, boolean isIncludedMachine) {
 		this.currentGroup = CodeGeneratorUtils.getGroup(mode);
@@ -154,7 +165,11 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		this.isIncludedMachine = isIncludedMachine;
 
 
+		this.nodeType = new HashMap<>();
+
 		this.variableTypAnalyzer = new VariableTypAnalyzer();
+		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType, nameHandler, currentGroup);
+
 		this.typeInfoGenerator = new TypeInfoGenerator(nameHandler, currentGroup);
 	}
 
@@ -202,6 +217,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
 				new ArrayList<>());
 		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());*/
+		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateTypeInfo(node.getVariables()));
 		TemplateHandler.add(machine, "type_info", typeInfoGenerator.generateTypeInfo(node.getVariables()));
 	}
 

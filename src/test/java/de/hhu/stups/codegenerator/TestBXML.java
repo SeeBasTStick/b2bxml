@@ -10,7 +10,8 @@ public class TestBXML {
 
     public void testC(String machine) throws Exception {
         Path mchPath = Paths.get(CodeGenerator.class.getClassLoader()
-                .getResource("de/hhu/stups/codegenerator/" + machine + ".mch").toURI());
+                .getResource("" + machine + ".mch").toURI());
+        System.out.println(mchPath);
         CodeGenerator codeGenerator = new CodeGenerator();
         List<Path> bxmlFilePaths = codeGenerator.generate(mchPath, GeneratorMode.BXML, false,
                 String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE), "10",
@@ -24,9 +25,9 @@ public class TestBXML {
 
     @Test
     public void testExample() throws Exception {
-       // testC("Mega");
+        testC("Mega");
         System.out.println("---------------------"
         );
-        testC("foo");
+      //  testC("foo");
     }
 }
