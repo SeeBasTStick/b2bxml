@@ -119,6 +119,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	private AbstractVariablesGenerator abstractVariablesGenerator;
 
+	private InvariantGenerator invariantGenerator;
+
 	private HashMap<Integer, BType> nodeType;
 
 
@@ -169,7 +171,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 		this.variableTypAnalyzer = new VariableTypAnalyzer();
 		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType, nameHandler, currentGroup);
-
+		this.invariantGenerator = new InvariantGenerator(nodeType, nameHandler, currentGroup);
 		this.typeInfoGenerator = new TypeInfoGenerator(nameHandler, currentGroup);
 	}
 
@@ -217,7 +219,8 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
 				new ArrayList<>());
 		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());*/
-		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateTypeInfo(node.getVariables()));
+		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateAbstractVariables(node.getVariables()));
+		TemplateHandler.add(machine, "invariant", invariantGenerator.generateInvariants(node.getInvariant()));
 		TemplateHandler.add(machine, "type_info", typeInfoGenerator.generateTypeInfo(node.getVariables()));
 	}
 

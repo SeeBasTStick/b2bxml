@@ -38,15 +38,16 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
         if(node.getProperties() != null) {
             visitPredicateNode(node.getProperties(), null);
         }
+
         if(node.getInvariant() != null) {
-            System.out.println("Moving to Invariant: " + node.getInvariant());
+   //         System.out.println("Moving to Invariant: " + node.getInvariant());
             visitPredicateNode(node.getInvariant(), null);
         }
 
        // node.getValues().forEach(substitution -> visitSubstitutionNode(substitution, null));
 
-        System.out.println(nameType);
-        System.out.println(variableType);
+   //     System.out.println(nameType);
+     //   System.out.println(variableType);
     }
 
     private void putInMap(DeclarationNode node){
@@ -56,7 +57,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
             {
                 variableType.put(node.getType(), node.getType().hashCode());
             }
-            System.out.println(node);
+      //      System.out.println(node);
         }
     }
 
@@ -74,7 +75,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
     @Override
     public Void visitExprNode(ExprNode node, Void expected) {
-        System.out.println(node);
+     //   System.out.println(node);
 
         return null;
     }
@@ -122,7 +123,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
 
     @Override
     public Void visitPredicateOperatorWithExprArgs(PredicateOperatorWithExprArgsNode node, Void expected) {
-        System.out.println("node expression" + node.getExpressionNodes() + "node oper "+    node.getOperator() + " node type " + node.getType());
+     //   System.out.println("node expression" + node.getExpressionNodes() + "node oper "+    node.getOperator() + " node type " + node.getType());
         node.getExpressionNodes().forEach(exprNode -> visitExprNode(exprNode, null));
         return null;
     }
