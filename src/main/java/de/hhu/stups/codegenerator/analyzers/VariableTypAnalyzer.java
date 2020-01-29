@@ -35,6 +35,7 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
             visitSubstitutionNode(node.getInitialisation(), null);
         }
 
+
         if(node.getProperties() != null) {
             visitPredicateNode(node.getProperties(), null);
         }

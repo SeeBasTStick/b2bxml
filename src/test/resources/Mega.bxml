@@ -1,114 +1,114 @@
 <Machine name='Mega' type='abstraction'>
-<Abstract_Variables>
-<Id value='ii' typref='2701647786'/>
-<Id value='jj' typref='2701647786'/>
-</Abstract_Variables>
-<Invariant>
-<Nary_Pred op='&amp;'>
-<Exp_Comparison op=':'>
-<Id value='ii' typref='2701647786'/>
-<Binary_Exp op='..' typref='3603043417'>
-<Integer_Literal value='0' typref='2701647786'/>
-<Integer_Literal value='10' typref='2701647786'/>
-</Binary_Exp>
-</Exp_Comparison>
-<Exp_Comparison op=':'>
-<Id value='jj' typref='2701647786'/>
-<Binary_Exp op='..' typref='3603043417'>
-<Integer_Literal value='0' typref='2701647786'/>
-<Integer_Literal value='10' typref='2701647786'/>
-</Binary_Exp>
-</Exp_Comparison>
-<Exp_Comparison op='&lt;'>
-<Id value='ii' typref='2701647786'/>
-<Integer_Literal value='11' typref='2701647786'/>
-</Exp_Comparison>
-<Exp_Comparison op='&gt;='>
-<Id value='jj' typref='2701647786'/>
-<Integer_Literal value='0' typref='2701647786'/>
-</Exp_Comparison>
-</Nary_Pred>
-</Invariant>
-<Initialisation>
-<Assignement_Sub>
-<Variables>
-<Id value='ii' typref='2701647786'/>
-<Id value='jj' typref='2701647786'/>
-</Variables>
-<Values>
-<Integer_Literal value='2' typref='2701647786'/>
-<Integer_Literal value='10' typref='2701647786'/>
-</Values>
-</Assignement_Sub>
-</Initialisation>
-<Operations>
-<Operation name='inc'>
-<Body>
-<Select>
-<When_Clauses>
-<When>
-<Condition>
-<Exp_Comparison op='&gt;'>
-<Id value='jj' typref='2701647786'/>
-<Integer_Literal value='0' typref='2701647786'/>
-</Exp_Comparison>
-</Condition>
-<Then>
-<Nary_Sub op='||'>
-<Assignement_Sub>
-<Variables>
-<Id value='ii' typref='2701647786'/>
-</Variables>
-<Values>
-<Binary_Exp op='+' typref='2701647786'>
-<Id value='ii' typref='2701647786'/>
-<Integer_Literal value='1' typref='2701647786'/>
-</Binary_Exp>
-</Values>
-</Assignement_Sub>
-<Assignement_Sub>
-<Variables>
-<Id value='jj' typref='2701647786'/>
-</Variables>
-<Values>
-<Binary_Exp op='-' typref='2701647786'>
-<Id value='jj' typref='2701647786'/>
-<Integer_Literal value='1' typref='2701647786'/>
-</Binary_Exp>
-</Values>
-</Assignement_Sub>
-</Nary_Sub>
-</Then>
-</When>
-</When_Clauses>
-</Select>
-</Body>
-</Operation>
-<Operation name='res'>
-<Output_Parameters>
-<Id value='result' typref='2701647786'/>
-</Output_Parameters>
-<Body>
-<Assignement_Sub>
-<Variables>
-<Id value='result' typref='2701647786'/>
-</Variables>
-<Values>
-<Id value='ii' typref='2701647786'/>
-</Values>
-</Assignement_Sub>
-</Body>
-</Operation>
-</Operations>
-<TypeInfos>
-<Type id='2701647786'>
-<Id value='INTEGER'/>
-</Type>
-<Type id='3603043417'>
-<Unary_Exp op='POW'>
-<Id value='INTEGER'/>
-</Unary_Exp>
-</Type>
-</TypeInfos>
+    <Abstract_Variables>
+        <Id value='ii' typref='2701647786'/>
+        <Id value='jj' typref='2701647786'/>
+    </Abstract_Variables>
+    <Invariant>
+        <Nary_Pred op='&amp;'>
+            <Exp_Comparison op=':'>
+                <Id value='ii' typref='2701647786'/>
+                <Binary_Exp op='..' typref='3603043417'>
+                    <Integer_Literal value='0' typref='2701647786'/>
+                    <Integer_Literal value='10' typref='2701647786'/>
+                </Binary_Exp>
+            </Exp_Comparison>
+            <Exp_Comparison op=':'>
+                <Id value='jj' typref='2701647786'/>
+                <Binary_Exp op='..' typref='3603043417'>
+                    <Integer_Literal value='0' typref='2701647786'/>
+                    <Integer_Literal value='10' typref='2701647786'/>
+                </Binary_Exp>
+            </Exp_Comparison>
+            <Exp_Comparison op='&lt;'>
+                <Id value='ii' typref='2701647786'/>
+                <Integer_Literal value='11' typref='2701647786'/>
+            </Exp_Comparison>
+            <Exp_Comparison op='&gt;='>
+                <Id value='jj' typref='2701647786'/>
+                <Integer_Literal value='0' typref='2701647786'/>
+            </Exp_Comparison>
+        </Nary_Pred>
+    </Invariant>
+    <Initialis  ation>
+        <Assignement_Sub>
+            <Variables>
+                <Id value='ii' typref='2701647786'/>
+                <Id value='jj' typref='2701647786'/>
+            </Variables>
+            <Values>
+                <Integer_Literal value='2' typref='2701647786'/>
+                <Integer_Literal value='10' typref='2701647786'/>
+            </Values>
+        </Assignement_Sub>
+    </Initialisation>
+    <Operations>
+        <Operation name='inc'>
+            <Body>
+                <Select>
+                    <When_Clauses>
+                        <When>
+                            <Condition>
+                                <Exp_Comparison op='&gt;'>
+                                    <Id value='jj' typref='2701647786'/>
+                                    <Integer_Literal value='0' typref='2701647786'/>
+                                </Exp_Comparison>
+                            </Condition>
+                            <Then>
+                                <Nary_Sub op='||'>
+                                    <Assignement_Sub>
+                                        <Variables>
+                                            <Id value='ii' typref='2701647786'/>
+                                        </Variables>
+                                        <Values>
+                                            <Binary_Exp op='+' typref='2701647786'>
+                                                <Id value='ii' typref='2701647786'/>
+                                                <Integer_Literal value='1' typref='2701647786'/>
+                                            </Binary_Exp>
+                                        </Values>
+                                    </Assignement_Sub>
+                                    <Assignement_Sub>
+                                        <Variables>
+                                            <Id value='jj' typref='2701647786'/>
+                                        </Variables>
+                                        <Values>
+                                            <Binary_Exp op='-' typref='2701647786'>
+                                                <Id value='jj' typref='2701647786'/>
+                                                <Integer_Literal value='1' typref='2701647786'/>
+                                            </Binary_Exp>
+                                        </Values>
+                                    </Assignement_Sub>
+                                </Nary_Sub>
+                            </Then>
+                        </When>
+                    </When_Clauses>
+                </Select>
+            </Body>
+        </Operation>
+        <Operation name='res'>
+            <Output_Parameters>
+                <Id value='result' typref='2701647786'/>
+            </Output_Parameters>
+            <Body>
+                <Assignement_Sub>
+                    <Variables>
+                        <Id value='result' typref='2701647786'/>
+                    </Variables>
+                    <Values>
+                        <Id value='ii' typref='2701647786'/>
+                    </Values>
+                </Assignement_Sub>
+            </Body>
+        </Operation>
+    </Operations>
+    <TypeInfos>
+        <Type id='2701647786'>
+            <Id value='INTEGER'/>
+        </Type>
+        <Type id='3603043417'>
+            <Unary_Exp op='POW'>
+                <Id value='INTEGER'/>
+            </Unary_Exp>
+        </Type>
+    </TypeInfos>
 
 </Machine>

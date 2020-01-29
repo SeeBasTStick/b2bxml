@@ -24,14 +24,18 @@ public class InvariantGenerator extends BXMLBodyGenerator {
 
     public String generateInvariants(PredicateNode node){
 
+        String result;
         switch (node.getClass().getSimpleName()){
             case "PredicateOperatorNode":
                 PredicateOperatorNode predicateOperatorNode = (PredicateOperatorNode) node;
-                processPredicateOperatorNode(predicateOperatorNode);
+                ST invariant = super.getSTGroup().getInstanceOf("invariant");
+                TemplateHandler.add(invariant, "body", processPredicateOperatorNode(predicateOperatorNode));
+                result = invariant.render();
                 // do stuff
 
                 break;
             default:
+                result = "";
                 try {
                     throw new Exception(node.getClass().getSimpleName()+ " not yet implemented");
                 } catch (Exception e) {
@@ -40,44 +44,61 @@ public class InvariantGenerator extends BXMLBodyGenerator {
         }
 
 
-        return "";
+        return result;
     }
 
-    private void processPredicateOperatorNode(PredicateOperatorNode node)
+    private String processPredicateOperatorNode(PredicateOperatorNode node)
     {
+        String result = "";
         if(node.getPredicateArguments().size() == 1){
+            result = "";
             //ToDo ExprComparision and more
         }
         else{
+            System.out.println(node);
             ST nary_pred = super.getSTGroup().getInstanceOf("nary_pred");
-            ST op = super.getSTGroup().getInstanceOf("op");
-            TemplateHandler.add(op, "op", generateOperatorNAry(node));
-            TemplateHandler.add(nary_pred, "exp_comparisons", node.getPredicateArguments().stream()
-                    .map(this::generateInvariant)
+            TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
+            TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
+                    .map(this::generatePredicateNode)
                     .collect(Collectors.toList()));
+            result = nary_pred.render();
+
         }
+
+        return result;
     }
 
-    private String generateInvariant(PredicateNode node)
+    private String generatePredicateNode(PredicateNode node)
     {
+        String result ;
+        System.out.println("genPre "+ node);
         switch (node.getClass().getSimpleName()){
             case "PredicateOperatorWithExprArgsNode":
                 PredicateOperatorWithExprArgsNode predicateOperatorWithExprArgsNode = (PredicateOperatorWithExprArgsNode) node;
-                ST op = super.getSTGroup().getInstanceOf("op");
-                TemplateHandler.add(op, "op", generateOperatorPredOperatorExprArgs(predicateOperatorWithExprArgsNode.getOperator()));
+                ST expComparision = super.getSTGroup().getInstanceOf("exp_comparision");
+                TemplateHandler.add(expComparision, "op",
+                        generateOperatorPredOperatorExprArgs(predicateOperatorWithExprArgsNode.getOperator()));
+                TemplateHandler.add(expComparision, "statements",
+                        predicateOperatorWithExprArgsNode.getExpressionNodes().stream()
+                                .map(this::processExprNode)
+                                .collect(Collectors.toList()));
 
-                predicateOperatorWithExprArgsNode.getExpressionNodes().stream().map(this::processExprNode).collect(Collectors.toList());
-
-
-                ST binary_exp = super.getSTGroup().getInstanceOf("binary_exp");
-                ST integer_literal = super.getSTGroup().getInstanceOf("integer_literals");
+                result = expComparision.render();
+                break;
+            default:
+                result = "";
+                try {
+                    throw new Exception(node.getClass().getSimpleName()+ " not yet implemented");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
         }
-        return "";
+        return result;
     }
 
     private String processExprNode(ExprNode node){
-        System.out.println(node.getClass());
+        System.out.println("proExpr " + node);
         String result;
 
         switch (node.getClass().getSimpleName()){
@@ -129,10 +150,12 @@ public class InvariantGenerator extends BXMLBodyGenerator {
                         NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 
                 TemplateHandler.add(binary_exp, "typref", node.getType().hashCode());
+
+                TemplateHandler.add(binary_exp, "body",  node.getExpressionNodes().stream()
+                        .map(this::processExprNode)
+                        .collect(Collectors.toList()));
+
                 super.getNodeTyp().put(node.getType().hashCode(), node.getType());
-
-                node.getExpressionNodes().stream().map(this::processExprNode).collect(Collectors.toList());
-
                 result = binary_exp.render();
                 break;
             default:
@@ -151,22 +174,22 @@ public class InvariantGenerator extends BXMLBodyGenerator {
         String result;
         switch (operator){
             case LESS:
-                result ="&lt";
+                result ="&lt;";
                 break;
             case GREATER:
-                result ="&gt";
+                result ="&gt;";
                 break;
             case EQUAL:
-                result="&eq";
+                result="&eq;";
                 break;
             case NOT_EQUAL:
-                result="&neq";
+                result="&neq;";
                 break;
             case GREATER_EQUAL:
-                result="&geq";
+                result="&gt;=";
                 break;
             case LESS_EQUAL:
-                result="&leq";
+                result="&lt;=";
                 break;
             case ELEMENT_OF:
                 result=":";

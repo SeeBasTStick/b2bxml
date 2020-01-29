@@ -1,69 +1,80 @@
 keywords() ::= <<Machine>>
 
 machine(type_info, invariant, abstract_variables, operations, initialisation, machine) ::= <<
-
 \<Machine name='<machine>' type='abstraction'>
-
-<abstract_variables>
-<invariant>
-<initialisation>
-<operations>
-<type_info>
+    <abstract_variables>
+    <invariant>
+    <initialisation>
+    <operations>
+    <type_info>
 \</Machine>
+>>
+
+initialisation(body) ::= <<
+\<Initialisation>
+    <body>
+\</Initialisation>
+>>
+
+assignment_sub(body1, body2) ::= <<
+\<Assignement_Sub>
+    \<Variables>
+        <body1>
+    \</Variables>
+    \<Values>
+        <body2>
+    \</Values>
+\</Assignement_Sub>
 >>
 
 abstract_variable(ids, attrs) ::= <<
 \<Abstract_Variables>
-<ids; separator="\n">
+    <ids; separator="\n">
 \</Abstract_Variables>
 >>
 
 id(val, typref) ::= <<
-\<Id value='<val>' typref='<typref>'>
+\<Id value='<val>' typref='<typref>'/>
 >>
 
-invariant(binary_pred, exp_comparison, quantified_pred, unary_pred, nary_pred) ::= <<
+invariant(body) ::= <<
 \<Invariant>
-<nary_pred>
+    <body>
 \</Invariant>
 >>
 
-nary_pred(op, binary_pred, exp_comparisons, quantified_pred, unary_pred, nary_pred) ::= <<
+nary_pred(op, statements) ::= <<
 \<Nary_Pred op='<op>'>
-<exp_comparisons; separator="\ņ">
+    <statements; separator="\n">
 \</Nary_Pred>
 >>
 
-exp_comparision(op, unary_exp, binary_exp, ternary_exp, nary_exp, boolean_literal, boolean_exp, empty_set, empty_seq,
-id, integer_literal, quantified_exp, quantified_set, string_literal, struct, record, real_literal, record_field_access)
+exp_comparision(op, statements)
 ::= <<
-\<Exp_Comparision op='<op>'>
-<id>
-<binary_exp>
-<integer_literal>
-\</Exp_Comparision>
+\<Exp_Comparison op='<op>'>
+    <statements; separator="\n">
+\</Exp_Comparison>
 >>
 
-binary_exp(op, typref, unary_exp, binary_exp, ternary_exp, nary_exp, boolean_literal, boolean_exp, empty_set, empty_seq,
-id, integer_literal, quantified_exp, quantified_set, string_literal, struct, record, real_literal, record_field_access)
+binary_exp(op, typref, body)
 ::= <<
 \<Binary_Exp op='<op>' typref='<typref>'>
-<integer_literals; separator="\n">
+    <body; separator="\n">
 \</Binary_Exp>
 >>
 
 integer_literal(val, typref) ::=<<
-\<Integer_Literal value='<val>' typref='<typref>'>
+\<Integer_Literal value='<val>' typref='<typref>'/>
 >>
 
 type_info(types) ::= <<
 \<TypeInfos>
-<types; separator="\n">
+    <types; separator="\n">
 \</TypeInfos>
 >>
 
 type(id) ::= <<
-\</Type id='<id>'>
+\<Type id='<id>'>
 
 \</Type>
 >>
