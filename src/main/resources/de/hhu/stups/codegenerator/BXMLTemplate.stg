@@ -10,6 +10,42 @@ machine(type_info, invariant, abstract_variables, operations, initialisation, ma
 \</Machine>
 >>
 
+operations(operation) ::=<<
+\<Operations>
+    <operation; separator="\n">
+\</Operations>
+>>
+
+operation(name, output_parameter, parameter, body) ::=<<
+\<Operation name='<name>'>
+    \<Output_Parameters>
+        <output_parameter; separator="\n">
+     \</Output_Parameters>
+    <parameter>
+    \<Body>
+        <body; separator="\n">
+    \</Body>
+\</Operation>
+>>
+
+
+
+
+select(conditions, then) ::= <<
+\<Select>
+    \<When_Clauses>
+        \<When>
+            \<Condition>
+                <conditions; separator="\n">
+            \</Condition>
+            \<Then>
+                <then>
+            \</Then>
+        \</When>
+    \</When_Clauses>
+\</Select>
+>>
+
 initialisation(body) ::= <<
 \<Initialisation>
     <body>
@@ -19,10 +55,10 @@ initialisation(body) ::= <<
 assignment_sub(body1, body2) ::= <<
 \<Assignement_Sub>
     \<Variables>
-        <body1>
+        <body1; separator="\n">
     \</Variables>
     \<Values>
-        <body2>
+        <body2; separator="\n">
     \</Values>
 \</Assignement_Sub>
 >>
@@ -47,6 +83,12 @@ nary_pred(op, statements) ::= <<
 \<Nary_Pred op='<op>'>
     <statements; separator="\n">
 \</Nary_Pred>
+>>
+
+nary_sub(op,statements) ::= <<
+\<Nary_Sub op='<op>'>
+    <statements; separator="\n">
+\</Nary_Sub>
 >>
 
 exp_comparision(op, statements)

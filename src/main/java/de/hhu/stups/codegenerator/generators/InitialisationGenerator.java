@@ -13,8 +13,6 @@ public class InitialisationGenerator extends BXMLBodyGenerator{
     }
 
     public String generateInitialisation(SubstitutionNode node){
-
-
-        return "";
+       return processSubstitutionNode(node);
     }
 }

@@ -19,10 +19,10 @@ public class AbstractVariablesGenerator extends BXMLBodyGenerator {
         super(nodeType, nameHandler, currentGroup);
     }
 
-    public String generateAbstractVariables(List<DeclarationNode> variables){
+    public String generateAbstractVariables(List<DeclarationNode> declarations){
         ST typeInfo = super.getSTGroup().getInstanceOf("abstract_variable");
-        TemplateHandler.add(typeInfo, "ids", variables.stream()
-                .map(this::generateIDs)
+        TemplateHandler.add(typeInfo, "ids", declarations.stream()
+                .map(super::processDeclarationNode)
                 .collect(Collectors.toList()));
 
         //TODO Attrs
@@ -30,15 +30,4 @@ public class AbstractVariablesGenerator extends BXMLBodyGenerator {
         return typeInfo.render();
     }
 
-    public String generateIDs(DeclarationNode variable)
-    {
-        ST id = super.getSTGroup().getInstanceOf("id");
-        TemplateHandler.add(id, "val", super.getNameHandler().handleIdentifier(variable.getName(),
-                NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
-
-        TemplateHandler.add(id, "typref", variable.getType().hashCode());
-
-        super.getNodeTyp().put(variable.getType().hashCode(), variable.getType());
-        return id.render();
-    }
 }

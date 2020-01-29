@@ -29,7 +29,7 @@
             </Exp_Comparison>
         </Nary_Pred>
     </Invariant>
-    <Initialis  ation>
+    <Initialisation>
         <Assignement_Sub>
             <Variables>
                 <Id value='ii' typref='2701647786'/>

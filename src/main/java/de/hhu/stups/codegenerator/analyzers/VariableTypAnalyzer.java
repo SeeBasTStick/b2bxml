@@ -45,6 +45,8 @@ public class VariableTypAnalyzer implements AbstractVisitor<Void, Void> {
             visitPredicateNode(node.getInvariant(), null);
         }
 
+
+
        // node.getValues().forEach(substitution -> visitSubstitutionNode(substitution, null));
 
    //     System.out.println(nameType);
