@@ -19,8 +19,6 @@ public class TestBXML {
 
         System.out.println(bxmlFilePaths);
         //cFilePaths.forEach(path -> cleanUp(path.toString()));
-
-
     }
 
     @Test

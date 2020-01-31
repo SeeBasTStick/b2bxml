@@ -178,7 +178,7 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 		this.invariantGenerator = new InvariantGenerator(nodeType, nameHandler, currentGroup);
 		this.initialisationGenerator = new InitialisationGenerator(nodeType, nameHandler, currentGroup);
 		this.operationsGenerator = new OperationsGenerator(nodeType, nameHandler, currentGroup);
-		this.typeInfoGenerator = new TypeInfoGenerator(nameHandler, currentGroup);
+		this.typeInfoGenerator = new TypeInfoGenerator(nodeType, nameHandler, currentGroup);
 	}
 
 	/*

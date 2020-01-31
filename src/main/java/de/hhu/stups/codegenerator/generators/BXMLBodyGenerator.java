@@ -9,6 +9,7 @@ import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
 import de.prob.parser.ast.nodes.expression.NumberNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
+import de.prob.parser.ast.nodes.predicate.PredicateOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
 import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
@@ -17,6 +18,7 @@ import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.parser.ast.types.BType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,9 +66,9 @@ public abstract class BXMLBodyGenerator {
                 TemplateHandler.add(id, "val", nameHandler.handleIdentifier(identifierExprNode.getName(),
                         NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 
-                TemplateHandler.add(id, "typref", identifierExprNode.getType().hashCode());
+                TemplateHandler.add(id, "typref", generateHash(identifierExprNode.getType()));
 
-                nodeType.put(identifierExprNode.getType().hashCode(), identifierExprNode.getType());
+                nodeType.put(generateHash(identifierExprNode.getType()), identifierExprNode.getType());
                 result = id.render();
                 break;
             case "ExpressionOperatorNode":
@@ -79,9 +81,9 @@ public abstract class BXMLBodyGenerator {
                 TemplateHandler.add(integer_literal, "val", nameHandler.handleIdentifier(numberNode.getValue().toString(),
                         NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 
-                TemplateHandler.add(integer_literal, "typref", numberNode.getType().hashCode());
+                TemplateHandler.add(integer_literal, "typref", generateHash(numberNode.getType()));
 
-                nodeType.put(numberNode.getType().hashCode(), numberNode.getType());
+                nodeType.put(generateHash(numberNode.getType()), numberNode.getType());
                 result = integer_literal.render();
                 break;
             default:
@@ -107,17 +109,16 @@ public abstract class BXMLBodyGenerator {
                 break;
 
             case MINUS:
-                TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("+",
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
-                break;
-
-            case PLUS:
                 TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("-",
                         NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
                 break;
 
+            case PLUS:
+                TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("+",
+                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                break;
+
             default:
-                result = "";
                 try {
                     throw new Exception(node.getOperator() + " not implemented yet");
                 } catch (Exception e) {
@@ -125,13 +126,14 @@ public abstract class BXMLBodyGenerator {
                 }
         }
 
-        TemplateHandler.add(binary_exp, "typref", node.getType().hashCode());
+        TemplateHandler.add(binary_exp, "typref", generateHash(node.getType()));
 
         TemplateHandler.add(binary_exp, "body",  node.getExpressionNodes().stream()
                 .map(this::processExprNode)
                 .collect(Collectors.toList()));
 
-        nodeType.put(node.getType().hashCode(), node.getType());
+        System.out.println("node " + node + " has type " + node.getType().toString() + "with hash " + generateHash(node.getType()));
+        nodeType.put(generateHash(node.getType()), node.getType());
         result = binary_exp.render();
 
         return result;
@@ -216,12 +218,48 @@ public abstract class BXMLBodyGenerator {
 
                 result = expComparision.render();
                 break;
+            case "PredicateOperatorNode":
+                PredicateOperatorNode predicateOperatorNode = (PredicateOperatorNode) node;
+                ST invariant = currentGroup.getInstanceOf("invariant");
+                TemplateHandler.add(invariant, "body", processPredicateOperatorNode(predicateOperatorNode));
+                result = invariant.render();
+                // do stuff
+
+                break;
             default:
                 result = exceptionThrower(node);
 
         }
         return result;
     }
+
+    private String processPredicateOperatorNode(PredicateOperatorNode node)
+    {
+        String result = "";
+        if(node.getPredicateArguments().size() == 1){
+            result = "";
+            //ToDo ExprComparision and more
+        }
+        else{
+            //System.out.println(node);
+            ST nary_pred = currentGroup.getInstanceOf("nary_pred");
+            TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
+            TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
+                    .map(this::processPredicateNode)
+                    .collect(Collectors.toList()));
+            result = nary_pred.render();
+
+        }
+
+        return result;
+    }
+
+
+    private String generateOperatorNAry(PredicateOperatorNode node)
+    {
+        return "&amp;";
+    }
+
 
     private String processOperatorPredOperatorExprArgs(PredicateOperatorWithExprArgsNode.PredOperatorExprArgs operator){
         String result;
@@ -264,11 +302,15 @@ public abstract class BXMLBodyGenerator {
         TemplateHandler.add(id, "val", nameHandler.handleIdentifier(node.getName(),
                 NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
 
-        TemplateHandler.add(id, "typref", node.getType().hashCode());
+        TemplateHandler.add(id, "typref", generateHash(node.getType()));
 
-        nodeType.put(node.getType().hashCode(), node.getType());
+        nodeType.put(generateHash(node.getType()), node.getType());
         return id.render();
     }
 
+    private int generateHash(BType type)
+    {
+        return Math.abs(type.toString().hashCode());
+    }
 
 }

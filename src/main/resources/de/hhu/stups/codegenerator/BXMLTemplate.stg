@@ -73,6 +73,10 @@ id(val, typref) ::= <<
 \<Id value='<val>' typref='<typref>'/>
 >>
 
+id_blank(val) ::= <<
+\<Id value='<val>'/>
+>>
+
 invariant(body) ::= <<
 \<Invariant>
     <body>
@@ -91,18 +95,22 @@ nary_sub(op,statements) ::= <<
 \</Nary_Sub>
 >>
 
-exp_comparision(op, statements)
-::= <<
+exp_comparision(op, statements)::= <<
 \<Exp_Comparison op='<op>'>
     <statements; separator="\n">
 \</Exp_Comparison>
 >>
 
-binary_exp(op, typref, body)
-::= <<
+binary_exp(op, typref, body)::= <<
 \<Binary_Exp op='<op>' typref='<typref>'>
     <body; separator="\n">
 \</Binary_Exp>
+>>
+
+unary_exp(op, body) ::= <<
+\<Unary_Exp op='<op>'>
+    <body>
+\</Unary_Exp>
 >>
 
 integer_literal(val, typref) ::=<<
@@ -115,9 +123,9 @@ type_info(types) ::= <<
 \</TypeInfos>
 >>
 
-type(id) ::= <<
+type(id, body) ::= <<
 \<Type id='<id>'>
-
+    <body>
 \</Type>
 >>
 
