@@ -30,7 +30,7 @@ dependencies {
     compile group: 'org.antlr', name: 'ST4', version: '4.1'
     // antlr parser dependency
     compile 'com.github.hhu-stups:antlr-parser:-SNAPSHOT' // https://github.com/hhu-stups/antlr-parser'
-
+    implementation 'org.xmlunit:xmlunit-core:2.6.3' //https://github.com/xmlunit/user-guide
     testCompile 'junit:junit:4.8.2'
 }
 

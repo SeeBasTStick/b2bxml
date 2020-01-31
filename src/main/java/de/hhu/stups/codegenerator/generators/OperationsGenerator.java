@@ -30,9 +30,12 @@ public class OperationsGenerator extends BXMLBodyGenerator {
 
         if(!node.getOutputParams().isEmpty())
         {
-            TemplateHandler.add(operation, "output_parameter", node.getOutputParams().stream()
+            ST outputParameters = super.getSTGroup().getInstanceOf("output_parameters");
+            TemplateHandler.add(outputParameters, "body", node.getOutputParams().stream()
                     .map(this::processDeclarationNode)
                     .collect(Collectors.toList()));
+
+            TemplateHandler.add(operation, "output_parameters", outputParameters.render());
         }
 
         if(!node.getParams().isEmpty())

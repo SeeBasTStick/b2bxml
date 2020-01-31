@@ -99,7 +99,7 @@ public abstract class BXMLBodyGenerator {
 
     protected String processExpressionOperatorNode(ExpressionOperatorNode node){
 
-        String result = "";
+        String result;
         ST binary_exp = currentGroup.getInstanceOf("binary_exp");
 
         switch (node.getOperator()){
@@ -132,7 +132,7 @@ public abstract class BXMLBodyGenerator {
                 .map(this::processExprNode)
                 .collect(Collectors.toList()));
 
-        System.out.println("node " + node + " has type " + node.getType().toString() + "with hash " + generateHash(node.getType()));
+    //    System.out.println("node " + node + " has type " + node.getType().toString() + "with hash " + generateHash(node.getType()));
         nodeType.put(generateHash(node.getType()), node.getType());
         result = binary_exp.render();
 
@@ -235,7 +235,7 @@ public abstract class BXMLBodyGenerator {
 
     private String processPredicateOperatorNode(PredicateOperatorNode node)
     {
-        String result = "";
+        String result ;
         if(node.getPredicateArguments().size() == 1){
             result = "";
             //ToDo ExprComparision and more

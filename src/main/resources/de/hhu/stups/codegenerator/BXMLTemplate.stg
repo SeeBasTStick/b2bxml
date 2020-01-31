@@ -16,11 +16,9 @@ operations(operation) ::=<<
 \</Operations>
 >>
 
-operation(name, output_parameter, parameter, body) ::=<<
+operation(name, output_parameters, parameter, body) ::=<<
 \<Operation name='<name>'>
-    \<Output_Parameters>
-        <output_parameter; separator="\n">
-     \</Output_Parameters>
+    <output_parameters>
     <parameter>
     \<Body>
         <body; separator="\n">
@@ -28,6 +26,11 @@ operation(name, output_parameter, parameter, body) ::=<<
 \</Operation>
 >>
 
+output_parameters(body) ::=<<
+\<Output_Parameters>
+    <body; separator="\n">
+\</Output_Parameters>
+>>
 
 
 
