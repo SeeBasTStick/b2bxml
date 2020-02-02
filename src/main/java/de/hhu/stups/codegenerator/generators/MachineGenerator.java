@@ -4,14 +4,12 @@ import de.hhu.stups.codegenerator.CodeGeneratorUtils;
 import de.hhu.stups.codegenerator.GeneratorMode;
 import de.hhu.stups.codegenerator.analyzers.DeferredSetAnalyzer;
 import de.hhu.stups.codegenerator.analyzers.RecordStructAnalyzer;
-import de.hhu.stups.codegenerator.analyzers.VariableTypAnalyzer;
 import de.hhu.stups.codegenerator.handlers.IterationConstructHandler;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.ParallelConstructHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.MachineNode;
-import de.prob.parser.ast.nodes.Node;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.expression.ExprNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
@@ -62,7 +60,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /*
@@ -113,8 +110,6 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 	private boolean isIncludedMachine;
 
-	private VariableTypAnalyzer variableTypAnalyzer;
-
 	private TypeInfoGenerator typeInfoGenerator;
 
 	private AbstractVariablesGenerator abstractVariablesGenerator;
@@ -142,43 +137,45 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 			}
 		}
 		this.nameHandler = new NameHandler(currentGroup);
-		this.parallelConstructHandler = new ParallelConstructHandler();
-		this.typeGenerator = new TypeGenerator(currentGroup, nameHandler, this);
-		this.importGenerator = new ImportGenerator(currentGroup, nameHandler, useBigInteger);
-		this.iterationConstructHandler = new IterationConstructHandler(currentGroup, this, nameHandler,
-				typeGenerator, importGenerator);
-		this.deferredSetAnalyzer = new DeferredSetAnalyzer(Integer.parseInt(deferredSetSize));
-		this.declarationGenerator = new DeclarationGenerator(currentGroup, this, typeGenerator,
-				importGenerator, nameHandler, deferredSetAnalyzer);
-        this.identifierGenerator = new IdentifierGenerator(currentGroup, this, nameHandler,
-				parallelConstructHandler, declarationGenerator);
-		this.predicateGenerator = new PredicateGenerator(currentGroup, this, nameHandler,
-				importGenerator, iterationConstructHandler);
-		this.recordStructGenerator = new RecordStructGenerator(currentGroup, this, typeGenerator,
-				importGenerator, nameHandler);
-		this.recordStructAnalyzer = new RecordStructAnalyzer(recordStructGenerator);
-		this.expressionGenerator = new ExpressionGenerator(currentGroup, this, useBigInteger, minint,
-				maxint, nameHandler, importGenerator, declarationGenerator, identifierGenerator, typeGenerator,
-				iterationConstructHandler, recordStructGenerator);
-		this.substitutionGenerator = new SubstitutionGenerator(currentGroup, this, nameHandler,
-				typeGenerator, expressionGenerator, identifierGenerator, iterationConstructHandler,
-				parallelConstructHandler, recordStructGenerator,
-				declarationGenerator);
-		this.operatorGenerator = new OperatorGenerator(predicateGenerator, expressionGenerator);
-		this.operationGenerator = new OperationGenerator(currentGroup, this, substitutionGenerator,
-				declarationGenerator, identifierGenerator, nameHandler, typeGenerator, recordStructGenerator);
-		this.iterationConstructDepth = 0;
-		this.isIncludedMachine = isIncludedMachine;
 
 
-		this.nodeType = new HashMap<>();
+			this.parallelConstructHandler = new ParallelConstructHandler();
+			this.typeGenerator = new TypeGenerator(currentGroup, nameHandler, this);
+			this.importGenerator = new ImportGenerator(currentGroup, nameHandler, useBigInteger);
+			this.iterationConstructHandler = new IterationConstructHandler(currentGroup, this, nameHandler,
+					typeGenerator, importGenerator);
+			this.deferredSetAnalyzer = new DeferredSetAnalyzer(Integer.parseInt(deferredSetSize));
+			this.declarationGenerator = new DeclarationGenerator(currentGroup, this, typeGenerator,
+					importGenerator, nameHandler, deferredSetAnalyzer);
+			this.identifierGenerator = new IdentifierGenerator(currentGroup, this, nameHandler,
+					parallelConstructHandler, declarationGenerator);
+			this.predicateGenerator = new PredicateGenerator(currentGroup, this, nameHandler,
+					importGenerator, iterationConstructHandler);
+			this.recordStructGenerator = new RecordStructGenerator(currentGroup, this, typeGenerator,
+					importGenerator, nameHandler);
+			this.recordStructAnalyzer = new RecordStructAnalyzer(recordStructGenerator);
+			this.expressionGenerator = new ExpressionGenerator(currentGroup, this, useBigInteger, minint,
+					maxint, nameHandler, importGenerator, declarationGenerator, identifierGenerator, typeGenerator,
+					iterationConstructHandler, recordStructGenerator);
+			this.substitutionGenerator = new SubstitutionGenerator(currentGroup, this, nameHandler,
+					typeGenerator, expressionGenerator, identifierGenerator, iterationConstructHandler,
+					parallelConstructHandler, recordStructGenerator,
+					declarationGenerator);
+			this.operatorGenerator = new OperatorGenerator(predicateGenerator, expressionGenerator);
+			this.operationGenerator = new OperationGenerator(currentGroup, this, substitutionGenerator,
+					declarationGenerator, identifierGenerator, nameHandler, typeGenerator, recordStructGenerator);
+			this.iterationConstructDepth = 0;
+			this.isIncludedMachine = isIncludedMachine;
 
-		this.variableTypAnalyzer = new VariableTypAnalyzer();
-		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType, nameHandler, currentGroup);
-		this.invariantGenerator = new InvariantGenerator(nodeType, nameHandler, currentGroup);
-		this.initialisationGenerator = new InitialisationGenerator(nodeType, nameHandler, currentGroup);
-		this.operationsGenerator = new OperationsGenerator(nodeType, nameHandler, currentGroup);
-		this.typeInfoGenerator = new TypeInfoGenerator(nodeType, nameHandler, currentGroup);
+
+
+			this.nodeType = new HashMap<>();
+			this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType, nameHandler, currentGroup);
+			this.invariantGenerator = new InvariantGenerator(nodeType, nameHandler, currentGroup);
+			this.initialisationGenerator = new InitialisationGenerator(nodeType, nameHandler, currentGroup);
+			this.operationsGenerator = new OperationsGenerator(nodeType, nameHandler, currentGroup);
+			this.typeInfoGenerator = new TypeInfoGenerator(nodeType, nameHandler, currentGroup);
+
 	}
 
 	/*
@@ -187,7 +184,6 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 	public String generateMachine(MachineNode node) {
 		recordStructAnalyzer.visitMachineNode(node);
 		deferredSetAnalyzer.analyze(node.getDeferredSets(), node.getProperties());
-		variableTypAnalyzer.visitMachineNode(node);
 
 		initialize(node);
 		ST machine = currentGroup.getInstanceOf("machine");
