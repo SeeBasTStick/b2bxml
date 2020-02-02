@@ -191,11 +191,13 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 
 		initialize(node);
 		ST machine = currentGroup.getInstanceOf("machine");
-		TemplateHandler.add(machine, "useBigInteger", useBigInteger);
-		TemplateHandler.add(machine, "addition", addition);
-		TemplateHandler.add(machine, "imports", importGenerator.getImports());
-		//TemplateHandler.add(machine, "methods", generateMethods(node));
-		TemplateHandler.add(machine, "includedMachines", importGenerator.generateMachineImports(node));
+		if(!currentGroup.getName().equals("BXMLTemplate")) {
+			TemplateHandler.add(machine, "useBigInteger", useBigInteger);
+			TemplateHandler.add(machine, "addition", addition);
+			TemplateHandler.add(machine, "imports", importGenerator.getImports());
+			TemplateHandler.add(machine, "methods", generateMethods(node));
+			TemplateHandler.add(machine, "includedMachines", importGenerator.generateMachineImports(node));
+		}
 		TemplateHandler.add(machine, "machine", nameHandler.handle(node.getName()));
 		generateBody(node, machine);
 		return machine.render();
@@ -214,22 +216,27 @@ public class MachineGenerator implements AbstractVisitor<String, Void> {
 	* This function generates the whole body of a machine from the given AST node for the machine.
 	*/
 	private void generateBody(MachineNode node, ST machine) {
-	/*	TemplateHandler.add(machine, "constants_declarations", declarationGenerator.generateConstantsDeclarations(node));
-		TemplateHandler.add(machine, "enums", declarationGenerator.generateEnumDeclarations(node));
-		TemplateHandler.add(machine, "sets", declarationGenerator.generateSetDeclarations(node));
-		TemplateHandler.add(machine, "declarations", declarationGenerator.visitDeclarations(node.getVariables()));
-		TemplateHandler.add(machine, "includes", declarationGenerator.generateIncludes(node));
-		TemplateHandler.add(machine, "initialization", substitutionGenerator.visitInitialization(node));
-		TemplateHandler.add(machine, "operations", operationGenerator.visitOperations(node.getOperations(),
-				node.getVariables().stream().map(DeclarationNode::getName).collect(Collectors.toList())));
-		TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
-				new ArrayList<>());
-		TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());*/
+
+		System.out.println(currentGroup.getName());
+		if(!currentGroup.getName().equals("BXMLTemplate")) {
+			TemplateHandler.add(machine, "constants_declarations", declarationGenerator.generateConstantsDeclarations(node));
+			TemplateHandler.add(machine, "enums", declarationGenerator.generateEnumDeclarations(node));
+			TemplateHandler.add(machine, "sets", declarationGenerator.generateSetDeclarations(node));
+			TemplateHandler.add(machine, "declarations", declarationGenerator.visitDeclarations(node.getVariables()));
+			TemplateHandler.add(machine, "includes", declarationGenerator.generateIncludes(node));
+			TemplateHandler.add(machine, "initialization", substitutionGenerator.visitInitialization(node));
+			TemplateHandler.add(machine, "operations", operationGenerator.visitOperations(node.getOperations(),
+					node.getVariables().stream().map(DeclarationNode::getName).collect(Collectors.toList())));
+			TemplateHandler.add(machine, "getters", isIncludedMachine ? generateGetters(node.getVariables()) :
+					new ArrayList<>());
+			TemplateHandler.add(machine, "structs", recordStructGenerator.generateStructs());
+		}else{
 		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateAbstractVariables(node.getVariables()));
 		TemplateHandler.add(machine, "invariant", invariantGenerator.generateInvariants(node.getInvariant()));
 		TemplateHandler.add(machine, "initialisation", initialisationGenerator.generateInitialisation(node.getInitialisation()));
 		TemplateHandler.add(machine, "operations", operationsGenerator.generateOperations(node.getOperations()));
-		TemplateHandler.add(machine, "type_info", typeInfoGenerator.generateTypeInfo(node.getVariables()));
+		TemplateHandler.add(machine, "type_info", typeInfoGenerator.generateTypeInfo(node.getVariables()));}
+
 	}
 
 	/*
