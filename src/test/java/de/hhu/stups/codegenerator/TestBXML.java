@@ -40,17 +40,10 @@ public class TestBXML {
 
     @Test
     public void testExamples() throws Exception {
-        // /home/sebastian/IdeaProjects/b2program/build/resources/test/Mega.bxml
-        // /home/sebastian/IdeaProjects/b2program/src/test/resources/Mega.bxml
         String name = "Mega";
-      //
-          Path result = buildBXML(name).get(0);
+        Path result = buildBXML(name).get(0);
 
-        URI original = URI.create(System.getProperty("user.dir")+"/src/test/resources/bxml/" + name + ".bxml");
-
-      //  URI result = URI.create("/home/sebastian/IdeaProjects/b2program/build/resources/test/de/hhu/stups/codegenerator/Mega.bxml");
-        System.out.println(original);
-
+        URI original = URI.create(System.getProperty("user.dir") + "/src/test/resources/bxml/" + name + ".bxml");
 
         File xmlFile1 = new File(original.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -71,15 +64,12 @@ public class TestBXML {
 
         Diff myDiff = DiffBuilder.compare(toXmlString(doc1)).withTest(toXmlString(doc2))
                 .withNodeMatcher(new DefaultNodeMatcher(es))
-                .withDifferenceEvaluator(new IgnoreAttributeDifferenceEvaluator(List.of("typref", "id")))
-           //     .withDifferenceEvaluator(DifferenceEvaluators.downgradeDifferencesToSimilar(ComparisonType.TEXT_VALUE))
+                .withDifferenceEvaluator(new IgnoreAttributeDifferenceAndChildOrderEvaluator(List.of("typref", "id")))
                 .ignoreWhitespace()
                 .ignoreElementContentWhitespace()
                 .ignoreComments()
                 .checkForSimilar()
                 .build();
-
-
 
 
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
@@ -100,60 +90,38 @@ public class TestBXML {
 
     }
 
-    public static final class IgnoreAttributeDifferenceEvaluator implements DifferenceEvaluator {
-
+    public static final class IgnoreAttributeDifferenceAndChildOrderEvaluator implements DifferenceEvaluator {
 
 
         private List<String> attributeNames;
 
-        public IgnoreAttributeDifferenceEvaluator(List<String> attributeNames) {
+        public IgnoreAttributeDifferenceAndChildOrderEvaluator(List<String> attributeNames) {
             this.attributeNames = attributeNames;
-
-
         }
 
         @Override
         public ComparisonResult evaluate(Comparison comparison, ComparisonResult outcome) {
 
-            if (outcome == ComparisonResult.EQUAL)
-            {
-                return outcome; // only evaluate differences.
+            // Nodes are equal
+            if (outcome == ComparisonResult.EQUAL) {
+                return outcome;
             }
 
-            if(outcome == ComparisonResult.DIFFERENT && comparison.getType() == ComparisonType.CHILD_NODELIST_SEQUENCE)
+            //Nodes differ in order of their children
+            if (outcome == ComparisonResult.DIFFERENT && comparison.getType() == ComparisonType.CHILD_NODELIST_SEQUENCE)
             {
-
-                NodeList controlElementList = comparison.getControlDetails().getTarget().getChildNodes();
-
-                NodeList testElementList = comparison.getTestDetails().getTarget().getChildNodes();
-
-                List<Node> control = new ArrayList<>();
-
-                List<Node> test = new ArrayList<>();
-
-                for(int i = 0; i < controlElementList.getLength(); i++)
+                if(NodeListUtils.compareNodeList(comparison.getControlDetails().getTarget().getChildNodes(),
+                        comparison.getTestDetails().getTarget().getChildNodes()))
                 {
-                    control.add(controlElementList.item(i));
+                    return ComparisonResult.SIMILAR;
+                }
+                else{
+                    return ComparisonResult.DIFFERENT;
                 }
 
-                for(int i = 0; i < testElementList.getLength(); i++)
-                {
-                    test.add(testElementList.item(i));
-                }
-
-
-                for(int i = 0; i < test.size(); i++)
-                {
-                    if(!test.get(i).getNodeName().equals(control.get(i).getNodeName()))
-                    {
-                        System.out.println("false " + test.toString() + " " + control.toString());
-                        return ComparisonResult.DIFFERENT;
-                    }
-                }
-
-                return ComparisonResult.SIMILAR;
             }
 
+            //Nodes only differ in their attributes
             final Node controlNode = comparison.getControlDetails().getTarget();
             if (controlNode instanceof Attr) {
 
@@ -168,50 +136,10 @@ public class TestBXML {
     }
 
 
-
-    static class SameTypeSelector implements ElementSelector{
-
+    static class SameTypeSelector implements ElementSelector  {
         @Override
         public boolean canBeCompared(Element controlElement, Element testElement) {
-
-
-            NodeList controlElementList = controlElement.getChildNodes();
-
-            NodeList testElementList = testElement.getChildNodes();
-
-            List<Node> control = new ArrayList<>();
-
-            List<Node> test = new ArrayList<>();
-
-            for(int i = 0; i < controlElementList.getLength(); i++)
-            {
-                control.add(controlElementList.item(i));
-            }
-
-            for(int i = 0; i < testElementList.getLength(); i++)
-            {
-                test.add(testElementList.item(i));
-            }
-
-            if(control.size() != test.size())
-            {
-                System.out.println("false " + test.toString() + " " + control.toString());
-
-                return false;
-            }
-
-            for(int i = 0; i < test.size(); i++)
-            {
-                if(!test.get(i).getNodeName().equals(control.get(i).getNodeName()))
-                {
-                    System.out.println("false " + test.toString() + " " + control.toString());
-                    return false;
-                }
-            }
-            System.out.println("true: " + test.toString() + " " + control.toString());
-            return true;
+            return NodeListUtils.compareNodeList(controlElement.getChildNodes(), testElement.getChildNodes());
         }
     }
-
-
 }
