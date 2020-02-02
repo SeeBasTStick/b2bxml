@@ -2,11 +2,11 @@ package de.hhu.stups.codegenerator;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.*;
+import org.xmlunit.util.Linqy;
+import org.xmlunit.util.Nodes;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +21,10 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class TestBXML {
 
@@ -59,11 +62,23 @@ public class TestBXML {
         DocumentBuilder db2 = dbf2.newDocumentBuilder();
         Document doc2 = db2.parse(xmlFile2);
 
+        ElementSelector es = ElementSelectors.conditionalBuilder()
+                .whenElementIsNamed("Type")
+                .thenUse(new SameTypeSelector())
+                .elseUse(ElementSelectors.byNameAndText)
+                .build();
+
+
         Diff myDiff = DiffBuilder.compare(toXmlString(doc1)).withTest(toXmlString(doc2))
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+                .withNodeMatcher(new DefaultNodeMatcher(es))
                 .withDifferenceEvaluator(new IgnoreAttributeDifferenceEvaluator(List.of("typref", "id")))
+           //     .withDifferenceEvaluator(DifferenceEvaluators.downgradeDifferencesToSimilar(ComparisonType.TEXT_VALUE))
+                .ignoreWhitespace()
+                .ignoreElementContentWhitespace()
+                .ignoreComments()
                 .checkForSimilar()
                 .build();
+
 
 
 
@@ -85,42 +100,118 @@ public class TestBXML {
 
     }
 
-    public final class ChildNode implements DifferenceEvaluator{
+    public static final class IgnoreAttributeDifferenceEvaluator implements DifferenceEvaluator {
 
-        @Override
-        public ComparisonResult evaluate(Comparison comparison, ComparisonResult outcome) {
-            if (outcome == ComparisonResult.EQUAL) return outcome; // only evaluate differences.
-            final Node controlNode = comparison.getControlDetails().getTarget();
 
-            if(controlNode.hasChildNodes())
-            {
-
-            }
-
-            return null;
-        }
-    }
-
-    public final class IgnoreAttributeDifferenceEvaluator implements DifferenceEvaluator {
 
         private List<String> attributeNames;
 
         public IgnoreAttributeDifferenceEvaluator(List<String> attributeNames) {
             this.attributeNames = attributeNames;
+
+
         }
 
         @Override
         public ComparisonResult evaluate(Comparison comparison, ComparisonResult outcome) {
-            if (outcome == ComparisonResult.EQUAL) return outcome; // only evaluate differences.
+
+            if (outcome == ComparisonResult.EQUAL)
+            {
+                return outcome; // only evaluate differences.
+            }
+
+            if(outcome == ComparisonResult.DIFFERENT && comparison.getType() == ComparisonType.CHILD_NODELIST_SEQUENCE)
+            {
+
+                NodeList controlElementList = comparison.getControlDetails().getTarget().getChildNodes();
+
+                NodeList testElementList = comparison.getTestDetails().getTarget().getChildNodes();
+
+                List<Node> control = new ArrayList<>();
+
+                List<Node> test = new ArrayList<>();
+
+                for(int i = 0; i < controlElementList.getLength(); i++)
+                {
+                    control.add(controlElementList.item(i));
+                }
+
+                for(int i = 0; i < testElementList.getLength(); i++)
+                {
+                    test.add(testElementList.item(i));
+                }
+
+
+                for(int i = 0; i < test.size(); i++)
+                {
+                    if(!test.get(i).getNodeName().equals(control.get(i).getNodeName()))
+                    {
+                        System.out.println("false " + test.toString() + " " + control.toString());
+                        return ComparisonResult.DIFFERENT;
+                    }
+                }
+
+                return ComparisonResult.SIMILAR;
+            }
+
             final Node controlNode = comparison.getControlDetails().getTarget();
             if (controlNode instanceof Attr) {
+
                 Attr attr = (Attr) controlNode;
                 if (attributeNames.contains(attr.getName())) {
                     return ComparisonResult.SIMILAR; // will evaluate this difference as similar
                 }
+
             }
             return outcome;
         }
     }
+
+
+
+    static class SameTypeSelector implements ElementSelector{
+
+        @Override
+        public boolean canBeCompared(Element controlElement, Element testElement) {
+
+
+            NodeList controlElementList = controlElement.getChildNodes();
+
+            NodeList testElementList = testElement.getChildNodes();
+
+            List<Node> control = new ArrayList<>();
+
+            List<Node> test = new ArrayList<>();
+
+            for(int i = 0; i < controlElementList.getLength(); i++)
+            {
+                control.add(controlElementList.item(i));
+            }
+
+            for(int i = 0; i < testElementList.getLength(); i++)
+            {
+                test.add(testElementList.item(i));
+            }
+
+            if(control.size() != test.size())
+            {
+                System.out.println("false " + test.toString() + " " + control.toString());
+
+                return false;
+            }
+
+            for(int i = 0; i < test.size(); i++)
+            {
+                if(!test.get(i).getNodeName().equals(control.get(i).getNodeName()))
+                {
+                    System.out.println("false " + test.toString() + " " + control.toString());
+                    return false;
+                }
+            }
+            System.out.println("true: " + test.toString() + " " + control.toString());
+            return true;
+        }
+    }
+
 
 }
