@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Fin fin = new Fin();
-    fin.calculate();
-    System.out.println(fin.getRes());
-}

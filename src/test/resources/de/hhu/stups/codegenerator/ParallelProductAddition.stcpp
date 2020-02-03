@@ -1,6 +1,0 @@
-int main() {
-    ParallelProduct parallel;
-    parallel.calculate();
-    cout << parallel.getRes();
-    return 0;
-}

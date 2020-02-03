@@ -8,7 +8,6 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class InitialisationGenerator extends BXMLBodyGenerator{
     public InitialisationGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {

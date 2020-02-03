@@ -1,6 +1,0 @@
-int main() {
-    LetSubstitution let;
-    let.calculate();
-    cout << let.getRes();
-    return 0;
-}

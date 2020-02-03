@@ -1,6 +1,0 @@
-int main() {
-    SetUnionSmall set;
-    set.simulate();
-    cout << set.getSet().card();
-    return 0;
-}

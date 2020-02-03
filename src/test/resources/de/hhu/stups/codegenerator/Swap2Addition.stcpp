@@ -1,8 +1,0 @@
-int main() {
-    Swap2 swap;
-    swap.swap();
-    cout << swap.getXX();
-    cout << " ";
-    cout << swap.getYY();
-    return 0;
-}

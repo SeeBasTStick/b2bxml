@@ -1,6 +1,0 @@
-int main() {
-    Intersection intersection;
-    intersection.calculate();
-    cout << intersection.getRes();
-    return 0;
-}

@@ -1,5 +1,0 @@
-int main() {
-    While while1;
-    cout << while1.Inc(BInteger(1));
-    return 0;
-}

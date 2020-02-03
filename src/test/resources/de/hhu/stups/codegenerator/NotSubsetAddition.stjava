@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    NotSubset subset = new NotSubset();
-    subset.calculate();
-    System.out.println(subset.getRes());
-}

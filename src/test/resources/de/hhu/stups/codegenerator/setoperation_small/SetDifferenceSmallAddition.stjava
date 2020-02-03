@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    SetDifferenceSmall set = new SetDifferenceSmall();
-    set.simulate();
-    System.out.println(set.getSet());
-}

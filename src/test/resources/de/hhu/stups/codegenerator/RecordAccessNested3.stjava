@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    RecordAccessNested3 record = new RecordAccessNested3();
-    record.calculate();
-    System.out.println(record.getRes());
-}

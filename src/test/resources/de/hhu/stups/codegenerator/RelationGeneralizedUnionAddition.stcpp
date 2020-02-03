@@ -1,5 +1,0 @@
-int main() {
-    RelationGeneralizedUnion calculate;
-    calculate.calculate();
-    return 0;
-}

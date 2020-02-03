@@ -25,9 +25,9 @@ import java.util.List;
 public class BXMLTestUtils {
 
     public static void calculateDifference(String name) throws Exception {
-        Path result = buildBXML(name).get(0);
+        Path result = buildBXML(name);
 
-        URI original = URI.create(System.getProperty("user.dir") + "/src/test/resources/bxml/" + name + ".bxml");
+        Path original = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/bxml/" + name + ".bxml");
 
         File xmlFile1 = new File(original.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -59,14 +59,10 @@ public class BXMLTestUtils {
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
     }
 
-    private static List<Path> buildBXML(String machine) throws Exception {
-        Path mchPath = Paths.get(CodeGenerator.class.getClassLoader()
-                .getResource("de/hhu/stups/codegenerator/" + machine + ".mch").toURI());
-        System.out.println(mchPath.toString());
+    private static Path buildBXML(String machine)  {
+        Path mchPath = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/machine/" + machine + ".mch");
         CodeGenerator codeGenerator = new CodeGenerator();
-        return codeGenerator.generate(mchPath, GeneratorMode.BXML, false,
-                String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE), "10",
-                true, null, false);
+        return codeGenerator.generate(mchPath);
     }
 
     private static String toXmlString(Document document) throws TransformerException {

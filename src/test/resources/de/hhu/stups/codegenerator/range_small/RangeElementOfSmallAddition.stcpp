@@ -1,6 +1,0 @@
-int main() {
-    RangeElementOfSmall range;
-    range.simulate();
-    cout << range.getCounter();
-    return 0;
-}

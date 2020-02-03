@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    EmptySet empty = new EmptySet();
-    empty.calculate();
-    System.out.println(empty.getRes());
-}

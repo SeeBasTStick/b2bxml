@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    IfAndPredicates iff = new IfAndPredicates();
-    iff.calculate();
-    System.out.println(iff.getRes());
-}

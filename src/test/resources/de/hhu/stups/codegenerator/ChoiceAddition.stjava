@@ -1,4 +1,0 @@
-public static void main(String[] args) {
-    Choice choice = new Choice();
-    choice.calculate(new BInteger(3));
-}

@@ -1,5 +1,0 @@
-int main() {
-    RelationGeneralizedIntersection calculate;
-    calculate.calculate();
-    return 0;
-}

@@ -1,6 +1,0 @@
-int main() {
-    SmallNumbers numbers;
-    numbers.simulate();
-    cout << numbers.getValue();
-    return 0;
-}

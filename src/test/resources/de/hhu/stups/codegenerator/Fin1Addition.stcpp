@@ -1,6 +1,0 @@
-int main() {
-    Fin1 fin;
-    fin.calculate();
-    cout << fin.getRes();
-    return 0;
-}

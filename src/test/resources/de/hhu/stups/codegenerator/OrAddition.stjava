@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Or logical = new Or();
-    logical.calculate();
-    System.out.println(logical.getRes());
-}

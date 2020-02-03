@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    QuantifiedPredicate2 predicate = new QuantifiedPredicate2();
-    predicate.calculate();
-    System.out.println(predicate.getRes());
-}

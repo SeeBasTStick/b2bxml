@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    RecordsAccess3 record = new RecordsAccess3();
-    record.calculate();
-    System.out.println(record.getRes());
-}

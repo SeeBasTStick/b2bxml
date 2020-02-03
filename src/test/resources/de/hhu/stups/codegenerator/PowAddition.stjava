@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Pow pow = new Pow();
-    pow.calculate();
-    System.out.println(pow.getRes());
-}

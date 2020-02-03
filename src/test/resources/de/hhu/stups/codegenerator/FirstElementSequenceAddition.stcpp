@@ -1,6 +1,0 @@
-int main() {
-    FirstElementSequence first;
-    first.calculate();
-    cout << first.getRes();
-    return 0;
-}

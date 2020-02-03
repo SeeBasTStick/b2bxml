@@ -1,6 +1,0 @@
-int main() {
-    Less comparison;
-    comparison.calculate();
-    cout << comparison.getRes();
-    return 0;
-}

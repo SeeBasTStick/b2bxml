@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    LetPredicate let = new LetPredicate();
-    let.calculate();
-    System.out.println(let.getRes());
-}

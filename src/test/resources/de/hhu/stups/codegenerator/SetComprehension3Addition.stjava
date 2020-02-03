@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    SetComprehension3 set = new SetComprehension3();
-    set.calculate();
-    System.out.println(set.getRes());
-}

@@ -1,6 +1,0 @@
-int main() {
-    Range range;
-    range.calculate();
-    cout << range.getRes();
-    return 0;
-}

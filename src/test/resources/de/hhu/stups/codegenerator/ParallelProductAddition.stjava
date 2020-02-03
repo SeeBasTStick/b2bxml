@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    ParallelProduct parallel = new ParallelProduct();
-    parallel.calculate();
-    System.out.println(parallel.getRes());
-}

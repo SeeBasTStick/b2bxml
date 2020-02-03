@@ -1,5 +1,0 @@
-int main() {
-    SieveParallel sieve;
-    cout << sieve.ComputeNumberOfPrimes();
-    return 0;
-}

@@ -1,6 +1,0 @@
-int main() {
-    DanglingElse dangling;
-    dangling.calculate();
-    cout << dangling.getRes();
-    return 0;
-}

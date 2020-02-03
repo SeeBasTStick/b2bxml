@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Drop drop = new Drop();
-    drop.calculate();
-    System.out.println(drop.getRes());
-}

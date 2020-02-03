@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    NotStrictSubset subset = new NotStrictSubset();
-    subset.calculate();
-    System.out.println(subset.getRes());
-}

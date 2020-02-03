@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Not logical = new Not();
-    logical.calculate();
-    System.out.println(logical.getRes());
-}

@@ -7,8 +7,8 @@ public class TestBXML {
 
     @Test
     public void testExamples() throws Exception {
-   //     String name = "Mega";
-     //   BXMLTestUtils.calculateDifference(name);
+        String name = "Mega";
+        BXMLTestUtils.calculateDifference(name);
     }
 
     @Test

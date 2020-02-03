@@ -1,6 +1,0 @@
-int main() {
-    Pred pred;
-    pred.calculate();
-    cout << pred.getRes();
-    return 0;
-}

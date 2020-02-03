@@ -1,6 +1,0 @@
-int main() {
-    TailSequence sequence;
-    sequence.calculate();
-    cout << sequence.getRes();
-    return 0;
-}

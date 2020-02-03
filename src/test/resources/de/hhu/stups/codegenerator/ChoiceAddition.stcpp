@@ -1,5 +1,0 @@
-int main() {
-    Choice choice;
-    choice.calculate(BInteger(3));
-    return 0;
-}

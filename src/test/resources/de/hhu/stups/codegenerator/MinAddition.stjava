@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Min min = new Min();
-    min.calculate();
-    System.out.println(min.getRes());
-}

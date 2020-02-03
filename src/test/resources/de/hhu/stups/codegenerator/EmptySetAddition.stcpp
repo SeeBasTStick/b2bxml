@@ -1,6 +1,0 @@
-int main() {
-    EmptySet empty;
-    empty.calculate();
-    cout << empty.getRes();
-    return 0;
-}

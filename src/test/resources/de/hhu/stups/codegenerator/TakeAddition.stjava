@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Take sequence = new Take();
-    sequence.calculate();
-    System.out.println(sequence.getRes());
-}

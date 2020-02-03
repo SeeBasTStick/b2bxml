@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    RangeRestriction range = new RangeRestriction();
-    range.calculate();
-    System.out.println(range.getRes());
-}

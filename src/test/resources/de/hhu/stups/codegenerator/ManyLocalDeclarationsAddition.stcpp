@@ -1,5 +1,0 @@
-int main() {
-    ManyLocalDeclarations locals;
-    cout << locals.Inc(BInteger(10)).card();
-    return 0;
-}

@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Id identity = new Id();
-    identity.calculate();
-    System.out.println(identity.getRes());
-}

@@ -1,5 +1,0 @@
-int main() {
-    MapFunction map;
-    cout << map.getYY().domain().card() << " " << map.getYY().range().card();
-    return 0;
-}

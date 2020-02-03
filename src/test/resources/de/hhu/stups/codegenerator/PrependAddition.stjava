@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Prepend prepend = new Prepend();
-    prepend.calculate();
-    System.out.println(prepend.getRes());
-}

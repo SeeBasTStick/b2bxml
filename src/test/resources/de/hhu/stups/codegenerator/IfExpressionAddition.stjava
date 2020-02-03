@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    IfExpression iff = new IfExpression();
-    iff.calculate();
-    System.out.println(iff.getRes());
-}

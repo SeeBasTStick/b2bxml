@@ -1,6 +1,0 @@
-int main() {
-    BooleanExpression logical;
-    logical.simulate();
-    cout << logical.getCounter();
-    return 0;
-}

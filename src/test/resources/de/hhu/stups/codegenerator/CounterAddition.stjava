@@ -1,9 +1,0 @@
-public static void main(String[] args) {
-    Counter counter = new Counter();
-    counter.Reset();
-    counter.Inc();
-    counter.Odd();
-    counter.Inc();
-    counter.Even();
-    System.out.println(counter.getCount());
-}

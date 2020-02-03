@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Inverse inverse = new Inverse();
-    inverse.calculate();
-    System.out.println(inverse.getRes());
-}

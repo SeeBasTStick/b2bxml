@@ -1,6 +1,0 @@
-int main() {
-    Prepend prepend;
-    prepend.calculate();
-    cout << prepend.getRes();
-    return 0;
-}

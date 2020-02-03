@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    SetDifferenceBig set = new SetDifferenceBig();
-    set.simulate();
-    System.out.println(set.getSet().card());
-}

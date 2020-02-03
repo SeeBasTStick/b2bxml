@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    GreaterEqual comparison = new GreaterEqual();
-    comparison.calculate();
-    System.out.println(comparison.getRes());
-}

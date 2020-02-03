@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    FunctionCallAccessNested functional = new FunctionCallAccessNested();
-    functional.calculate();
-    System.out.println(functional.getRes());
-}

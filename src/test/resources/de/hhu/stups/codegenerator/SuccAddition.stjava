@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Succ succ = new Succ();
-    succ.calculate();
-    System.out.println(succ.getRes());
-}

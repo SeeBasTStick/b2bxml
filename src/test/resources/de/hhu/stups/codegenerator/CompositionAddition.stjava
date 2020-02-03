@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Composition composition = new Composition();
-    composition.calculate();
-    System.out.println(composition.getRes());
-}

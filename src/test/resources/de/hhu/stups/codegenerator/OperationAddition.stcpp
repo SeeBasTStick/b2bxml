@@ -1,5 +1,0 @@
-int main() {
-    Operation operation;
-    cout << operation.Inc(BInteger(10));
-    return 0;
-}

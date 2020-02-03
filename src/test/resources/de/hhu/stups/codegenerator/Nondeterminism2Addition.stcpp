@@ -1,6 +1,0 @@
-int main() {
-    Nondeterminism2 nondeterminism;
-    nondeterminism.calculate();
-    cout << nondeterminism.getRes();
-    return 0;
-}

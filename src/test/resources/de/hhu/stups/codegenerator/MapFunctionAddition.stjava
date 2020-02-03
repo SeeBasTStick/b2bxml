@@ -1,4 +1,0 @@
-public static void main(String[] args) {
-    MapFunction map = new MapFunction();
-    System.out.println(map.getYY().domain().card() + " " + map.getYY().range().card());
-}

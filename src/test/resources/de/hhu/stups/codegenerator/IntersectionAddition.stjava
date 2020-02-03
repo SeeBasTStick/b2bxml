@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Intersection intersection = new Intersection();
-    intersection.calculate();
-    System.out.println(intersection.getRes());
-}

@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    Append append = new Append();
-    append.calculate();
-    System.out.println(append.getRes());
-}

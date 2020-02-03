@@ -1,6 +1,0 @@
-int main() {
-    Plus plus;
-    plus.calculate();
-    cout << plus.getRes();
-    return 0;
-}

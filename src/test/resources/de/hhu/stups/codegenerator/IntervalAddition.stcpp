@@ -1,6 +1,0 @@
-int main() {
-    Interval interval;
-    interval.calculate();
-    cout << interval.getRes();
-    return 0;
-}

@@ -1,5 +1,0 @@
-public static void main(String[] args) {
-    DanglingElse dangling = new DanglingElse();
-    dangling.calculate();
-    System.out.println(dangling.getRes());
-}

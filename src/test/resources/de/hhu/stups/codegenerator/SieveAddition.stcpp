@@ -1,5 +1,0 @@
-int main() {
-    Sieve sieve;
-    cout << sieve.ComputeNumberOfPrimes();
-    return 0;
-}

@@ -1,7 +1,0 @@
-int main() {
-    ACounter counter;
-    counter.inc();
-    counter.inc();
-    cout << counter.res();
-    return 0;
-}
