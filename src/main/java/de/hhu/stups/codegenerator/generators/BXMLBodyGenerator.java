@@ -310,6 +310,7 @@ public abstract class BXMLBodyGenerator {
 
     private int generateHash(BType type)
     {
+        //ToDo negativ value
         return Math.abs(type.toString().hashCode());
     }
 
