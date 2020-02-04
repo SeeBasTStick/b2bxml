@@ -22,7 +22,9 @@ repositories {
         name "release"
         url "https://oss.sonatype.org/content/repositories/releases/"
     }
-    maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
@@ -30,8 +32,12 @@ dependencies {
     compile group: 'org.antlr', name: 'ST4', version: '4.1'
     // antlr parser dependency
     compile 'com.github.hhu-stups:antlr-parser:-SNAPSHOT' // https://github.com/hhu-stups/antlr-parser'
+    implementation 'com.github.favu100:b2program:-SNAPSHOT'
     implementation 'org.xmlunit:xmlunit-core:2.6.3' //https://github.com/xmlunit/user-guide
     testCompile 'junit:junit:4.8.2'
+
+
+
 }
 
 jar {

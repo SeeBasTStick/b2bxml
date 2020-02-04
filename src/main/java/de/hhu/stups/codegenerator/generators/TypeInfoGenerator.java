@@ -2,13 +2,11 @@ package de.hhu.stups.codegenerator.generators;
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
-import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.SetType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 

@@ -1,4 +1,0 @@
-
-		Revision: ${env.SVN_REVISION}
-		October 17 2018 - 2130
-     
