@@ -3,13 +3,17 @@ package de.hhu.stups.codegenerator.unit;
 import de.hhu.stups.codegenerator.generators.BXMLBodyGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
+import de.prob.parser.ast.nodes.expression.ExprNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
 import de.prob.parser.ast.nodes.expression.NumberNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
+import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
+import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
 import org.junit.Before;
@@ -32,6 +36,27 @@ public class UnitTests {
         public DummyGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
             super(nodeType, nameHandler, currentGroup);
         }
+    }
+
+
+    private IdentifierExprNode dummy_IdentifierExprNodeGenerator(BType type, String name ){
+        IdentifierExprNode result = new IdentifierExprNode(new SourceCodePosition(), name, true);
+        result.setType(type);
+        return result;
+    }
+
+    private ExpressionOperatorNode dummy_ExpressionOperatorNodeGenerator(
+            BType type, ExpressionOperatorNode.ExpressionOperator operator ){
+        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(), operator);
+        expressionOperatorNode.setType(type);
+        return expressionOperatorNode;
+    }
+
+    private ExprNode dummy_ExprNodeGenerator(
+            BType type, ExpressionOperatorNode.ExpressionOperator operator ){
+        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(), operator);
+        expressionOperatorNode.setType(type);
+        return expressionOperatorNode;
     }
 
     @Before
@@ -79,11 +104,10 @@ public class UnitTests {
     @Test
     public void test_processExpressionOperatorNode_INTERVAL()
     {
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
-                ExpressionOperatorNode.ExpressionOperator.INTERVAL);
-        BType type = BoolType.getInstance();
-        expressionOperatorNode.setType(type);
-        assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
+
+        assertEquals(dummyGenerator.processExpressionOperatorNode(
+                dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
+                        ExpressionOperatorNode.ExpressionOperator.INTERVAL)),
                 "<Binary_Exp op='..' typref='2044650'>\n</Binary_Exp>");
     }
 
@@ -112,13 +136,93 @@ public class UnitTests {
     }
 
     @Test
-    public void test_processSubstitutionNode_IfOrSelectSubstitutionsNode(){
-       // IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
-       //         IfOrSelectSubstitutionsNode.Operator.SELECT, new Pre)
+    public void test_processSubstitutionNode_IfOrSelectSubstitutionsNode_SELECT(){
+        BType type = BoolType.getInstance();
+        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+                ExpressionOperatorNode.ExpressionOperator.MINUS);
+        expressionOperatorNode.setType(type);
+        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
+                PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
+                List.of(expressionOperatorNode));
+
+
+      //  IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
+      //          IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(predicateNode), n);
+
+    }
+
+    @Test
+    public void test_processSubstitutionNode_ListSubstitutionNode_Parallel(){
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
+                ListSubstitutionNode.ListOperator.Parallel, List.of(assignSubstitutionNode));
+
+        assertEquals("<Nary_Sub op='||'>\n" +
+                "    <Assignement_Sub>\n" +
+                "        <Variables>\n" +
+                "            <Id value='test' typref='2044650'/>\n" +
+                "        </Variables>\n" +
+                "        <Values>\n" +
+                "            <Id value='test2' typref='2044650'/>\n" +
+                "        </Values>\n" +
+                "    </Assignement_Sub>\n" +
+                "</Nary_Sub>", dummyGenerator.processSubstitutionNode(listSubstitutionNode));
+    }
+
+    @Test
+    public void test_processSubstitutionNode_ListSubstitutionNode_Sequentiel(){
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
+                ListSubstitutionNode.ListOperator.Sequential, List.of(assignSubstitutionNode));
+
+        assertEquals("<Nary_Sub op=';'>\n" +
+                "    <Assignement_Sub>\n" +
+                "        <Variables>\n" +
+                "            <Id value='test' typref='2044650'/>\n" +
+                "        </Variables>\n" +
+                "        <Values>\n" +
+                "            <Id value='test2' typref='2044650'/>\n" +
+                "        </Values>\n" +
+                "    </Assignement_Sub>\n" +
+                "</Nary_Sub>", dummyGenerator.processSubstitutionNode(listSubstitutionNode));
+    }
+
+    @Test
+    public void test_processSubstitutionNode_AssignSubstitutionNode(){
+
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+
+        assertEquals("<Assignement_Sub>\n" +
+                "    <Variables>\n" +
+                "        <Id value='test' typref='2044650'/>\n" +
+                "    </Variables>\n" +
+                "    <Values>\n" +
+                "        <Id value='test2' typref='2044650'/>\n" +
+                "    </Values>\n" +
+                "</Assignement_Sub>", dummyGenerator.processSubstitutionNode(assignSubstitutionNode));
     }
 
     @Test
     public void test_processPredicateNode_PredicateOperatorNode(){
+        BType type = BoolType.getInstance();
+        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+                ExpressionOperatorNode.ExpressionOperator.MINUS);
+        expressionOperatorNode.setType(type);
+        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
+                PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
+                List.of(expressionOperatorNode));
+
+        PredicateOperatorNode predicateOperatorNode = new PredicateOperatorNode(new SourceCodePosition(),
+                PredicateOperatorNode.PredicateOperator.AND, List.of(predicateNode));
+
+        assertEquals("<Invariant>\n" +
+                "</Invariant>", dummyGenerator.processPredicateNode(predicateOperatorNode));
 
     }
 
