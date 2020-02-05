@@ -25,11 +25,11 @@ import java.util.stream.Collectors;
 
 public abstract class BXMLBodyGenerator {
 
-    private Map<Integer, BType> nodeType;
+    public Map<Integer, BType> nodeType;
 
-    private NameHandler nameHandler;
+    public NameHandler nameHandler;
 
-    private STGroup currentGroup;
+    public STGroup currentGroup;
 
     public BXMLBodyGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup)
     {
@@ -57,8 +57,10 @@ public abstract class BXMLBodyGenerator {
         return "";
     }
 
-    protected String processExprNode(ExprNode node){
+    public String processExprNode(ExprNode node){
         String result;
+
+
         switch (node.getClass().getSimpleName()){
             case "IdentifierExprNode":
                 IdentifierExprNode identifierExprNode = (IdentifierExprNode) node;
@@ -97,7 +99,7 @@ public abstract class BXMLBodyGenerator {
         return result;
     }
 
-    protected String processExpressionOperatorNode(ExpressionOperatorNode node){
+    public String processExpressionOperatorNode(ExpressionOperatorNode node){
 
         String result;
         ST binary_exp = currentGroup.getInstanceOf("binary_exp");
@@ -132,14 +134,13 @@ public abstract class BXMLBodyGenerator {
                 .map(this::processExprNode)
                 .collect(Collectors.toList()));
 
-    //    System.out.println("node " + node + " has type " + node.getType().toString() + "with hash " + generateHash(node.getType()));
         nodeType.put(generateHash(node.getType()), node.getType());
         result = binary_exp.render();
 
         return result;
     }
 
-    protected String processSubstitutionNode(SubstitutionNode node) {
+    public String processSubstitutionNode(SubstitutionNode node) {
 
         String result;
 
@@ -201,10 +202,9 @@ public abstract class BXMLBodyGenerator {
 
     }
 
-    protected String processPredicateNode(PredicateNode node)
+    public String processPredicateNode(PredicateNode node)
     {
         String result ;
-        //System.out.println("genPre "+ node);
         switch (node.getClass().getSimpleName()){
             case "PredicateOperatorWithExprArgsNode":
                 PredicateOperatorWithExprArgsNode predicateOperatorWithExprArgsNode = (PredicateOperatorWithExprArgsNode) node;
@@ -215,7 +215,6 @@ public abstract class BXMLBodyGenerator {
                         predicateOperatorWithExprArgsNode.getExpressionNodes().stream()
                                 .map(this::processExprNode)
                                 .collect(Collectors.toList()));
-
                 result = expComparision.render();
                 break;
             case "PredicateOperatorNode":
@@ -223,8 +222,6 @@ public abstract class BXMLBodyGenerator {
                 ST invariant = currentGroup.getInstanceOf("invariant");
                 TemplateHandler.add(invariant, "body", processPredicateOperatorNode(predicateOperatorNode));
                 result = invariant.render();
-                // do stuff
-
                 break;
             default:
                 result = exceptionThrower(node);
@@ -233,35 +230,35 @@ public abstract class BXMLBodyGenerator {
         return result;
     }
 
-    private String processPredicateOperatorNode(PredicateOperatorNode node)
+    public String processPredicateOperatorNode(PredicateOperatorNode node)
     {
+        System.out.println("Hallo?");
+
         String result ;
         if(node.getPredicateArguments().size() == 1){
             result = "";
             //ToDo ExprComparision and more
         }
         else{
-            //System.out.println(node);
             ST nary_pred = currentGroup.getInstanceOf("nary_pred");
             TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
             TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
                     .map(this::processPredicateNode)
                     .collect(Collectors.toList()));
             result = nary_pred.render();
-
         }
 
         return result;
     }
 
 
-    private String generateOperatorNAry(PredicateOperatorNode node)
+    public String generateOperatorNAry(PredicateOperatorNode node)
     {
         return "&amp;";
     }
 
 
-    private String processOperatorPredOperatorExprArgs(PredicateOperatorWithExprArgsNode.PredOperatorExprArgs operator){
+    public String processOperatorPredOperatorExprArgs(PredicateOperatorWithExprArgsNode.PredOperatorExprArgs operator){
         String result;
         switch (operator){
             case LESS:
@@ -296,7 +293,7 @@ public abstract class BXMLBodyGenerator {
         return result;
     }
 
-    protected String processDeclarationNode(DeclarationNode node)
+    public String processDeclarationNode(DeclarationNode node)
     {
         ST id = currentGroup.getInstanceOf("id");
         TemplateHandler.add(id, "val", nameHandler.handleIdentifier(node.getName(),
@@ -308,7 +305,7 @@ public abstract class BXMLBodyGenerator {
         return id.render();
     }
 
-    private int generateHash(BType type)
+    public int generateHash(BType type)
     {
         //ToDo negativ value
         return Math.abs(type.toString().hashCode());

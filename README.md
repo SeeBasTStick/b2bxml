@@ -1,3 +1,4 @@
 # B2Program
 
-This REPO is deprecated. Visit for the actual Repo
+## Requirements
+Java 1.9 or higher
