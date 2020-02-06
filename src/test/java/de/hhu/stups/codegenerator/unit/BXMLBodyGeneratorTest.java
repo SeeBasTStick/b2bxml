@@ -5,7 +5,6 @@ import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.MachineNode;
-import de.prob.parser.ast.nodes.expression.ExprNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
 import de.prob.parser.ast.nodes.expression.NumberNode;
@@ -18,6 +17,7 @@ import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
 import de.prob.parser.ast.types.IntegerType;
+import de.prob.parser.ast.types.SetType;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class BXMLBodyGeneratorTest {
+public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
     DummyGenerator dummyGenerator;
 
@@ -43,19 +43,6 @@ public class BXMLBodyGeneratorTest {
         }
     }
 
-
-    private IdentifierExprNode dummy_IdentifierExprNodeGenerator(BType type, String name ){
-        IdentifierExprNode result = new IdentifierExprNode(new SourceCodePosition(), name, true);
-        result.setType(type);
-        return result;
-    }
-
-    private ExpressionOperatorNode dummy_ExpressionOperatorNodeGenerator(
-            BType type, ExpressionOperatorNode.ExpressionOperator operator ){
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(), operator);
-        expressionOperatorNode.setType(type);
-        return expressionOperatorNode;
-    }
 
     @Before
     public void prepare(){
@@ -141,9 +128,7 @@ public class BXMLBodyGeneratorTest {
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
 
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
 
         IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
                 IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(assignSubstitutionNode),
@@ -176,9 +161,7 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_processSubstitutionNode_ListSubstitutionNode_Parallel(){
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Parallel, List.of(assignSubstitutionNode));
 
@@ -196,9 +179,7 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_processSubstitutionNode_ListSubstitutionNode_Sequentiel(){
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Sequential, List.of(assignSubstitutionNode));
 
@@ -217,9 +198,7 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processSubstitutionNode_AssignSubstitutionNode(){
 
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
-                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
 
         assertEquals("<Assignement_Sub>\n" +
                 "    <Variables>\n" +
@@ -244,8 +223,7 @@ public class BXMLBodyGeneratorTest {
         PredicateOperatorNode predicateOperatorNode = new PredicateOperatorNode(new SourceCodePosition(),
                 PredicateOperatorNode.PredicateOperator.AND, List.of(predicateNode));
 
-        assertEquals("<Invariant>\n" +
-                "</Invariant>", dummyGenerator.processPredicateNode(predicateOperatorNode));
+        assertEquals("", dummyGenerator.processPredicateNode(predicateOperatorNode));
 
     }
 
@@ -370,12 +348,26 @@ public class BXMLBodyGeneratorTest {
         dummy.put(hash, type);
         prepare(dummy);
         dummyGenerator.generateHash(crashType);
-        System.out.println(dummy);
     }
 
     @Test
     public void test_hashFunction_3(){
         BType type = BoolType.getInstance();
+        assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
+
+    }
+
+    @Test
+    public void test_hashFunction_4(){
+        HashMap<Integer, BType> dummy = new HashMap<>();
+        BType type = new SetType(IntegerType.getInstance());
+        BType crashType = new SetType(IntegerType.getInstance());
+        int hash = Math.abs(crashType.toString().hashCode());
+
+        dummy.put(hash, type);
+        prepare(dummy);
+        dummyGenerator.generateHash(crashType);
+
         assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
 
     }

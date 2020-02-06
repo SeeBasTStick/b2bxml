@@ -219,9 +219,7 @@ public abstract class BXMLBodyGenerator {
                 break;
             case "PredicateOperatorNode":
                 PredicateOperatorNode predicateOperatorNode = (PredicateOperatorNode) node;
-                ST invariant = currentGroup.getInstanceOf("invariant");
-                TemplateHandler.add(invariant, "body", processPredicateOperatorNode(predicateOperatorNode));
-                result = invariant.render();
+                result = processPredicateOperatorNode(predicateOperatorNode);
                 break;
             default:
                 result = exceptionThrower(node);
@@ -308,7 +306,8 @@ public abstract class BXMLBodyGenerator {
     public int generateHash(BType type)
     {
         int hash = Math.abs(type.toString().hashCode());
-        if(!nodeType.containsKey(hash) || nodeType.containsKey(hash) && nodeType.get(hash) == type)
+        //Need strings here due to the fact that BTypes might be different instances...
+        if(!nodeType.containsKey(hash) || nodeType.containsKey(hash) && nodeType.get(hash).toString().equals(type.toString()))
         {
             return hash;
         }

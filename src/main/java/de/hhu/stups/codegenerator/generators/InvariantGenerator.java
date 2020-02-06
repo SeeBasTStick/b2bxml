@@ -1,8 +1,10 @@
 package de.hhu.stups.codegenerator.generators;
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
+import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.types.BType;
+import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
 import java.util.Map;
@@ -13,7 +15,9 @@ public class InvariantGenerator extends BXMLBodyGenerator {
     }
 
     public String generateInvariants(PredicateNode node){
-        return processPredicateNode(node);
+        ST invariant = currentGroup.getInstanceOf("invariant");
+        TemplateHandler.add(invariant, "body", processPredicateNode(node));
+        return invariant.render();
     }
 
 }
