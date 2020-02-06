@@ -57,19 +57,17 @@ public class BXMLBodyGeneratorTest {
         return expressionOperatorNode;
     }
 
-    private ExprNode dummy_ExprNodeGenerator(
-            BType type, ExpressionOperatorNode.ExpressionOperator operator ){
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(), operator);
-        expressionOperatorNode.setType(type);
-        return expressionOperatorNode;
-    }
-
     @Before
     public void prepare(){
-        dummyGenerator = new DummyGenerator(new HashMap<Integer, BType>(),
+      prepare(new HashMap<>());
+    }
+
+    public void prepare(HashMap<Integer, BType> nodeType){
+        dummyGenerator = new DummyGenerator(nodeType,
                 new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
+
 
     /*
      * Node that the hash in typref is always the same due to the fact that node.getType().toString().hash() always
@@ -90,10 +88,8 @@ public class BXMLBodyGeneratorTest {
         /*The original is only a dispatcher (see code) we will do only a test to see if dispatching works, the rest
          * will be checked down further
          */
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.PLUS);
-        BType type = BoolType.getInstance();
-        expressionOperatorNode.setType(type);
         assertEquals(dummyGenerator.processExprNode(expressionOperatorNode),
                 "<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>");
     }
@@ -109,7 +105,6 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processExpressionOperatorNode_INTERVAL()
     {
-
         assertEquals(dummyGenerator.processExpressionOperatorNode(
                 dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                         ExpressionOperatorNode.ExpressionOperator.INTERVAL)),
@@ -119,10 +114,8 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processExpressionOperatorNode_Plus()
     {
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.PLUS);
-        BType type = BoolType.getInstance();
-        expressionOperatorNode.setType(type);
         assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
                 "<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>");
 
@@ -131,10 +124,8 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processExpressionOperatorNode_Minus()
     {
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+        ExpressionOperatorNode expressionOperatorNode =dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.MINUS);
-        BType type = BoolType.getInstance();
-        expressionOperatorNode.setType(type);
         assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
                 "<Binary_Exp op='-' typref='2044650'>\n</Binary_Exp>");
 
@@ -142,10 +133,10 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_processSubstitutionNode_IfOrSelectSubstitutionsNode_SELECT(){
-        BType type = BoolType.getInstance();
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.MINUS);
-        expressionOperatorNode.setType(type);
+
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
@@ -242,10 +233,10 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_processPredicateNode_PredicateOperatorNode(){
-        BType type = BoolType.getInstance();
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
-                ExpressionOperatorNode.ExpressionOperator.MINUS);
-        expressionOperatorNode.setType(type);
+
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
+                ExpressionOperatorNode.ExpressionOperator.PLUS);
+
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
@@ -261,9 +252,9 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processPredicateNode_PredicateOperatorWithExprArgsNode(){
         BType type = BoolType.getInstance();
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.MINUS);
-        expressionOperatorNode.setType(type);
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
@@ -277,9 +268,9 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processPredicateOperatorNode_PredicateOperatorNode(){
         BType type = BoolType.getInstance();
-        ExpressionOperatorNode expressionOperatorNode = new ExpressionOperatorNode(new SourceCodePosition(),
+        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
                 ExpressionOperatorNode.ExpressionOperator.MINUS);
-        expressionOperatorNode.setType(type);
+
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
@@ -356,7 +347,7 @@ public class BXMLBodyGeneratorTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void test_hashFunction(){
+    public void test_hashFunction_1(){
         exception.expect(IndexOutOfBoundsException.class);
         exception.expectMessage("Hash was already taken! BOOL is not INTEGER");
         BType type = BoolType.getInstance();
@@ -364,6 +355,28 @@ public class BXMLBodyGeneratorTest {
         BType crashType = IntegerType.getInstance();
         dummyGenerator.getNodeTyp().put(hash, crashType);
         dummyGenerator.generateHash(type);
+
+    }
+
+    @Test
+    public void test_hashFunction_2(){
+        HashMap<Integer, BType> dummy = new HashMap<>();
+        exception.expect(IndexOutOfBoundsException.class);
+        exception.expectMessage("Hash was already taken! INTEGER is not BOOL");
+        BType type = BoolType.getInstance();
+        BType crashType = IntegerType.getInstance();
+        int hash = Math.abs(crashType.toString().hashCode());
+
+        dummy.put(hash, type);
+        prepare(dummy);
+        dummyGenerator.generateHash(crashType);
+        System.out.println(dummy);
+    }
+
+    @Test
+    public void test_hashFunction_3(){
+        BType type = BoolType.getInstance();
+        assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
 
     }
 }
