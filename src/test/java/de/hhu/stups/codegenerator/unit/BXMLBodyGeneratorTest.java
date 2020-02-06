@@ -3,6 +3,8 @@ package de.hhu.stups.codegenerator.unit;
 import de.hhu.stups.codegenerator.generators.BXMLBodyGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
+import de.prob.parser.ast.nodes.DeclarationNode;
+import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.nodes.expression.ExprNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
@@ -13,25 +15,28 @@ import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
 import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
 import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
-import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
+import de.prob.parser.ast.types.IntegerType;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
-import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UnitTests {
+import static org.junit.Assert.assertEquals;
+
+public class BXMLBodyGeneratorTest {
 
     DummyGenerator dummyGenerator;
 
-    protected static class DummyGenerator extends BXMLBodyGenerator{
+    protected static class DummyGenerator extends BXMLBodyGenerator {
 
         public DummyGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
             super(nodeType, nameHandler, currentGroup);
@@ -145,9 +150,36 @@ public class UnitTests {
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
 
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstitutionNode(new SourceCodePosition(),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
+                List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
 
-      //  IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
-      //          IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(predicateNode), n);
+        IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
+                IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(assignSubstitutionNode),
+                null);
+
+        assertEquals("<Select>\n" +
+                "    <When_Clauses>\n" +
+                "        <When>\n" +
+                "            <Condition>\n" +
+                "                <Exp_Comparison op=':'>\n" +
+                "                    <Binary_Exp op='-' typref='2044650'>\n" +
+                "                    </Binary_Exp>\n" +
+                "                </Exp_Comparison>\n" +
+                "            </Condition>\n" +
+                "            <Then>\n" +
+                "                <Assignement_Sub>\n" +
+                "                    <Variables>\n" +
+                "                        <Id value='test' typref='2044650'/>\n" +
+                "                    </Variables>\n" +
+                "                    <Values>\n" +
+                "                        <Id value='test2' typref='2044650'/>\n" +
+                "                    </Values>\n" +
+                "                </Assignement_Sub>\n" +
+                "            </Then>\n" +
+                "        </When>\n" +
+                "    </When_Clauses>\n" +
+                "</Select>", dummyGenerator.processSubstitutionNode(ifOrSelectSubstitutionsNode));
 
     }
 
@@ -309,5 +341,29 @@ public class UnitTests {
     public void test_processOperatorPredOperatorExprArgs_GREATER_EQUAL(){
         assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.GREATER_EQUAL), "&gt;=");
+    }
+
+    @Test
+    public void test_processDeclarationNode(){
+        DeclarationNode declarationNode = new DeclarationNode(new SourceCodePosition(), "test",
+                DeclarationNode.Kind.CONSTANT, new MachineNode(new SourceCodePosition()));
+        BType type = BoolType.getInstance();
+        declarationNode.setType(type);
+        assertEquals("<Id value='test' typref='2044650'/>", dummyGenerator.processDeclarationNode(declarationNode));
+    }
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void test_hashFunction(){
+        exception.expect(IndexOutOfBoundsException.class);
+        exception.expectMessage("Hash was already taken! BOOL is not INTEGER");
+        BType type = BoolType.getInstance();
+        int hash = dummyGenerator.generateHash(type);
+        BType crashType = IntegerType.getInstance();
+        dummyGenerator.getNodeTyp().put(hash, crashType);
+        dummyGenerator.generateHash(type);
+
     }
 }

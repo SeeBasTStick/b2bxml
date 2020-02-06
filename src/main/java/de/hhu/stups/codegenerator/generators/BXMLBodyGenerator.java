@@ -307,8 +307,14 @@ public abstract class BXMLBodyGenerator {
 
     public int generateHash(BType type)
     {
-        //ToDo negativ value
-        return Math.abs(type.toString().hashCode());
+        int hash = Math.abs(type.toString().hashCode());
+        if(!nodeType.containsKey(hash) || nodeType.containsKey(hash) && nodeType.get(hash) == type)
+        {
+            return hash;
+        }
+        else{
+            throw new IndexOutOfBoundsException("Hash was already taken! " +type.toString() + " is not " + nodeType.get(hash));
+        }
     }
 
 }
