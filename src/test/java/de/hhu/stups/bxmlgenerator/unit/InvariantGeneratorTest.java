@@ -1,7 +1,6 @@
-package de.hhu.stups.codegenerator.unit;
+package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.codegenerator.generators.InitialisationGenerator;
-import de.hhu.stups.codegenerator.generators.InvariantGenerator;
+import de.hhu.stups.bxmlgenerator.generators.InvariantGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;

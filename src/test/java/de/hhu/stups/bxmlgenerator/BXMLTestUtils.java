@@ -1,4 +1,4 @@
-package de.hhu.stups.codegenerator;
+package de.hhu.stups.bxmlgenerator;
 
 import org.junit.Assert;
 import org.w3c.dom.Attr;
@@ -17,7 +17,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.StringWriter;
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -61,8 +60,8 @@ public class BXMLTestUtils {
 
     private static Path buildBXML(String machine)  {
         Path mchPath = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/machine/" + machine + ".mch");
-        CodeGenerator codeGenerator = new CodeGenerator();
-        return codeGenerator.generate(mchPath);
+        de.hhu.stups.bxmlgenerator.CodeGenerator codeGenerator = new CodeGenerator();
+        return codeGenerator.generate(mchPath , mchPath);
     }
 
     private static String toXmlString(Document document) throws TransformerException {

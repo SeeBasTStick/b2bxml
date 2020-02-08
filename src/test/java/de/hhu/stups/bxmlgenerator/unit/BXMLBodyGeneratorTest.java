@@ -1,10 +1,8 @@
-package de.hhu.stups.codegenerator.unit;
+package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.codegenerator.generators.BXMLBodyGenerator;
+import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
-import de.prob.parser.ast.nodes.DeclarationNode;
-import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
 import de.prob.parser.ast.nodes.expression.NumberNode;
@@ -314,11 +312,8 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
     @Test
     public void test_processDeclarationNode(){
-        DeclarationNode declarationNode = new DeclarationNode(new SourceCodePosition(), "test",
-                DeclarationNode.Kind.CONSTANT, new MachineNode(new SourceCodePosition()));
-        BType type = BoolType.getInstance();
-        declarationNode.setType(type);
-        assertEquals("<Id value='test' typref='2044650'/>", dummyGenerator.processDeclarationNode(declarationNode));
+        assertEquals("<Id value='test' typref='2044650'/>",
+                dummyGenerator.processDeclarationNode(dummy_DeclarationNodeGenerator((BoolType.getInstance()))));
     }
 
     @Rule

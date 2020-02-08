@@ -1,6 +1,6 @@
-package de.hhu.stups.codegenerator.unit;
+package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.codegenerator.generators.InitialisationGenerator;
+import de.hhu.stups.bxmlgenerator.generators.InitialisationGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import org.junit.Before;
 import org.junit.Test;

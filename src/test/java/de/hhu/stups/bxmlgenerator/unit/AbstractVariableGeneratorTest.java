@@ -1,6 +1,6 @@
-package de.hhu.stups.codegenerator.unit;
+package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.codegenerator.generators.AbstractVariablesGenerator;
+import de.hhu.stups.bxmlgenerator.generators.AbstractVariablesGenerator;
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.DeclarationNode;

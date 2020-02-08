@@ -1,4 +1,4 @@
-package de.hhu.stups.codegenerator.generators;
+package de.hhu.stups.bxmlgenerator.generators;
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
@@ -230,8 +230,6 @@ public abstract class BXMLBodyGenerator {
 
     public String processPredicateOperatorNode(PredicateOperatorNode node)
     {
-        System.out.println("Hallo?");
-
         String result ;
         if(node.getPredicateArguments().size() == 1){
             result = "";

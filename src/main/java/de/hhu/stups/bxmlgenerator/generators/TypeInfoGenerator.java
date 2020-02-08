@@ -1,4 +1,4 @@
-package de.hhu.stups.codegenerator.generators;
+package de.hhu.stups.bxmlgenerator.generators;
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;

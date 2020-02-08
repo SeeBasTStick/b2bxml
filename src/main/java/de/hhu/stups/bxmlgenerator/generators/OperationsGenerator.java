@@ -1,4 +1,4 @@
-package de.hhu.stups.codegenerator.generators;
+package de.hhu.stups.bxmlgenerator.generators;
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
@@ -24,7 +24,7 @@ public class OperationsGenerator extends BXMLBodyGenerator {
         return operations.render();
     }
 
-    private String generateOperation(OperationNode node){
+    public String generateOperation(OperationNode node){
         ST operation = super.getSTGroup().getInstanceOf("operation");
         TemplateHandler.add(operation, "name", node.getName());
 

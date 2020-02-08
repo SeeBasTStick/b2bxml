@@ -1,4 +1,4 @@
-package de.hhu.stups.codegenerator.generators;
+package de.hhu.stups.bxmlgenerator.generators;
 
 
 import de.hhu.stups.codegenerator.handlers.NameHandler;
@@ -11,9 +11,6 @@ import org.stringtemplate.v4.STGroupFile;
 
 import java.util.HashMap;
 
-/*
-* The code generator is implemented by using the visitor pattern
-*/
 
 public class MachineGenerator {
 
@@ -44,9 +41,7 @@ public class MachineGenerator {
 		this.typeInfoGenerator = new TypeInfoGenerator(nodeType, nameHandler, currentGroup);
 	}
 
-	/*
-	 * This function generates code for the whole machine with the given AST node.
-	 */
+
 	public String generateMachine(MachineNode node) {
 		ST machine = currentGroup.getInstanceOf("machine");
 		TemplateHandler.add(machine, "machine", nameHandler.handle(node.getName()));
@@ -55,9 +50,6 @@ public class MachineGenerator {
 	}
 
 
-	/*types
-	 * This function generates the whole body of a machine from the given AST node for the machine.
-	 */
 	private void generateBody(MachineNode node, ST machine) {
 		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateAbstractVariables(node.getVariables()));
 		TemplateHandler.add(machine, "invariant", invariantGenerator.generateInvariants(node.getInvariant()));

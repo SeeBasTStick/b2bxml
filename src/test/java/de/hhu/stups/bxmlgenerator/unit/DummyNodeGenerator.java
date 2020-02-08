@@ -1,6 +1,8 @@
-package de.hhu.stups.codegenerator.unit;
+package de.hhu.stups.bxmlgenerator.unit;
 
 import de.prob.parser.ast.SourceCodePosition;
+import de.prob.parser.ast.nodes.DeclarationNode;
+import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
 import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
@@ -28,6 +30,13 @@ public abstract class DummyNodeGenerator {
         return new AssignSubstitutionNode(new SourceCodePosition(),
                 List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test")),
                 List.of(dummy_IdentifierExprNodeGenerator(BoolType.getInstance(), "test2")));
+    }
+
+    protected DeclarationNode dummy_DeclarationNodeGenerator(BType type){
+        DeclarationNode declarationNode = new DeclarationNode(new SourceCodePosition(), "test",
+                DeclarationNode.Kind.CONSTANT, new MachineNode(new SourceCodePosition()));
+        declarationNode.setType(type);
+        return declarationNode;
     }
 
 }
