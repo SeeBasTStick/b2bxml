@@ -8,3 +8,5 @@ Java 1.9 or higher.
 I highly recommend gradle wrapper for executing the program:
 
 `./gradlew run --args='<target Path> <optional destination Path>'`
+
+`./gradlew run --args='/home/user/resources/Mega.mch /home/user/Desktop/'`

@@ -8,6 +8,7 @@ import de.prob.parser.antlr.ScopeException;
 import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.visitors.TypeErrorException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ public class CodeGenerator {
 
 	/*
 	 * [0] Target
-	 * [1] Destination (optional)
+	 * [1] Destination (optional) e.g ~/Desktop/
 	 */
 	public static void main(String[] args) throws CodeGenerationException {
 		if(args.length < 1) {
@@ -32,7 +33,6 @@ public class CodeGenerator {
 			return;
 		}
 
-		CodeGenerator codeGenerator = new CodeGenerator();
 		Path path = Paths.get(args[0]);
 		checkPath(path);
 
@@ -44,7 +44,8 @@ public class CodeGenerator {
 			destination = path;
 		}
 
-		codeGenerator.generate(path, destination);
+		BProject project = parseProject(path);
+		writeToFile(path, destination, project.getMainMachine());
 	}
 
 	private static void checkPath(Path path) {
@@ -53,31 +54,37 @@ public class CodeGenerator {
 		}
 	}
 
-	public Path generate(Path path, Path destination) throws CodeGenerationException {
-		BProject project = parseProject(path);
-		return  writeToFile(destination, project.getMainMachine());
-	}
 
-	private Path writeToFile(Path path,  MachineNode node) {
+	private static void writeToFile(Path target, Path destination,  MachineNode node) {
+
+		Path newPath;
+
+		if(target.toString().equals(destination.toString()))
+		{
+			int lastIndexSlash = target.toString().lastIndexOf(File.separator);
+
+			newPath = Paths.get(target.toString().substring(0, lastIndexSlash + 1)  + node.getName() + ".bxml");
+		}
+		else{
+			newPath = Paths.get(destination + File.separator + node.getName() + ".bxml");
+		}
+
+		System.out.println(newPath);
+
 		MachineGenerator generator = new MachineGenerator();
 
 		String code = generator.generateMachine(node);
 
-		int lastIndexSlash = path.toString().lastIndexOf("/");
-
-		Path newPath = Paths.get(path.toString().substring(0, lastIndexSlash + 1) + node.getName() + ".bxml");
-
-		System.out.println(newPath);
-
 		try {
-			return Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
+			Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
-	private BProject parseProject(Path path) throws CodeGenerationException {
+
+	private static BProject parseProject(Path path) throws CodeGenerationException {
 		BProject project;
 		try {
 			project = Antlr4BParser.createBProjectFromMainMachineFile(path.toFile());
