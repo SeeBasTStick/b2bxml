@@ -1,8 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'antlr'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+
+plugins{
+    id 'java';
+    id 'application'
+    id 'antlr'
+    id 'eclipse'
+    id 'idea'
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
 
 project.archivesBaseName = 'B2bxml'
 project.version = '0.0.1-SNAPSHOT' // If no snapshot, adapt ANTLR parser tag to git revision
@@ -37,28 +42,14 @@ dependencies {
     implementation 'org.xmlunit:xmlunit-core:2.6.3' //https://github.com/xmlunit/user-guide
     testImplementation 'junit:junit:4.8.2'
 
-
 }
 
 jar {
     manifest {
         attributes(
-                'Main-Class': 'de.hhu.stups.bxmlgenerator' +
-                        '.CodeGenerator'
+                'Main-Class': 'de.hhu.stups.bxmlgenerator.CodeGenerator'
         )
     }
-}
-
-task fatJar(type: Jar) {
-    archiveBaseName = project.name + '-all'
-    manifest {
-        attributes(
-                'Main-Class': 'de.hhu.stups.bxmlgenerator' +
-                        '.CodeGenerator'
-        )
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
 }
 
 
@@ -70,11 +61,7 @@ sourceSets.main.java.srcDirs = ['src/main/java']
 sourceSets.test.runtimeClasspath += files(sourceSets.main.java.srcDirs)
 
 tasks.withType(JavaExec) {
-
     systemProperty "java.library.path", "./"
-
-
-
 }
 
 
