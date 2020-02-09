@@ -54,8 +54,18 @@ public class CodeGenerator {
 		}
 	}
 
+	public Path generate(Path target, Path destination){
+		BProject project = parseProject(target);
+		return writeToFile(target, destination, project.getMainMachine());
+	}
 
-	private static void writeToFile(Path target, Path destination,  MachineNode node) {
+	public Path generate(Path target){
+		BProject project = parseProject(target);
+		return writeToFile(target, Paths.get(target.toString().substring(0, target.toString().lastIndexOf(File.separator)+1)), project.getMainMachine());
+	}
+
+
+	private static Path writeToFile(Path target, Path destination,  MachineNode node) {
 
 		Path newPath;
 
@@ -69,14 +79,12 @@ public class CodeGenerator {
 			newPath = Paths.get(destination + File.separator + node.getName() + ".bxml");
 		}
 
-		System.out.println(newPath);
-
 		MachineGenerator generator = new MachineGenerator();
 
 		String code = generator.generateMachine(node);
 
 		try {
-			Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
+			return Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

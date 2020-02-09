@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator;
+package de.hhu.stups.bxmlgenerator.integration;
 
 import org.junit.Test;
 

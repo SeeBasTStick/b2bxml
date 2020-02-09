@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator;
+package de.hhu.stups.bxmlgenerator.integration;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -1,5 +1,6 @@
-package de.hhu.stups.bxmlgenerator;
+package de.hhu.stups.bxmlgenerator.integration;
 
+import de.hhu.stups.bxmlgenerator.CodeGenerator;
 import org.junit.Assert;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -58,10 +59,11 @@ public class BXMLTestUtils {
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
     }
 
-    private static Path buildBXML(String machine)  {
-        Path mchPath = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/machine/" + machine + ".mch");
-        de.hhu.stups.bxmlgenerator.CodeGenerator codeGenerator = new CodeGenerator();
-        return codeGenerator.generate(mchPath , mchPath);
+    private static Path buildBXML(String machineName)  {
+        Path mchPath = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/machine/"
+                + machineName + ".mch");
+        CodeGenerator codeGenerator = new CodeGenerator();
+        return codeGenerator.generate(mchPath);
     }
 
     private static String toXmlString(Document document) throws TransformerException {
