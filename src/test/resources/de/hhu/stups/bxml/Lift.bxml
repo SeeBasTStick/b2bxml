@@ -47,7 +47,7 @@
                         </Binary_Exp>
                     </Values>
                 </Assignement_Sub>
-            </Body>
+             </Body>
         </Operation>
         <Operation name='dec'>
             <Precondition>

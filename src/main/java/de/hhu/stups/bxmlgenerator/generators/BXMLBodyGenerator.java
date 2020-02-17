@@ -185,13 +185,6 @@ public abstract class BXMLBodyGenerator {
                 ST skipSub = currentGroup.getInstanceOf("skip");
                 TemplateHandler.add(skipSub, "", null);
                 return skipSub.render();
-            case "ConditionSubstitutionNode":
-                ConditionSubstitutionNode conditionSubstitutionNode = (ConditionSubstitutionNode) node;
-
-
-                System.out.println(conditionSubstitutionNode.toString());
-                System.out.println(conditionSubstitutionNode.getCondition());
-                System.out.println(conditionSubstitutionNode.getSubstitution());
             default:
                 result = exceptionThrower(node);
 

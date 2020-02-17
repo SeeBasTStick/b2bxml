@@ -16,14 +16,21 @@ operations(operation) ::=<<
 \</Operations>
 >>
 
-operation(name, output_parameters, parameter, body) ::=<<
+operation(name, output_parameters, parameter, precondition, body) ::=<<
 \<Operation name='<name>'>
     <output_parameters>
     <parameter>
+    <precondition>
     \<Body>
         <body; separator="\n">
     \</Body>
 \</Operation>
+>>
+
+    precondition(body) ::=<<
+\<Precondition>
+    <body>
+\</Precondition>
 >>
 
 output_parameters(body) ::=<<
