@@ -14,9 +14,6 @@ import java.util.HashMap;
 
 public class MachineGenerator {
 
-
-	private NameHandler nameHandler;
-
 	private STGroup currentGroup;
 
 	private TypeInfoGenerator typeInfoGenerator;
@@ -32,19 +29,18 @@ public class MachineGenerator {
 
 	public MachineGenerator() {
 		this.currentGroup = new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg");
-		this.nameHandler = new NameHandler(currentGroup);
 		HashMap<Integer, BType> nodeType = new HashMap<>();
-		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType, nameHandler, currentGroup);
-		this.invariantGenerator = new InvariantGenerator(nodeType, nameHandler, currentGroup);
-		this.initialisationGenerator = new InitialisationGenerator(nodeType, nameHandler, currentGroup);
-		this.operationsGenerator = new OperationsGenerator(nodeType, nameHandler, currentGroup);
-		this.typeInfoGenerator = new TypeInfoGenerator(nodeType, nameHandler, currentGroup);
+		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType,  currentGroup);
+		this.invariantGenerator = new InvariantGenerator(nodeType,  currentGroup);
+		this.initialisationGenerator = new InitialisationGenerator(nodeType,  currentGroup);
+		this.operationsGenerator = new OperationsGenerator(nodeType,  currentGroup);
+		this.typeInfoGenerator = new TypeInfoGenerator(nodeType,  currentGroup);
 	}
 
 
 	public String generateMachine(MachineNode node) {
 		ST machine = currentGroup.getInstanceOf("machine");
-		TemplateHandler.add(machine, "machine", nameHandler.handle(node.getName()));
+		TemplateHandler.add(machine, "machine", node.getName());
 		generateBody(node, machine);
 		return machine.render();
 	}

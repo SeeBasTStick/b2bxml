@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 public class AbstractVariablesGenerator extends BXMLBodyGenerator {
 
-    public AbstractVariablesGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-        super(nodeType, nameHandler, currentGroup);
+    public AbstractVariablesGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        super(nodeType,  currentGroup);
     }
 
     public String generateAbstractVariables(List<DeclarationNode> declarations){

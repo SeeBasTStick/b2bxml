@@ -17,7 +17,6 @@ public class InitialisationGeneratorTest extends DummyNodeGenerator{
     @Before
     public void prepare(){
         initialisationGenerator = new InitialisationGenerator(new HashMap<>(),
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 

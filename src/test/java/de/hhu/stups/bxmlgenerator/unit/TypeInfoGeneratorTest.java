@@ -22,7 +22,6 @@ public class TypeInfoGeneratorTest {
         nodeTypes.put(Math.abs(IntegerType.getInstance().toString().hashCode()), IntegerType.getInstance());
 
         typeInfoGenerator  = new TypeInfoGenerator(nodeTypes,
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
 
         assertEquals("<Type id='1618932450'>\n" +
@@ -38,7 +37,6 @@ public class TypeInfoGeneratorTest {
         nodeTypes.put(Math.abs(IntegerType.getInstance().toString().hashCode()), IntegerType.getInstance());
 
         typeInfoGenerator  = new TypeInfoGenerator(nodeTypes,
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
 
         assertEquals("<TypeInfos>\n" +

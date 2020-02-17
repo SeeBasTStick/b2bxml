@@ -22,7 +22,6 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Before
     public void prepare(){
         operationsGenerator = new OperationsGenerator(new HashMap<>(),
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 

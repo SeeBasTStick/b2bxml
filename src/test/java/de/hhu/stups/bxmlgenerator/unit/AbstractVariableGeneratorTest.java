@@ -23,7 +23,6 @@ public class AbstractVariableGeneratorTest {
     @Before
     public void prepare(){
         abstractVariablesGenerator = new AbstractVariablesGenerator(new HashMap<> (),
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 

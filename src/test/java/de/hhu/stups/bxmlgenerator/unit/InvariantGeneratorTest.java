@@ -23,7 +23,6 @@ public class InvariantGeneratorTest extends DummyNodeGenerator{
     @Before
     public void prepare(){
         invariantGenerator = new InvariantGenerator(new HashMap<>(),
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 

@@ -132,3 +132,7 @@ type(id, body) ::= <<
 \</Type>
 >>
 
+skip() ::=<<
+\<Skip/>
+>>
+

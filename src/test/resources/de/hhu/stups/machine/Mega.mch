@@ -14,6 +14,7 @@ INITIALISATION ii, jj := 2, 10
 OPERATIONS 
     inc = SELECT jj>0
     THEN ii := ii+1|| jj:=jj-1 END;
+
     result <-- res = result := ii
 
 END

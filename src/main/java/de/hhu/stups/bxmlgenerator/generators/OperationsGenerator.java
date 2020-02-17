@@ -1,6 +1,5 @@
 package de.hhu.stups.bxmlgenerator.generators;
 
-import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.types.BType;
@@ -12,8 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OperationsGenerator extends BXMLBodyGenerator {
-    public OperationsGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-        super(nodeType, nameHandler, currentGroup);
+    public OperationsGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        super(nodeType,  currentGroup);
     }
 
     public String generateOperations(List<OperationNode> nodeList){
@@ -24,9 +23,16 @@ public class OperationsGenerator extends BXMLBodyGenerator {
         return operations.render();
     }
 
+    /*
+     * node.getSub...() -> conditionSubstitutionNode ist + operator = pre
+     * test if atelier b can do assert
+     */
+
     public String generateOperation(OperationNode node){
         ST operation = super.getSTGroup().getInstanceOf("operation");
         TemplateHandler.add(operation, "name", node.getName());
+
+        System.out.println("Operation " + node.getSubstitution().toString());
 
         if(!node.getOutputParams().isEmpty())
         {
@@ -38,11 +44,9 @@ public class OperationsGenerator extends BXMLBodyGenerator {
             TemplateHandler.add(operation, "output_parameters", outputParameters.render());
         }
 
-        if(!node.getParams().isEmpty())
-        {
+        if(!node.getParams().isEmpty()) {
             System.out.println(node.getParams() + " operation not implemented yet");
         }
-
         TemplateHandler.add(operation, "body" , processSubstitutionNode(node.getSubstitution()));
 
         return  operation.render();

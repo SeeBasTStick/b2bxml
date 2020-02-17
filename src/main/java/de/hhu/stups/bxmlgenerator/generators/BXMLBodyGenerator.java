@@ -11,10 +11,7 @@ import de.prob.parser.ast.nodes.expression.NumberNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
-import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
-import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
-import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
-import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.*;
 import de.prob.parser.ast.types.BType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -27,24 +24,19 @@ public abstract class BXMLBodyGenerator {
 
     public Map<Integer, BType> nodeType;
 
-    public NameHandler nameHandler;
 
     public STGroup currentGroup;
 
-    public BXMLBodyGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup)
+    public BXMLBodyGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup)
     {
         this.nodeType = nodeType;
         this.currentGroup = currentGroup;
-        this.nameHandler = nameHandler;
     }
 
     public Map<Integer, BType> getNodeTyp(){
         return nodeType;
     }
 
-    public NameHandler getNameHandler(){
-        return nameHandler;
-    }
 
     public STGroup getSTGroup(){ return currentGroup; }
 
@@ -65,8 +57,7 @@ public abstract class BXMLBodyGenerator {
             case "IdentifierExprNode":
                 IdentifierExprNode identifierExprNode = (IdentifierExprNode) node;
                 ST id = currentGroup.getInstanceOf("id");
-                TemplateHandler.add(id, "val", nameHandler.handleIdentifier(identifierExprNode.getName(),
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                TemplateHandler.add(id, "val", identifierExprNode.getName());
 
                 TemplateHandler.add(id, "typref", generateHash(identifierExprNode.getType()));
 
@@ -80,8 +71,7 @@ public abstract class BXMLBodyGenerator {
             case "NumberNode":
                 NumberNode numberNode = (NumberNode) node;
                 ST integer_literal = currentGroup.getInstanceOf("integer_literal");
-                TemplateHandler.add(integer_literal, "val", nameHandler.handleIdentifier(numberNode.getValue().toString(),
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                TemplateHandler.add(integer_literal, "val", numberNode.getValue().toString());
 
                 TemplateHandler.add(integer_literal, "typref", generateHash(numberNode.getType()));
 
@@ -106,18 +96,15 @@ public abstract class BXMLBodyGenerator {
 
         switch (node.getOperator()){
             case INTERVAL:
-                TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("..",
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                TemplateHandler.add(binary_exp, "op", "..");
                 break;
 
             case MINUS:
-                TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("-",
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                TemplateHandler.add(binary_exp, "op", "-");
                 break;
 
             case PLUS:
-                TemplateHandler.add(binary_exp, "op", nameHandler.handleIdentifier("+",
-                        NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+                TemplateHandler.add(binary_exp, "op", "+");
                 break;
 
             default:
@@ -194,6 +181,17 @@ public abstract class BXMLBodyGenerator {
                         .collect(Collectors.toList()));
 
                 return assignSub.render();
+            case "SkipSubstitutionNode":
+                ST skipSub = currentGroup.getInstanceOf("skip");
+                TemplateHandler.add(skipSub, "", null);
+                return skipSub.render();
+            case "ConditionSubstitutionNode":
+                ConditionSubstitutionNode conditionSubstitutionNode = (ConditionSubstitutionNode) node;
+
+
+                System.out.println(conditionSubstitutionNode.toString());
+                System.out.println(conditionSubstitutionNode.getCondition());
+                System.out.println(conditionSubstitutionNode.getSubstitution());
             default:
                 result = exceptionThrower(node);
 
@@ -292,8 +290,7 @@ public abstract class BXMLBodyGenerator {
     public String processDeclarationNode(DeclarationNode node)
     {
         ST id = currentGroup.getInstanceOf("id");
-        TemplateHandler.add(id, "val", nameHandler.handleIdentifier(node.getName(),
-                NameHandler.IdentifierHandlingEnum.FUNCTION_NAMES));
+        TemplateHandler.add(id, "val", node.getName());
 
         TemplateHandler.add(id, "typref", generateHash(node.getType()));
 

@@ -9,7 +9,7 @@ plugins{
 }
 
 
-project.archivesBaseName = 'B2bxml'
+project.archivesBaseName = 'B2Bxml'
 project.version = '0.0.1-SNAPSHOT' // If no snapshot, adapt ANTLR parser tag to git revision
 project.group = 'de.hhu.stups'
 

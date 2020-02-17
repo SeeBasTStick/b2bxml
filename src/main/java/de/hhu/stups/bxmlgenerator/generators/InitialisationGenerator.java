@@ -10,8 +10,8 @@ import org.stringtemplate.v4.STGroup;
 import java.util.Map;
 
 public class InitialisationGenerator extends BXMLBodyGenerator{
-    public InitialisationGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-        super(nodeType, nameHandler, currentGroup);
+    public InitialisationGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        super(nodeType, currentGroup);
     }
 
     public String generateInitialisation(SubstitutionNode node){

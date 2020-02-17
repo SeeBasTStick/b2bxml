@@ -1,7 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
-import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
@@ -12,6 +11,7 @@ import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
 import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
 import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.SkipSubstitutionNode;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
 import de.prob.parser.ast.types.IntegerType;
@@ -36,8 +36,8 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
     protected static class DummyGenerator extends BXMLBodyGenerator {
 
-        public DummyGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-            super(nodeType, nameHandler, currentGroup);
+        public DummyGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+            super(nodeType,  currentGroup);
         }
     }
 
@@ -49,7 +49,6 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
     public void prepare(HashMap<Integer, BType> nodeType){
         dummyGenerator = new DummyGenerator(nodeType,
-                new NameHandler(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")),
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 
@@ -209,6 +208,17 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
     }
 
     @Test
+    public void test_processSubstitutionNode_SkipSubstitutionNode(){
+
+        SkipSubstitutionNode assignSubstitutionNode = new SkipSubstitutionNode(new SourceCodePosition());
+
+        assertEquals("<Skip/>", dummyGenerator.processSubstitutionNode(assignSubstitutionNode));
+    }
+
+
+
+
+    @Test
     public void test_processPredicateNode_PredicateOperatorNode(){
 
         ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
@@ -366,4 +376,6 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
         assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
 
     }
+
+
 }

@@ -10,8 +10,8 @@ import org.stringtemplate.v4.STGroup;
 import java.util.Map;
 
 public class InvariantGenerator extends BXMLBodyGenerator {
-    public InvariantGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-        super(nodeType, nameHandler, currentGroup);
+    public InvariantGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        super(nodeType, currentGroup);
     }
 
     public String generateInvariants(PredicateNode node){

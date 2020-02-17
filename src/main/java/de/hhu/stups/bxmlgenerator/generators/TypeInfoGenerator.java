@@ -1,6 +1,5 @@
 package de.hhu.stups.bxmlgenerator.generators;
 
-import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.SetType;
@@ -13,8 +12,8 @@ import java.util.stream.Collectors;
 public class TypeInfoGenerator extends BXMLBodyGenerator{
 
 
-    public TypeInfoGenerator(Map<Integer, BType> nodeType, NameHandler nameHandler, STGroup currentGroup) {
-        super(nodeType, nameHandler, currentGroup);
+    public TypeInfoGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        super(nodeType,  currentGroup);
     }
 
 
