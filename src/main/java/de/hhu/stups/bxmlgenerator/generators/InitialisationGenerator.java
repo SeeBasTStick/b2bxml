@@ -16,7 +16,7 @@ public class InitialisationGenerator extends BXMLBodyGenerator{
 
     public String generateInitialisation(SubstitutionNode node){
         ST initialisation = getSTGroup().getInstanceOf("initialisation");
-        TemplateHandler.add(initialisation, "body", processSubstitutionNode(node));
+        TemplateHandler.add(initialisation, "body", visitSubstitutionNode(node, null));
         return initialisation.render();
     }
 }

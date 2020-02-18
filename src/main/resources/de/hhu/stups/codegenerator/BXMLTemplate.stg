@@ -27,7 +27,7 @@ operation(name, output_parameters, parameter, precondition, body) ::=<<
 \</Operation>
 >>
 
-    precondition(body) ::=<<
+precondition(body) ::=<<
 \<Precondition>
     <body>
 \</Precondition>

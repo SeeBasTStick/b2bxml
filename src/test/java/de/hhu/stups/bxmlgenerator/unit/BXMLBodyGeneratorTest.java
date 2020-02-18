@@ -152,7 +152,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "            </Then>\n" +
                 "        </When>\n" +
                 "    </When_Clauses>\n" +
-                "</Select>", dummyGenerator.processSubstitutionNode(ifOrSelectSubstitutionsNode));
+                "</Select>", dummyGenerator.visitSubstitutionNode(ifOrSelectSubstitutionsNode, null));
 
     }
 
@@ -171,7 +171,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "            <Id value='test2' typref='2044650'/>\n" +
                 "        </Values>\n" +
                 "    </Assignement_Sub>\n" +
-                "</Nary_Sub>", dummyGenerator.processSubstitutionNode(listSubstitutionNode));
+                "</Nary_Sub>", dummyGenerator.visitSubstitutionNode(listSubstitutionNode, null));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "            <Id value='test2' typref='2044650'/>\n" +
                 "        </Values>\n" +
                 "    </Assignement_Sub>\n" +
-                "</Nary_Sub>", dummyGenerator.processSubstitutionNode(listSubstitutionNode));
+                "</Nary_Sub>", dummyGenerator.visitSubstitutionNode(listSubstitutionNode, null));
     }
 
     @Test
@@ -204,7 +204,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "    <Values>\n" +
                 "        <Id value='test2' typref='2044650'/>\n" +
                 "    </Values>\n" +
-                "</Assignement_Sub>", dummyGenerator.processSubstitutionNode(assignSubstitutionNode));
+                "</Assignement_Sub>", dummyGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
     }
 
     @Test
@@ -212,7 +212,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
         SkipSubstitutionNode assignSubstitutionNode = new SkipSubstitutionNode(new SourceCodePosition());
 
-        assertEquals("<Skip/>", dummyGenerator.processSubstitutionNode(assignSubstitutionNode));
+        assertEquals("<Skip/>", dummyGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
     }
 
 
