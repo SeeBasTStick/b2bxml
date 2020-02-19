@@ -17,24 +17,30 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class BXMLTestUtils {
 
+    static String projectLocation = System.getProperty("user.dir");
+
     public static void calculateDifference(String name) throws Exception {
-        Path result = buildBXML(name);
 
-        Path original = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/bxml/" + name + ".bxml");
 
+        Path original = generateOriginal(name);
+
+    //    Path image = generateImage(name);
+/*
         File xmlFile1 = new File(original.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc1 = db.parse(xmlFile1);
 
-        File xmlFile2 = new File(result.toString());
+        File xmlFile2 = new File(image.toString());
         DocumentBuilderFactory dbf2 = DocumentBuilderFactory.newInstance();
         DocumentBuilder db2 = dbf2.newDocumentBuilder();
         Document doc2 = db2.parse(xmlFile2);
@@ -57,13 +63,61 @@ public class BXMLTestUtils {
 
 
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
+*/
+
     }
 
-    private static Path buildBXML(String machineName)  {
-        Path mchPath = Paths.get(System.getProperty("user.dir") + "/src/test/resources/de/hhu/stups/machine/"
+
+    private static Path generateOriginal(String machineName) throws IOException, InterruptedException {
+
+        Path cudata = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/generators/libicudata.so.48");
+        Path cuuc = Paths.get(":" ,projectLocation , "/src/test/resources/de/hhu/stups/generators/");
+
+        Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
                 + machineName + ".mch");
+
+        Path bxml = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/generators/bxml");
+
+        Path bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/");
+
+
+        ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-O",
+                bxmlTarget.toString(),
+                mchPath.toString());
+
+        pb.directory(new File(projectLocation+"/src/test/resources/de/hhu/stups/generators"));
+
+        Map<String, String> env = pb.environment();
+
+        // Exportion Libraries
+        env.put("LD_LIBRARY_PATH", cuuc.toString());
+
+        pb.redirectErrorStream(true);
+
+        pb.redirectOutput(new File("/home/sebastian/Desktop/bla.txt"));
+
+        Process javap = pb.start();
+
+
+
+        javap.waitFor();
+        System.out.println(bxml);
+        System.out.println(env);
+        System.out.println(javap.exitValue());
+        System.out.println(pb.directory());
+
+        return mchPath;
+    }
+
+    private static Path generateImage(String machineName) {
+
+        Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
+                + machineName + ".mch");
+
+        Path target = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/image");
+
         CodeGenerator codeGenerator = new CodeGenerator();
-        return codeGenerator.generate(mchPath);
+        return codeGenerator.generate(mchPath, target);
     }
 
     private static String toXmlString(Document document) throws TransformerException {
