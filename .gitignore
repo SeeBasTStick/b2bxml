@@ -1,3 +1,5 @@
+*.bxml
+
 .DS_Store
 **/target
 *.o
