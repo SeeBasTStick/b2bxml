@@ -3,6 +3,7 @@ package de.hhu.stups.bxmlgenerator.generators;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.Node;
+import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.expression.*;
 import de.prob.parser.ast.nodes.ltl.*;
 import de.prob.parser.ast.nodes.predicate.*;
