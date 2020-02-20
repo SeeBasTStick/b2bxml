@@ -116,6 +116,16 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
     }
 
     @Test
+    public void test_processExpressionOperatorNode_NAT()
+    {
+        ExpressionOperatorNode expressionOperatorNode =dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
+                ExpressionOperatorNode.ExpressionOperator.NAT);
+        assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
+                "<Id value='NAT' typref='631359557'/>");
+
+    }
+
+    @Test
     public void test_processSubstitutionNode_IfOrSelectSubstitutionsNode_SELECT(){
 
         ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),

@@ -46,7 +46,7 @@ public class OperationsGenerator extends BXMLBodyGenerator  {
             System.out.println(node.getParams() + " operation not implemented yet");
         }
 
-        TemplateHandler.add(operation, "body", visitSubstitutionNode(node.getSubstitution(), null));
+        TemplateHandler.add(operation, "body", visitSubstitutionNode(node.getSubstitution(), node));
         /*
          * Case distinction ASSERT und PRE
          */
@@ -54,15 +54,25 @@ public class OperationsGenerator extends BXMLBodyGenerator  {
     }
 
     /*
-     * Precondition is a special case, where we  need to ckeck at toplevel if it exists
+     * What happens here is not simple. AtelierB makes a difference between top and low level pre-condition
+     * what that means is that we check in the "body" node if there is a top level precondition. If this is true we need
+     * to alter the construct (aka the body of the operation) to add a tag <precondtion> before the actual body.
+     * In case we find a inner PRE condition we just can solve the problem when we deal with the body.
+     * In the method above, this is why we need to set a global variable. To do this we overwrite the conditionSubNode
+     * of the parent class to catch this special case. Otherwise we hand the problem down.
+     *
+     * I know very dirty...
      */
     public String visitConditionSubstitutionNode(ConditionSubstitutionNode node, Object expected) {
         if (node.getKind() == ConditionSubstitutionNode.Kind.PRECONDITION) {
             ST precondition = super.getSTGroup().getInstanceOf("precondition");
             TemplateHandler.add(precondition, "body", processPredicateNode(node.getCondition()));
             TemplateHandler.add(operation, "precondition", precondition.render());
+            return super.visitSubstitutionNode(node.getSubstitution(), node);
         }
-        return super.visitSubstitutionNode(node.getSubstitution(), node);
+        else{
+            return super.visitSubstitutionNode(node, null);
+        }
     }
 }
 

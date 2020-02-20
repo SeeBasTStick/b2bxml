@@ -62,17 +62,6 @@ initialisation(body) ::= <<
 \</Initialisation>
 >>
 
-assignment_sub(body1, body2) ::= <<
-\<Assignement_Sub>
-    \<Variables>
-        <body1; separator="\n">
-    \</Variables>
-    \<Values>
-        <body2; separator="\n">
-    \</Values>
-\</Assignement_Sub>
->>
-
 abstract_variable(ids, attrs) ::= <<
 \<Abstract_Variables>
     <ids; separator="\n">
@@ -103,6 +92,39 @@ nary_sub(op,statements) ::= <<
 \<Nary_Sub op='<op>'>
     <statements; separator="\n">
 \</Nary_Sub>
+>>
+
+assignment_sub(body1, body2) ::= <<
+\<Assignement_Sub>
+    \<Variables>
+        <body1; separator="\n">
+    \</Variables>
+    \<Values>
+        <body2; separator="\n">
+    \</Values>
+\</Assignement_Sub>
+>>
+
+assert_sub(guard, body) ::= <<
+\<Assert_Sub>
+    \<Guard>
+        <guard>
+    \</Guard>
+    \<Body>
+        <body>
+    \</Body>
+\</Assert_Sub>
+>>
+
+pre_sub(precondition, body) ::= <<
+\<PRE_Sub>
+    \<Precondition>
+        <precondition>
+    \</Precondition>
+    \<Body>
+        <body>
+    \</Body>
+\</PRE_Sub>
 >>
 
 exp_comparision(op, statements)::= <<

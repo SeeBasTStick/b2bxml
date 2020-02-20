@@ -6,6 +6,7 @@ plugins{
     id 'eclipse'
     id 'idea'
     id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'jacoco'
 }
 
 
@@ -51,6 +52,25 @@ jar {
         )
     }
 }
+
+
+
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+
 
 
 sourceCompatibility = 1.9

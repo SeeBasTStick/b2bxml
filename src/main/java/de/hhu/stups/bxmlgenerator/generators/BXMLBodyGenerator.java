@@ -426,7 +426,21 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
 
     @Override
     public String visitConditionSubstitutionNode(ConditionSubstitutionNode node, Object expected) {
-        return null;
+        if(node.getKind() == ConditionSubstitutionNode.Kind.ASSERT){
+            ST assertSub = currentGroup.getInstanceOf("assert_sub");
+            TemplateHandler.add(assertSub, "guard", processPredicateNode(node.getCondition()));
+            TemplateHandler.add(assertSub, "body", visitSubstitutionNode(node.getSubstitution(), null));
+            return assertSub.render();
+        }
+        else{
+            /*
+             * PRE_sub is a undocumented feature of the bxml standard of atelierB - 20.02.2020
+             */
+            ST preSub = currentGroup.getInstanceOf("pre_sub");
+            TemplateHandler.add(preSub, "precondition", processPredicateNode(node.getCondition()));
+            TemplateHandler.add(preSub, "body", visitSubstitutionNode(node.getSubstitution(), null));
+            return preSub.render();
+        }
     }
 
     @Override

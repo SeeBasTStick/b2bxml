@@ -17,4 +17,10 @@ public class TestBXML {
         BXMLTestUtils.calculateDifference(name);
     }
 
+    @Test
+    public void testInnerOuterPre() throws Exception{
+        String name = "Inner_Outer_PRE_Test";
+        BXMLTestUtils.calculateDifference(name);
+    }
+
 }
