@@ -31,19 +31,19 @@ public class BXMLTestUtils {
     public static void calculateDifference(String name) throws Exception {
 
 
-        Path original = generateOriginal(name);
+        Path originalPath = generateOriginal(name);
 
-    //    Path image = generateImage(name);
-/*
-        File xmlFile1 = new File(original.toString());
+        Path imagePath = generateImage(name);
+
+        File originalFile = new File(originalPath.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc1 = db.parse(xmlFile1);
+        Document doc1 = db.parse(originalFile);
 
-        File xmlFile2 = new File(image.toString());
+        File imageFile = new File(imagePath.toString());
         DocumentBuilderFactory dbf2 = DocumentBuilderFactory.newInstance();
         DocumentBuilder db2 = dbf2.newDocumentBuilder();
-        Document doc2 = db2.parse(xmlFile2);
+        Document doc2 = db2.parse(imageFile);
 
         ElementSelector es = ElementSelectors.conditionalBuilder()
                 .whenElementIsNamed("Type")
@@ -60,17 +60,13 @@ public class BXMLTestUtils {
                 .ignoreComments()
                 .checkForSimilar()
                 .build();
-
-
         Assert.assertFalse(myDiff.toString(), myDiff.hasDifferences());
-*/
 
     }
 
 
-    private static Path generateOriginal(String machineName) throws IOException, InterruptedException {
+    private static Path generateOriginal(String machineName) throws IOException{
 
-        Path cudata = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/generators/libicudata.so.48");
         Path cuuc = Paths.get(":" ,projectLocation , "/src/test/resources/de/hhu/stups/generators/");
 
         Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
@@ -81,32 +77,25 @@ public class BXMLTestUtils {
         Path bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/");
 
 
-        ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-O",
+        /*
+         * calls the standalone bxml generator contained in atelierB to create an "original" file
+         * https://www.atelierb.eu/en/download/
+         * Arguments of Process Builder are:
+         *  <application> <enable semantic analysis> <indent of 4> <destination for result> <target>
+         *    ./bxml        -a                          -i 4            -o ../result       ../bla.mch
+         */
+        ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-a", "-i", "4", "-O",
                 bxmlTarget.toString(),
                 mchPath.toString());
 
-        pb.directory(new File(projectLocation+"/src/test/resources/de/hhu/stups/generators"));
-
+        //Sets needed library path
         Map<String, String> env = pb.environment();
-
-        // Exportion Libraries
         env.put("LD_LIBRARY_PATH", cuuc.toString());
 
-        pb.redirectErrorStream(true);
+        pb.start();
 
-        pb.redirectOutput(new File("/home/sebastian/Desktop/bla.txt"));
-
-        Process javap = pb.start();
-
-
-
-        javap.waitFor();
-        System.out.println(bxml);
-        System.out.println(env);
-        System.out.println(javap.exitValue());
-        System.out.println(pb.directory());
-
-        return mchPath;
+        return Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/"
+                + machineName + ".bxml");
     }
 
     private static Path generateImage(String machineName) {
