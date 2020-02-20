@@ -1,10 +1,14 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.OperationsGenerator;
-import de.hhu.stups.codegenerator.handlers.NameHandler;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.PredicateNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.OperationNode;
+import de.prob.parser.ast.nodes.substitution.ConditionSubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.parser.ast.types.BoolType;
+import javafx.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.STGroupFile;
@@ -13,7 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class OperationsGeneratorTest extends DummyNodeGenerator {
 
@@ -107,6 +113,45 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
                 "        </Body>\n" +
                 "    </Operation>\n" +
                 "</Operations>", operationsGenerator.generateOperations(List.of(operationNode1, operationNode2)));
+    }
+
+    @Test
+    public void test_visitConditionSubstitutionNodeTopLevel_CorrectNode_and_Precondition(){
+        ConditionSubstitutionNode conditionSubstitutionNode =
+                new ConditionSubstitutionNode(new SourceCodePosition(), ConditionSubstitutionNode.Kind.PRECONDITION,
+                        new PredicateNodeStub(), new AssignSubstituteStub());
+
+        Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(conditionSubstitutionNode);
+
+        assertEquals("<Precondition>\n" +
+                "</Precondition>", result.getKey());
+
+        assertThat(result.getValue(), instanceOf(SubstitutionNode.class));
+    }
+
+    @Test
+    public void test_visitConditionSubstitutionNodeTopLevel_WrongNode_and_Precondition(){
+        ConditionSubstitutionNode conditionSubstitutionNode =
+                new ConditionSubstitutionNode(new SourceCodePosition(), ConditionSubstitutionNode.Kind.ASSERT,
+                        new PredicateNodeStub(), new AssignSubstituteStub());
+
+        Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(conditionSubstitutionNode);
+
+        assertEquals("", result.getKey());
+
+        assertThat(result.getValue(), instanceOf(SubstitutionNode.class));
+
+    }
+
+    @Test
+    public void test_visitConditionSubstitutionNodeTopLevel_CorrectNode_and_Assert(){
+        AssignSubstituteStub assignSubstituteStub = new AssignSubstituteStub();
+
+        Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(assignSubstituteStub);
+
+        assertEquals("", result.getKey());
+
+        assertThat(result.getValue(), instanceOf(SubstitutionNode.class));
     }
 
 
