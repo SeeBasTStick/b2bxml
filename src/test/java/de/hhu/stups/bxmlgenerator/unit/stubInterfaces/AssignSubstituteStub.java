@@ -1,10 +1,12 @@
 package de.hhu.stups.bxmlgenerator.unit.stubInterfaces;
 
 import de.prob.parser.ast.SourceCodePosition;
-import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
 
-public class AssignSubstituteStub extends SubstitutionNode {
+import java.util.List;
+
+public class AssignSubstituteStub extends AssignSubstitutionNode {
     public AssignSubstituteStub() {
-        super(new SourceCodePosition());
+        super(new SourceCodePosition(), List.of(new ExprNodeStub()), List.of(new ExprNodeStub()));
     }
 }

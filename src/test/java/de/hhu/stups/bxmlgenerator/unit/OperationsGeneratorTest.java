@@ -2,6 +2,7 @@ package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.OperationsGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.ConditionSubstitutionNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.PredicateNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.OperationNode;
@@ -118,8 +119,7 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Test
     public void test_visitConditionSubstitutionNodeTopLevel_CorrectNode_and_Precondition(){
         ConditionSubstitutionNode conditionSubstitutionNode =
-                new ConditionSubstitutionNode(new SourceCodePosition(), ConditionSubstitutionNode.Kind.PRECONDITION,
-                        new PredicateNodeStub(), new AssignSubstituteStub());
+                new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.PRECONDITION);
 
         Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(conditionSubstitutionNode);
 
@@ -132,8 +132,7 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Test
     public void test_visitConditionSubstitutionNodeTopLevel_WrongNode_and_Precondition(){
         ConditionSubstitutionNode conditionSubstitutionNode =
-                new ConditionSubstitutionNode(new SourceCodePosition(), ConditionSubstitutionNode.Kind.ASSERT,
-                        new PredicateNodeStub(), new AssignSubstituteStub());
+                new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.ASSERT);
 
         Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(conditionSubstitutionNode);
 

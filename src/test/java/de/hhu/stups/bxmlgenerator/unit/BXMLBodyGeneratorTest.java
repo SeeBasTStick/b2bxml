@@ -1,6 +1,7 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.ConditionSubstitutionNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
@@ -8,10 +9,7 @@ import de.prob.parser.ast.nodes.expression.NumberNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
-import de.prob.parser.ast.nodes.substitution.AssignSubstitutionNode;
-import de.prob.parser.ast.nodes.substitution.IfOrSelectSubstitutionsNode;
-import de.prob.parser.ast.nodes.substitution.ListSubstitutionNode;
-import de.prob.parser.ast.nodes.substitution.SkipSubstitutionNode;
+import de.prob.parser.ast.nodes.substitution.*;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
 import de.prob.parser.ast.types.IntegerType;
@@ -385,6 +383,48 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
         assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
 
+    }
+
+    @Test
+    public void test_visitConditionSubstitutionNode_Assert(){
+        ConditionSubstitutionNode conditionSubstitutionNode =
+                new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.ASSERT);
+
+        String result = dummyGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
+
+        assertEquals("<Assert_Sub>\n" +
+                "    <Guard>\n" +
+                "    </Guard>\n" +
+                "    <Body>\n" +
+                "        <Assignement_Sub>\n" +
+                "            <Variables>\n" +
+                "            </Variables>\n" +
+                "            <Values>\n" +
+                "            </Values>\n" +
+                "        </Assignement_Sub>\n" +
+                "    </Body>\n" +
+                "</Assert_Sub>", result);
+    }
+
+    @Test
+    public void test_visitConditionSubstitutionNode_Precondition(){
+        ConditionSubstitutionNode conditionSubstitutionNode =
+                new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.PRECONDITION);
+
+        String result = dummyGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
+
+        assertEquals("<PRE_Sub>\n" +
+                "    <Precondition>\n" +
+                "    </Precondition>\n" +
+                "    <Body>\n" +
+                "        <Assignement_Sub>\n" +
+                "            <Variables>\n" +
+                "            </Variables>\n" +
+                "            <Values>\n" +
+                "            </Values>\n" +
+                "        </Assignement_Sub>\n" +
+                "    </Body>\n" +
+                "</PRE_Sub>", result);
     }
 
 
