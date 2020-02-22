@@ -1,7 +1,14 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.ConditionSubstitutionNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.IdentifierExprNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.highLevel.DeclarationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateOperatorNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateOperatorWithExprArgsNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.ConditionSubstitutionNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.ExprOperatorNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
@@ -28,13 +35,13 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
+public class BXMLBodyGeneratorTest {
 
-    DummyGenerator dummyGenerator;
+    StubGenerator stubGenerator;
 
-    protected static class DummyGenerator extends BXMLBodyGenerator {
+    protected static class StubGenerator extends BXMLBodyGenerator {
 
-        public DummyGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup) {
+        public StubGenerator(Map<Integer, BType> nodeType, STGroup currentGroup) {
             super(nodeType,  currentGroup);
         }
     }
@@ -46,7 +53,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
     }
 
     public void prepare(HashMap<Integer, BType> nodeType){
-        dummyGenerator = new DummyGenerator(nodeType,
+        stubGenerator = new StubGenerator(nodeType,
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"));
     }
 
@@ -57,83 +64,82 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
      */
 
     @Test
-    public void test_processExprNode_IdentifierExprNode() {
-        IdentifierExprNode identifierExprNode =
-                new IdentifierExprNode(new SourceCodePosition(), "test", true);
-        BType type = BoolType.getInstance();
-        identifierExprNode.setType(type);
-        assertEquals(dummyGenerator.processExprNode(identifierExprNode), "<Id value='test' typref='2044650'/>");
+    public void test_visitExprNode_IdentifierExprNode() {
+        IdentifierExprNode identifierExprNode = new IdentifierExprNodeStub( "test", BoolType.getInstance());
+
+        String result = stubGenerator.visitExprNode(identifierExprNode, null);
+
+        assertEquals("<Id value='test' typref='2044650'/>", result);
     }
 
     @Test
-    public void test_processExprNode_ExpressionOperatorNode() {
-        /*The original is only a dispatcher (see code) we will do only a test to see if dispatching works, the rest
-         * will be checked down further
-         */
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.PLUS);
-        assertEquals(dummyGenerator.processExprNode(expressionOperatorNode),
-                "<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>");
+    public void test_visitExprNode_ExpressionOperatorNode() {
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance());
+
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
+
+        assertEquals("<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>", result);
     }
 
     @Test
-    public void test_processExprNode_NumberNode(){
+    public void test_visitExprNode_NumberNode(){
         NumberNode numberNode = new NumberNode(new SourceCodePosition(), BigInteger.ONE);
         BType type = BoolType.getInstance();
         numberNode.setType(type);
-        assertEquals(dummyGenerator.processExprNode(numberNode), "<Integer_Literal value='1' typref='2044650'/>");
+        assertEquals(stubGenerator.visitExprNode(numberNode, null), "<Integer_Literal value='1' typref='2044650'/>");
     }
 
     @Test
-    public void test_processExpressionOperatorNode_INTERVAL()
+    public void test_visitExpressionOperatorNode_INTERVAL()
     {
-        assertEquals(dummyGenerator.processExpressionOperatorNode(
-                dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                        ExpressionOperatorNode.ExpressionOperator.INTERVAL)),
+        assertEquals(stubGenerator.visitExprNode(
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.INTERVAL, BoolType.getInstance()), null),
                 "<Binary_Exp op='..' typref='2044650'>\n</Binary_Exp>");
     }
 
     @Test
-    public void test_processExpressionOperatorNode_Plus()
+    public void test_visitExpressionOperatorNode_Plus()
     {
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.PLUS);
-        assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance());
+
+        assertEquals(stubGenerator.visitExprNode(expressionOperatorNode, null),
                 "<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>");
 
     }
 
     @Test
-    public void test_processExpressionOperatorNode_Minus()
+    public void test_visitExpressionOperatorNode_Minus()
     {
-        ExpressionOperatorNode expressionOperatorNode =dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.MINUS);
-        assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.MINUS, BoolType.getInstance());
+        assertEquals(stubGenerator.visitExprNode(expressionOperatorNode, null),
                 "<Binary_Exp op='-' typref='2044650'>\n</Binary_Exp>");
 
     }
 
     @Test
-    public void test_processExpressionOperatorNode_NAT()
+    public void test_visitExpressionOperatorNode_NAT()
     {
-        ExpressionOperatorNode expressionOperatorNode =dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.NAT);
-        assertEquals(dummyGenerator.processExpressionOperatorNode(expressionOperatorNode),
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.NAT, BoolType.getInstance());
+        assertEquals(stubGenerator.visitExprNode(expressionOperatorNode, null),
                 "<Id value='NAT' typref='631359557'/>");
 
     }
 
     @Test
-    public void test_processSubstitutionNode_IfOrSelectSubstitutionsNode_SELECT(){
+    public void test_visitIfOrSelectSubstitutionsNode_SELECT(){
 
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.MINUS);
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.MINUS, BoolType.getInstance());
 
-        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
+        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNodeStub(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
 
-        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
 
         IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
                 IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(assignSubstitutionNode),
@@ -151,86 +157,84 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "            <Then>\n" +
                 "                <Assignement_Sub>\n" +
                 "                    <Variables>\n" +
-                "                        <Id value='test' typref='2044650'/>\n" +
+                "                        <Id value='ii' typref='1618932450'/>\n" +
                 "                    </Variables>\n" +
                 "                    <Values>\n" +
-                "                        <Id value='test2' typref='2044650'/>\n" +
+                "                        <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "                    </Values>\n" +
                 "                </Assignement_Sub>\n" +
                 "            </Then>\n" +
                 "        </When>\n" +
                 "    </When_Clauses>\n" +
-                "</Select>", dummyGenerator.visitSubstitutionNode(ifOrSelectSubstitutionsNode, null));
+                "</Select>", stubGenerator.visitSubstitutionNode(ifOrSelectSubstitutionsNode, null));
 
     }
 
     @Test
-    public void test_processSubstitutionNode_ListSubstitutionNode_Parallel(){
-        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
+    public void test_visitSubstitutionNode_ListSubstitutionNode_Parallel(){
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Parallel, List.of(assignSubstitutionNode));
 
         assertEquals("<Nary_Sub op='||'>\n" +
                 "    <Assignement_Sub>\n" +
                 "        <Variables>\n" +
-                "            <Id value='test' typref='2044650'/>\n" +
+                "            <Id value='ii' typref='1618932450'/>\n" +
                 "        </Variables>\n" +
                 "        <Values>\n" +
-                "            <Id value='test2' typref='2044650'/>\n" +
+                "            <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "        </Values>\n" +
                 "    </Assignement_Sub>\n" +
-                "</Nary_Sub>", dummyGenerator.visitSubstitutionNode(listSubstitutionNode, null));
+                "</Nary_Sub>", stubGenerator.visitSubstitutionNode(listSubstitutionNode, null));
     }
 
     @Test
-    public void test_processSubstitutionNode_ListSubstitutionNode_Sequentiel(){
-        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
+    public void test_visitSubstitutionNode_ListSubstitutionNode_Sequential(){
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Sequential, List.of(assignSubstitutionNode));
 
         assertEquals("<Nary_Sub op=';'>\n" +
                 "    <Assignement_Sub>\n" +
                 "        <Variables>\n" +
-                "            <Id value='test' typref='2044650'/>\n" +
+                "            <Id value='ii' typref='1618932450'/>\n" +
                 "        </Variables>\n" +
                 "        <Values>\n" +
-                "            <Id value='test2' typref='2044650'/>\n" +
+                "            <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "        </Values>\n" +
                 "    </Assignement_Sub>\n" +
-                "</Nary_Sub>", dummyGenerator.visitSubstitutionNode(listSubstitutionNode, null));
+                "</Nary_Sub>", stubGenerator.visitSubstitutionNode(listSubstitutionNode, null));
     }
 
     @Test
-    public void test_processSubstitutionNode_AssignSubstitutionNode(){
+    public void test_visitSubstitutionNode_AssignSubstitutionNode(){
 
-        AssignSubstitutionNode assignSubstitutionNode = dummy_AssignSubstitutionNodeGenerator();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
 
         assertEquals("<Assignement_Sub>\n" +
                 "    <Variables>\n" +
-                "        <Id value='test' typref='2044650'/>\n" +
+                "        <Id value='ii' typref='1618932450'/>\n" +
                 "    </Variables>\n" +
                 "    <Values>\n" +
-                "        <Id value='test2' typref='2044650'/>\n" +
+                "        <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "    </Values>\n" +
-                "</Assignement_Sub>", dummyGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
+                "</Assignement_Sub>", stubGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
     }
 
     @Test
-    public void test_processSubstitutionNode_SkipSubstitutionNode(){
+    public void test_visitSubstitutionNode_SkipSubstitutionNode(){
 
         SkipSubstitutionNode assignSubstitutionNode = new SkipSubstitutionNode(new SourceCodePosition());
 
-        assertEquals("<Skip/>", dummyGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
+        assertEquals("<Skip/>", stubGenerator.visitSubstitutionNode(assignSubstitutionNode, null));
     }
 
 
-
-
     @Test
-    public void test_processPredicateNode_PredicateOperatorNode(){
+    public void test_visitPredicateNode_PredicateOperatorNode(){
 
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.PLUS);
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.MINUS, BoolType.getInstance());
 
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
@@ -239,99 +243,94 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
         PredicateOperatorNode predicateOperatorNode = new PredicateOperatorNode(new SourceCodePosition(),
                 PredicateOperatorNode.PredicateOperator.AND, List.of(predicateNode));
 
-        assertEquals("", dummyGenerator.processPredicateNode(predicateOperatorNode));
+        String result =  stubGenerator.visitPredicateNode(predicateOperatorNode, null);
+
+        assertEquals("", result);
 
     }
 
     @Test
-    public void test_processPredicateNode_PredicateOperatorWithExprArgsNode(){
+    public void test_visitPredicateNode_PredicateOperatorWithExprArgsNode(){
         BType type = BoolType.getInstance();
 
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.MINUS);
-        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
+        ExpressionOperatorNode expressionOperatorNode =
+        new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.MINUS, BoolType.getInstance());
+
+        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNodeStub(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
         predicateNode.setType(type);
+
+        String result = stubGenerator.visitPredicateNode(predicateNode, null);
+
         assertEquals("<Exp_Comparison op=':'>\n" +
                 "    <Binary_Exp op='-' typref='2044650'>\n" +
                 "    </Binary_Exp>\n" +
-                "</Exp_Comparison>", dummyGenerator.processPredicateNode(predicateNode));
+                "</Exp_Comparison>", result);
     }
 
     @Test
-    public void test_processPredicateOperatorNode_PredicateOperatorNode(){
-        BType type = BoolType.getInstance();
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.MINUS);
+    public void test_visitPredicateOperatorNode(){
 
-        PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
-                PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
-                List.of(expressionOperatorNode));
-        predicateNode.setType(type);
+        PredicateOperatorNode predicateOperatorNode = new PredicateOperatorNodeStub(
+                PredicateOperatorNode.PredicateOperator.AND,
+                List.of(new PredicateOperatorNodeStub(
+                        PredicateOperatorNode.PredicateOperator.AND, List.of(new PredicateNodeStub())),
+                        new PredicateOperatorNodeStub(
+                                PredicateOperatorNode.PredicateOperator.AND, List.of(new PredicateNodeStub()))));
 
-        PredicateOperatorNode predicateOperatorNode = new PredicateOperatorNode(new SourceCodePosition(),
-                PredicateOperatorNode.PredicateOperator.AND, List.of(predicateNode, predicateNode));
+        String result = stubGenerator.visitPredicateNode(predicateOperatorNode, null);
 
-        String result =  dummyGenerator.processPredicateOperatorNode(predicateOperatorNode);
         assertEquals("<Nary_Pred op='&amp;'>\n" +
-                "    <Exp_Comparison op=':'>\n" +
-                "        <Binary_Exp op='-' typref='2044650'>\n" +
-                "        </Binary_Exp>\n" +
-                "    </Exp_Comparison>\n" +
-                "    <Exp_Comparison op=':'>\n" +
-                "        <Binary_Exp op='-' typref='2044650'>\n" +
-                "        </Binary_Exp>\n" +
-                "    </Exp_Comparison>\n" +
                 "</Nary_Pred>",result);
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_LESS(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.LESS), "&lt;");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_GREATER(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.GREATER), "&gt;");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_EQUAL(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.EQUAL), "&eq;");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_NOT_EQUAL(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.NOT_EQUAL), "&neq;");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_ELEMENT_OF(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF), ":");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_LESS_EQUAL(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.LESS_EQUAL), "&lt;=");
     }
 
     @Test
     public void test_processOperatorPredOperatorExprArgs_GREATER_EQUAL(){
-        assertEquals(dummyGenerator.processOperatorPredOperatorExprArgs(
+        assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.GREATER_EQUAL), "&gt;=");
     }
 
     @Test
     public void test_processDeclarationNode(){
         assertEquals("<Id value='test' typref='2044650'/>",
-                dummyGenerator.processDeclarationNode(dummy_DeclarationNodeGenerator((BoolType.getInstance()))));
+                stubGenerator.processDeclarationNode(new DeclarationNodeStub(BoolType.getInstance())));
     }
 
     @Rule
@@ -342,10 +341,10 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
         exception.expect(IndexOutOfBoundsException.class);
         exception.expectMessage("Hash was already taken! BOOL is not INTEGER");
         BType type = BoolType.getInstance();
-        int hash = dummyGenerator.generateHash(type);
+        int hash = stubGenerator.generateHash(type);
         BType crashType = IntegerType.getInstance();
-        dummyGenerator.getNodeTyp().put(hash, crashType);
-        dummyGenerator.generateHash(type);
+        stubGenerator.getNodeTyp().put(hash, crashType);
+        stubGenerator.generateHash(type);
 
     }
 
@@ -360,13 +359,13 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
         dummy.put(hash, type);
         prepare(dummy);
-        dummyGenerator.generateHash(crashType);
+        stubGenerator.generateHash(crashType);
     }
 
     @Test
     public void test_hashFunction_3(){
         BType type = BoolType.getInstance();
-        assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
+        assertEquals(Math.abs(type.toString().hashCode()), stubGenerator.generateHash(type));
 
     }
 
@@ -379,9 +378,9 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
 
         dummy.put(hash, type);
         prepare(dummy);
-        dummyGenerator.generateHash(crashType);
+        stubGenerator.generateHash(crashType);
 
-        assertEquals(Math.abs(type.toString().hashCode()), dummyGenerator.generateHash(type));
+        assertEquals(Math.abs(type.toString().hashCode()), stubGenerator.generateHash(type));
 
     }
 
@@ -390,7 +389,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
         ConditionSubstitutionNode conditionSubstitutionNode =
                 new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.ASSERT);
 
-        String result = dummyGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
+        String result = stubGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
 
         assertEquals("<Assert_Sub>\n" +
                 "    <Guard>\n" +
@@ -398,8 +397,10 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "    <Body>\n" +
                 "        <Assignement_Sub>\n" +
                 "            <Variables>\n" +
+                "                <Id value='ii' typref='1618932450'/>\n" +
                 "            </Variables>\n" +
                 "            <Values>\n" +
+                "                <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "            </Values>\n" +
                 "        </Assignement_Sub>\n" +
                 "    </Body>\n" +
@@ -411,7 +412,7 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
         ConditionSubstitutionNode conditionSubstitutionNode =
                 new ConditionSubstitutionNodeStub(ConditionSubstitutionNode.Kind.PRECONDITION);
 
-        String result = dummyGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
+        String result = stubGenerator.visitConditionSubstitutionNode(conditionSubstitutionNode, null);
 
         assertEquals("<PRE_Sub>\n" +
                 "    <Precondition>\n" +
@@ -419,8 +420,10 @@ public class BXMLBodyGeneratorTest extends DummyNodeGenerator {
                 "    <Body>\n" +
                 "        <Assignement_Sub>\n" +
                 "            <Variables>\n" +
+                "                <Id value='ii' typref='1618932450'/>\n" +
                 "            </Variables>\n" +
                 "            <Values>\n" +
+                "                <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "            </Values>\n" +
                 "        </Assignement_Sub>\n" +
                 "    </Body>\n" +

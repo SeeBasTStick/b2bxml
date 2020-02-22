@@ -1,7 +1,7 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.InitialisationGenerator;
-import de.hhu.stups.codegenerator.handlers.NameHandler;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
 import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.STGroupFile;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
-public class InitialisationGeneratorTest extends DummyNodeGenerator{
+public class InitialisationGeneratorTest {
 
     InitialisationGenerator initialisationGenerator;
 
@@ -26,13 +26,13 @@ public class InitialisationGeneratorTest extends DummyNodeGenerator{
         assertEquals("<Initialisation>\n" +
                         "    <Assignement_Sub>\n" +
                         "        <Variables>\n" +
-                        "            <Id value='test' typref='2044650'/>\n" +
+                        "            <Id value='ii' typref='1618932450'/>\n" +
                         "        </Variables>\n" +
                         "        <Values>\n" +
-                        "            <Id value='test2' typref='2044650'/>\n" +
+                        "            <Integer_Literal value='42' typref='1618932450'/>\n" +
                         "        </Values>\n" +
                         "    </Assignement_Sub>\n" +
                         "</Initialisation>",
-                initialisationGenerator.generateInitialisation(dummy_AssignSubstitutionNodeGenerator()));
+                initialisationGenerator.generateInitialisation(new AssignSubstituteStub()));
     }
 }

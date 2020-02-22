@@ -1,7 +1,7 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.InvariantGenerator;
-import de.hhu.stups.codegenerator.handlers.NameHandler;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.ExprOperatorNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class InvariantGeneratorTest extends DummyNodeGenerator{
+public class InvariantGeneratorTest{
 
     InvariantGenerator invariantGenerator;
 
@@ -28,8 +28,8 @@ public class InvariantGeneratorTest extends DummyNodeGenerator{
 
     @Test
     public void test_generateInvariants(){
-        ExpressionOperatorNode expressionOperatorNode = dummy_ExpressionOperatorNodeGenerator(BoolType.getInstance(),
-                ExpressionOperatorNode.ExpressionOperator.PLUS);
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance());
 
         PredicateNode predicateNode = new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,

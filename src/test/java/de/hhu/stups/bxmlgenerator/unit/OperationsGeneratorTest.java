@@ -1,9 +1,9 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.OperationsGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.AssignSubstituteStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.ConditionSubstitutionNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.PredicateNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.highLevel.DeclarationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.ConditionSubstitutionNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.substitution.ConditionSubstitutionNode;
@@ -22,7 +22,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class OperationsGeneratorTest extends DummyNodeGenerator {
+public class OperationsGeneratorTest{
 
     OperationsGenerator operationsGenerator;
 
@@ -35,16 +35,16 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Test
     public void test_generateOperation_1(){
         OperationNode operationNode = new OperationNode(new SourceCodePosition(), "dec", new ArrayList<>(),
-                dummy_AssignSubstitutionNodeGenerator(), new ArrayList<>());
+                new AssignSubstituteStub(), new ArrayList<>());
 
         assertEquals("<Operation name='dec'>\n" +
                 "    <Body>\n" +
                 "        <Assignement_Sub>\n" +
                 "            <Variables>\n" +
-                "                <Id value='test' typref='2044650'/>\n" +
+                "                <Id value='ii' typref='1618932450'/>\n" +
                 "            </Variables>\n" +
                 "            <Values>\n" +
-                "                <Id value='test2' typref='2044650'/>\n" +
+                "                <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "            </Values>\n" +
                 "        </Assignement_Sub>\n" +
                 "    </Body>\n" +
@@ -55,8 +55,8 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Test
     public void test_generateOperation_2(){
         OperationNode operationNode = new OperationNode(new SourceCodePosition(), "dec",
-                List.of(dummy_DeclarationNodeGenerator(BoolType.getInstance())),
-                dummy_AssignSubstitutionNodeGenerator(), new ArrayList<>());
+                List.of(new DeclarationNodeStub(BoolType.getInstance())),
+                new AssignSubstituteStub(), new ArrayList<>());
 
         assertEquals("<Operation name='dec'>\n" +
                 "    <Output_Parameters>\n" +
@@ -65,10 +65,10 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
                 "    <Body>\n" +
                 "        <Assignement_Sub>\n" +
                 "            <Variables>\n" +
-                "                <Id value='test' typref='2044650'/>\n" +
+                "                <Id value='ii' typref='1618932450'/>\n" +
                 "            </Variables>\n" +
                 "            <Values>\n" +
-                "                <Id value='test2' typref='2044650'/>\n" +
+                "                <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "            </Values>\n" +
                 "        </Assignement_Sub>\n" +
                 "    </Body>\n" +
@@ -78,11 +78,11 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
     @Test
     public void test_generateOperations(){
         OperationNode operationNode1 = new OperationNode(new SourceCodePosition(), "dec", new ArrayList<>(),
-                dummy_AssignSubstitutionNodeGenerator(), new ArrayList<>());
+                new AssignSubstituteStub(), new ArrayList<>());
 
         OperationNode operationNode2 = new OperationNode(new SourceCodePosition(), "dec",
-                List.of(dummy_DeclarationNodeGenerator(BoolType.getInstance())),
-                dummy_AssignSubstitutionNodeGenerator(), new ArrayList<>());
+                List.of(new DeclarationNodeStub(BoolType.getInstance())),
+                new AssignSubstituteStub(), new ArrayList<>());
 
 
         assertEquals("<Operations>\n" +
@@ -90,10 +90,10 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
                 "        <Body>\n" +
                 "            <Assignement_Sub>\n" +
                 "                <Variables>\n" +
-                "                    <Id value='test' typref='2044650'/>\n" +
+                "                    <Id value='ii' typref='1618932450'/>\n" +
                 "                </Variables>\n" +
                 "                <Values>\n" +
-                "                    <Id value='test2' typref='2044650'/>\n" +
+                "                    <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "                </Values>\n" +
                 "            </Assignement_Sub>\n" +
                 "        </Body>\n" +
@@ -105,10 +105,10 @@ public class OperationsGeneratorTest extends DummyNodeGenerator {
                 "        <Body>\n" +
                 "            <Assignement_Sub>\n" +
                 "                <Variables>\n" +
-                "                    <Id value='test' typref='2044650'/>\n" +
+                "                    <Id value='ii' typref='1618932450'/>\n" +
                 "                </Variables>\n" +
                 "                <Values>\n" +
-                "                    <Id value='test2' typref='2044650'/>\n" +
+                "                    <Integer_Literal value='42' typref='1618932450'/>\n" +
                 "                </Values>\n" +
                 "            </Assignement_Sub>\n" +
                 "        </Body>\n" +

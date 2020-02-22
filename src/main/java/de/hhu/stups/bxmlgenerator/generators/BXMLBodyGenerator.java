@@ -48,147 +48,6 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return "";
     }
 
-
-    public String processExprNode(ExprNode node){
-        String result;
-
-
-        switch (node.getClass().getSimpleName()){
-            case "IdentifierExprNode":
-                IdentifierExprNode identifierExprNode = (IdentifierExprNode) node;
-                ST id = currentGroup.getInstanceOf("id");
-                TemplateHandler.add(id, "val", identifierExprNode.getName());
-
-                TemplateHandler.add(id, "typref", generateHash(identifierExprNode.getType()));
-
-                nodeType.put(generateHash(identifierExprNode.getType()), identifierExprNode.getType());
-                result = id.render();
-                break;
-            case "ExpressionOperatorNode":
-                ExpressionOperatorNode expressionOperatorNode = (ExpressionOperatorNode) node;
-                result = processExpressionOperatorNode(expressionOperatorNode);
-                break;
-            case "NumberNode":
-                NumberNode numberNode = (NumberNode) node;
-                ST integer_literal = currentGroup.getInstanceOf("integer_literal");
-                TemplateHandler.add(integer_literal, "val", numberNode.getValue().toString());
-
-                TemplateHandler.add(integer_literal, "typref", generateHash(numberNode.getType()));
-
-                nodeType.put(generateHash(numberNode.getType()), numberNode.getType());
-                result = integer_literal.render();
-                break;
-            default:
-                result = "";
-                try {
-                    throw new Exception(node.getClass() + " not implemented yet");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-        }
-        return result;
-    }
-
-    public String processExpressionOperatorNode(ExpressionOperatorNode node){
-
-        String result;
-        ST st;
-
-        switch (node.getOperator()){
-            case INTERVAL:
-                st  = currentGroup.getInstanceOf("binary_exp");
-                TemplateHandler.add(st, "op", "..");
-                TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
-                        .map(this::processExprNode)
-                        .collect(Collectors.toList()));
-                break;
-
-            case MINUS:
-                st  = currentGroup.getInstanceOf("binary_exp");
-                TemplateHandler.add(st, "op", "-");
-                TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
-                        .map(this::processExprNode)
-                        .collect(Collectors.toList()));
-                break;
-
-            case PLUS:
-                st  = currentGroup.getInstanceOf("binary_exp");
-                TemplateHandler.add(st, "op", "+");
-                TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
-                        .map(this::processExprNode)
-                        .collect(Collectors.toList()));
-                break;
-
-            case NAT:
-                st = currentGroup.getInstanceOf("id");
-                TemplateHandler.add(st, "val", "NAT");
-                TemplateHandler.add(st, "typref", generateHash(new SetType(IntegerType.getInstance())));
-                break;
-
-            default:
-                st  = currentGroup.getInstanceOf("st");
-                try {
-                    throw new Exception(node.getOperator() + " not implemented yet");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-        }
-
-        nodeType.put(generateHash(node.getType()), node.getType());
-        result = st.render();
-
-        return result;
-    }
-
-    public String processPredicateNode(PredicateNode node)
-    {
-        String result ;
-        switch (node.getClass().getSimpleName()){
-            case "PredicateOperatorWithExprArgsNode":
-                PredicateOperatorWithExprArgsNode predicateOperatorWithExprArgsNode = (PredicateOperatorWithExprArgsNode) node;
-                ST expComparision = currentGroup.getInstanceOf("exp_comparision");
-                TemplateHandler.add(expComparision, "op",
-                        processOperatorPredOperatorExprArgs(predicateOperatorWithExprArgsNode.getOperator()));
-                TemplateHandler.add(expComparision, "statements",
-                        predicateOperatorWithExprArgsNode.getExpressionNodes().stream()
-                                .map(this::processExprNode)
-                                .collect(Collectors.toList()));
-                result = expComparision.render();
-                break;
-            case "PredicateOperatorNode":
-                PredicateOperatorNode predicateOperatorNode = (PredicateOperatorNode) node;
-                result = processPredicateOperatorNode(predicateOperatorNode);
-                break;
-            default:
-                result = exceptionThrower(node);
-
-        }
-        return result;
-    }
-
-    public String processPredicateOperatorNode(PredicateOperatorNode node)
-    {
-        String result ;
-        if(node.getPredicateArguments().size() == 1){
-            result = "";
-            //ToDo ExprComparision and more
-        }
-        else{
-            ST nary_pred = currentGroup.getInstanceOf("nary_pred");
-            TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
-            TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
-                    .map(this::processPredicateNode)
-                    .collect(Collectors.toList()));
-            result = nary_pred.render();
-        }
-
-        return result;
-    }
-
-
     public String generateOperatorNAry(PredicateOperatorNode node)
     {
         return "&amp;";
@@ -254,15 +113,72 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         }
     }
 
-
+    /*
+     * Expr
+     */
     @Override
-    public String visitExprOperatorNode(ExpressionOperatorNode node, Object expected) {
-        return null;
+    public String visitExprOperatorNode(ExpressionOperatorNode node, Object expected){
+        String result;
+        ST st;
+
+        switch (node.getOperator()){
+            case INTERVAL:
+                st  = currentGroup.getInstanceOf("binary_exp");
+                TemplateHandler.add(st, "op", "..");
+                TemplateHandler.add(st, "typref", generateHash(node.getType()));
+                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                        .map(workNode -> visitExprNode(workNode, null))
+                        .collect(Collectors.toList()));
+                break;
+
+            case MINUS:
+                st  = currentGroup.getInstanceOf("binary_exp");
+                TemplateHandler.add(st, "op", "-");
+                TemplateHandler.add(st, "typref", generateHash(node.getType()));
+                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                        .map(workNode -> visitExprNode(workNode, null))
+                        .collect(Collectors.toList()));
+                break;
+
+            case PLUS:
+                st  = currentGroup.getInstanceOf("binary_exp");
+                TemplateHandler.add(st, "op", "+");
+                TemplateHandler.add(st, "typref", generateHash(node.getType()));
+                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                        .map(workNode -> visitExprNode(workNode, null))
+                        .collect(Collectors.toList()));
+                break;
+
+            case NAT:
+                st = currentGroup.getInstanceOf("id");
+                TemplateHandler.add(st, "val", "NAT");
+                TemplateHandler.add(st, "typref", generateHash(new SetType(IntegerType.getInstance())));
+                break;
+
+            default:
+                st  = currentGroup.getInstanceOf("st");
+                try {
+                    throw new Exception(node.getOperator() + " not implemented yet");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }
+
+        nodeType.put(generateHash(node.getType()), node.getType());
+        result = st.render();
+
+        return result;
     }
 
     @Override
     public String visitIdentifierExprNode(IdentifierExprNode node, Object expected) {
-        return null;
+        ST id = currentGroup.getInstanceOf("id");
+        TemplateHandler.add(id, "val", node.getName());
+
+        TemplateHandler.add(id, "typref", generateHash(node.getType()));
+
+        nodeType.put(generateHash(node.getType()), node.getType());
+        return id.render();
     }
 
     @Override
@@ -270,9 +186,20 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return null;
     }
 
+    /*
+     * Stuff
+     */
     @Override
     public String visitNumberNode(NumberNode node, Object expected) {
-        return null;
+
+        ST integer_literal = currentGroup.getInstanceOf("integer_literal");
+        TemplateHandler.add(integer_literal, "val", node.getValue().toString());
+
+        TemplateHandler.add(integer_literal, "typref", generateHash(node.getType()));
+
+        nodeType.put(generateHash(node.getType()), node.getType());
+        return integer_literal.render();
+
     }
 
     @Override
@@ -320,37 +247,63 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return null;
     }
 
-
+    /*
+     * Predicates
+     */
     @Override
     public String visitIdentifierPredicateNode(IdentifierPredicateNode node, Object expected) {
-        return null;
+        return "";
     }
 
     @Override
     public String visitPredicateOperatorNode(PredicateOperatorNode node, Object expected) {
-        return null;
+        String result ;
+        if(node.getPredicateArguments().size() == 1){
+            result = "";
+            //ToDo ExprComparision and more
+        }
+        else{
+            ST nary_pred = currentGroup.getInstanceOf("nary_pred");
+            TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
+            TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
+                    .map(predicateNode -> visitPredicateNode(predicateNode, null))
+                    .collect(Collectors.toList()));
+            result = nary_pred.render();
+        }
+
+        return result;
     }
 
     @Override
     public String visitPredicateOperatorWithExprArgs(PredicateOperatorWithExprArgsNode node, Object expected) {
-        return null;
+        ST expComparision = currentGroup.getInstanceOf("exp_comparision");
+        TemplateHandler.add(expComparision, "op",
+                processOperatorPredOperatorExprArgs(node.getOperator()));
+        TemplateHandler.add(expComparision, "statements",
+                node.getExpressionNodes().stream()
+                        .map(workNode -> visitExprNode(workNode, null))
+                        .collect(Collectors.toList()));
+        return expComparision.render();
     }
 
     @Override
     public String visitQuantifiedPredicateNode(QuantifiedPredicateNode node, Object expected) {
-        return null;
+        return "";
     }
 
     @Override
     public String visitLetPredicateNode(LetPredicateNode node, Object expected) {
-        return null;
+        return "";
     }
 
     @Override
     public String visitIfPredicateNode(IfPredicateNode node, Object expected) {
-        return null;
+        return "";
     }
 
+    /*
+     * Substitutions
+     */
     @Override
     public String visitVarSubstitutionNode(VarSubstitutionNode node, Object expected) {
         return null;
@@ -390,7 +343,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
 
             ST select = currentGroup.getInstanceOf("select");
             TemplateHandler.add(select, "conditions", node.getConditions().stream()
-                    .map(this::processPredicateNode)
+                    .map(predicateNode -> visitPredicateNode(predicateNode, null))
                     .collect(Collectors.toList()));
 
 
@@ -407,11 +360,11 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     public String visitAssignSubstitutionNode(AssignSubstitutionNode node, Object expected) {
         ST assignSub = currentGroup.getInstanceOf("assignment_sub");
         TemplateHandler.add(assignSub, "body1", node.getLeftSide().stream()
-                .map(this::processExprNode)
+                .map(workNode -> visitExprNode(workNode, null))
                 .collect(Collectors.toList()));
 
         TemplateHandler.add(assignSub, "body2", node.getRightSide().stream()
-                .map(this::processExprNode)
+                .map(workNode -> visitExprNode(workNode, null))
                 .collect(Collectors.toList()));
 
         return assignSub.render();
@@ -429,7 +382,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     public String visitConditionSubstitutionNode(ConditionSubstitutionNode node, Object expected) {
         if(node.getKind() == ConditionSubstitutionNode.Kind.ASSERT){
             ST assertSub = currentGroup.getInstanceOf("assert_sub");
-            TemplateHandler.add(assertSub, "guard", processPredicateNode(node.getCondition()));
+            TemplateHandler.add(assertSub, "guard", visitPredicateNode(node.getCondition(), null));
             TemplateHandler.add(assertSub, "body", visitSubstitutionNode(node.getSubstitution(), null));
             return assertSub.render();
         }
@@ -438,7 +391,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
              * PRE_sub is a undocumented feature of the bxml standard of atelierB - 20.02.2020
              */
             ST preSub = currentGroup.getInstanceOf("pre_sub");
-            TemplateHandler.add(preSub, "precondition", processPredicateNode(node.getCondition()));
+            TemplateHandler.add(preSub, "precondition", visitPredicateNode(node.getCondition(), null));
             TemplateHandler.add(preSub, "body", visitSubstitutionNode(node.getSubstitution(), null));
             return preSub.render();
         }
@@ -477,7 +430,6 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     /*
      * Not used
      */
-
     @Override
     public String visitNode(Node node, Object expected) {
         return null;

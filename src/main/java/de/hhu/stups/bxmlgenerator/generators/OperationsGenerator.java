@@ -68,7 +68,7 @@ public class OperationsGenerator extends BXMLBodyGenerator  {
 
                 ST precondition = currentGroup.getInstanceOf("precondition");
                 TemplateHandler.add(precondition, "body",
-                        processPredicateNode(((ConditionSubstitutionNode) node).getCondition()));
+                        visitPredicateNode(((ConditionSubstitutionNode) node).getCondition(), null));
                 return new Pair<>(precondition.render(), ((ConditionSubstitutionNode) node).getSubstitution());
 
         }

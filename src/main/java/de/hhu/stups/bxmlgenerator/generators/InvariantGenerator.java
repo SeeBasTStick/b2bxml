@@ -16,7 +16,7 @@ public class InvariantGenerator extends BXMLBodyGenerator {
 
     public String generateInvariants(PredicateNode node){
         ST invariant = currentGroup.getInstanceOf("invariant");
-        TemplateHandler.add(invariant, "body", processPredicateNode(node));
+        TemplateHandler.add(invariant, "body", visitPredicateNode(node, null));
         return invariant.render();
     }
 
