@@ -1,9 +1,11 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.MachineGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.ExprOperatorNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.highLevel.DeclarationNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.expr.ExprOperatorNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.MachineNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.OperationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.nodes.OperationNode;
@@ -23,21 +25,20 @@ public class MachineGeneratorTest extends BXMLBodyGeneratorTest {
     @Test
     public void test_generateMachine(){
         MachineGenerator machineGenerator = new MachineGenerator();
-        MachineNode machineNode = new MachineNode(new SourceCodePosition());
-        machineNode.setName("TEST");
+        MachineNode machineNode = new MachineNodeStub();
 
         machineNode.setConstants(List.of(new DeclarationNodeStub(IntegerType.getInstance())));
-        machineNode.setInitialisation(new AssignSubstituteStub());
+        machineNode.setInitialisation(new AssignSubstituteNodeStub());
         machineNode.setInvariant(new PredicateOperatorWithExprArgsNode(new SourceCodePosition(),
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance()))));
 
-        OperationNode operationNode1 = new OperationNode(new SourceCodePosition(), "dec", new ArrayList<>(),
-                new AssignSubstituteStub(), new ArrayList<>());
+        OperationNode operationNode1 = new OperationNodeStub( "dec", new ArrayList<>(),
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
-        OperationNode operationNode2 = new OperationNode(new SourceCodePosition(), "dec",
+        OperationNode operationNode2 = new OperationNodeStub( "dec",
                 List.of(new DeclarationNodeStub(IntegerType.getInstance())),
-                new AssignSubstituteStub(), new ArrayList<>());
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
 
         machineNode.setOperations(List.of(operationNode1, operationNode2));

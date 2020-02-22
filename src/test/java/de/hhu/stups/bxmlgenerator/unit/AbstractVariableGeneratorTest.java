@@ -1,6 +1,7 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.AbstractVariablesGenerator;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.MachineNode;
@@ -27,10 +28,7 @@ public class AbstractVariableGeneratorTest {
 
     @Test
     public void test_generateAbstractVariables(){
-        DeclarationNode declarationNode = new DeclarationNode(new SourceCodePosition(), "test",
-                DeclarationNode.Kind.CONSTANT, new MachineNode(new SourceCodePosition()));
-        BType type = BoolType.getInstance();
-        declarationNode.setType(type);
+        DeclarationNode declarationNode = new DeclarationNodeStub(BoolType.getInstance());
         assertEquals("<Abstract_Variables>\n" +
                         "    <Id value='test' typref='2044650'/>\n" +
                         "    <Id value='test' typref='2044650'/>\n" +

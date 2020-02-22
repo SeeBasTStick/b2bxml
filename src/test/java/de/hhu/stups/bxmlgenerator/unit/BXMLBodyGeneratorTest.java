@@ -1,14 +1,14 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.IdentifierExprNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.highLevel.DeclarationNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateOperatorNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat.PredicateOperatorWithExprArgsNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.ConditionSubstitutionNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr.ExprOperatorNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.expr.IdentifierExprNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.predicat.PredicateNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.predicat.PredicateOperatorNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.predicat.PredicateOperatorWithExprArgsNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.ConditionSubstitutionNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.expr.ExprOperatorNodeStub;
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.expression.IdentifierExprNode;
@@ -139,7 +139,7 @@ public class BXMLBodyGeneratorTest {
                 PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.ELEMENT_OF,
                 List.of(expressionOperatorNode));
 
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteNodeStub();
 
         IfOrSelectSubstitutionsNode ifOrSelectSubstitutionsNode = new IfOrSelectSubstitutionsNode(new SourceCodePosition(),
                 IfOrSelectSubstitutionsNode.Operator.SELECT, List.of(predicateNode), List.of(assignSubstitutionNode),
@@ -172,7 +172,7 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_visitSubstitutionNode_ListSubstitutionNode_Parallel(){
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteNodeStub();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Parallel, List.of(assignSubstitutionNode));
 
@@ -190,7 +190,7 @@ public class BXMLBodyGeneratorTest {
 
     @Test
     public void test_visitSubstitutionNode_ListSubstitutionNode_Sequential(){
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteNodeStub();
         ListSubstitutionNode listSubstitutionNode = new ListSubstitutionNode(new SourceCodePosition(),
                 ListSubstitutionNode.ListOperator.Sequential, List.of(assignSubstitutionNode));
 
@@ -209,7 +209,7 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_visitSubstitutionNode_AssignSubstitutionNode(){
 
-        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteStub();
+        AssignSubstitutionNode assignSubstitutionNode = new AssignSubstituteNodeStub();
 
         assertEquals("<Assignement_Sub>\n" +
                 "    <Variables>\n" +

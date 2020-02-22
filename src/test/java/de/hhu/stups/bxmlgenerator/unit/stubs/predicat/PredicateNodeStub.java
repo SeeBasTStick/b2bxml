@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator.unit.stubInterfaces.predicat;
+package de.hhu.stups.bxmlgenerator.unit.stubs.predicat;
 
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;

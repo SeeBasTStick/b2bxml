@@ -33,7 +33,7 @@ public class TypeInfoGenerator extends BXMLBodyGenerator{
         return type.render();
     }
 
-    private String generateTypeInformation(BType type)
+    public String generateTypeInformation(BType type)
     {
         String result;
 

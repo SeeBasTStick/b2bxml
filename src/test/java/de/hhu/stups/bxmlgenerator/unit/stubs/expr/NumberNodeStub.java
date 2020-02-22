@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator.unit.stubInterfaces.expr;
+package de.hhu.stups.bxmlgenerator.unit.stubs.expr;
 
 import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.NumberNode;

@@ -1,7 +1,7 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.InitialisationGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
 import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.STGroupFile;
@@ -33,6 +33,6 @@ public class InitialisationGeneratorTest {
                         "        </Values>\n" +
                         "    </Assignement_Sub>\n" +
                         "</Initialisation>",
-                initialisationGenerator.generateInitialisation(new AssignSubstituteStub()));
+                initialisationGenerator.generateInitialisation(new AssignSubstituteNodeStub()));
     }
 }

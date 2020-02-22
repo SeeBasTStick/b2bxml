@@ -1,10 +1,10 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
 import de.hhu.stups.bxmlgenerator.generators.OperationsGenerator;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.highLevel.DeclarationNodeStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.AssignSubstituteStub;
-import de.hhu.stups.bxmlgenerator.unit.stubInterfaces.substitution.ConditionSubstitutionNodeStub;
-import de.prob.parser.ast.SourceCodePosition;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.OperationNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
+import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.ConditionSubstitutionNodeStub;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.substitution.ConditionSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
@@ -34,8 +34,8 @@ public class OperationsGeneratorTest{
 
     @Test
     public void test_generateOperation_1(){
-        OperationNode operationNode = new OperationNode(new SourceCodePosition(), "dec", new ArrayList<>(),
-                new AssignSubstituteStub(), new ArrayList<>());
+        OperationNode operationNode = new OperationNodeStub( "dec", new ArrayList<>(),
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
         assertEquals("<Operation name='dec'>\n" +
                 "    <Body>\n" +
@@ -54,9 +54,9 @@ public class OperationsGeneratorTest{
 
     @Test
     public void test_generateOperation_2(){
-        OperationNode operationNode = new OperationNode(new SourceCodePosition(), "dec",
+        OperationNode operationNode = new OperationNodeStub( "dec",
                 List.of(new DeclarationNodeStub(BoolType.getInstance())),
-                new AssignSubstituteStub(), new ArrayList<>());
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
         assertEquals("<Operation name='dec'>\n" +
                 "    <Output_Parameters>\n" +
@@ -77,12 +77,12 @@ public class OperationsGeneratorTest{
 
     @Test
     public void test_generateOperations(){
-        OperationNode operationNode1 = new OperationNode(new SourceCodePosition(), "dec", new ArrayList<>(),
-                new AssignSubstituteStub(), new ArrayList<>());
+        OperationNode operationNode1 = new OperationNodeStub( "dec", new ArrayList<>(),
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
-        OperationNode operationNode2 = new OperationNode(new SourceCodePosition(), "dec",
+        OperationNode operationNode2 = new OperationNodeStub( "dec",
                 List.of(new DeclarationNodeStub(BoolType.getInstance())),
-                new AssignSubstituteStub(), new ArrayList<>());
+                new AssignSubstituteNodeStub(), new ArrayList<>());
 
 
         assertEquals("<Operations>\n" +
@@ -144,9 +144,9 @@ public class OperationsGeneratorTest{
 
     @Test
     public void test_visitConditionSubstitutionNodeTopLevel_CorrectNode_and_Assert(){
-        AssignSubstituteStub assignSubstituteStub = new AssignSubstituteStub();
+        AssignSubstituteNodeStub assignSubstituteNodeStub = new AssignSubstituteNodeStub();
 
-        Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(assignSubstituteStub);
+        Pair<String, SubstitutionNode> result = operationsGenerator.visitConditionSubstitutionNodeTopLevel(assignSubstituteNodeStub);
 
         assertEquals("", result.getKey());
 
