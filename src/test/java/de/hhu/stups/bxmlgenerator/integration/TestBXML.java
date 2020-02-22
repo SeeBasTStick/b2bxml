@@ -6,21 +6,29 @@ import org.junit.Test;
 public class TestBXML {
 
     @Test
-    public void testExamples() throws Exception {
+    public void test_Examples() throws Exception {
         String name = "Mega";
         BXMLTestUtils.calculateDifference(name);
     }
 
     @Test
-    public void testLift() throws Exception {
+    public void test_Lift() throws Exception {
         String name = "Lift";
         BXMLTestUtils.calculateDifference(name);
     }
 
     @Test
-    public void testInnerOuterPre() throws Exception{
+    public void test_InnerOuterPre() throws Exception{
         String name = "Inner_Outer_PRE_Test";
         BXMLTestUtils.calculateDifference(name);
     }
+
+    @Test
+    public void test_Assert_Test() throws Exception{
+        String name = "Assert_Test";
+        BXMLTestUtils.calculateDifference(name);
+    }
+
+
 
 }
