@@ -9,6 +9,7 @@ import de.prob.parser.ast.nodes.ltl.*;
 import de.prob.parser.ast.nodes.predicate.*;
 import de.prob.parser.ast.nodes.substitution.*;
 import de.prob.parser.ast.types.BType;
+import de.prob.parser.ast.types.BoolType;
 import de.prob.parser.ast.types.IntegerType;
 import de.prob.parser.ast.types.SetType;
 import de.prob.parser.ast.visitors.AbstractVisitor;
@@ -64,7 +65,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
                 result ="&gt;";
                 break;
             case EQUAL:
-                result="&eq;";
+                result="=";
                 break;
             case NOT_EQUAL:
                 result="&neq;";
@@ -153,6 +154,24 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
                 st = currentGroup.getInstanceOf("id");
                 TemplateHandler.add(st, "val", "NAT");
                 TemplateHandler.add(st, "typref", generateHash(new SetType(IntegerType.getInstance())));
+                break;
+
+            case BOOL:
+                st = currentGroup.getInstanceOf("id");
+                TemplateHandler.add(st, "val", "BOOL");
+                TemplateHandler.add(st, "typref", generateHash(BoolType.getInstance()));
+                break;
+
+            case FALSE:
+                st = currentGroup.getInstanceOf("boolean_literal");
+                TemplateHandler.add(st, "val", "FALSE");
+                TemplateHandler.add(st, "typref", generateHash(node.getType()));
+                break;
+
+            case TRUE:
+                st = currentGroup.getInstanceOf("boolean_literal");
+                TemplateHandler.add(st, "val", "TRUE");
+                TemplateHandler.add(st, "typref", generateHash(node.getType()));
                 break;
 
             default:

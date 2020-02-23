@@ -81,18 +81,20 @@ public class BXMLTestUtils {
          * calls the standalone bxml generator contained in atelierB to create an "original" file
          * https://www.atelierb.eu/en/download/
          * Arguments of Process Builder are:
-         *  <application> <enable semantic analysis> <indent of 4> <destination for result> <target>
-         *    ./bxml        -a                          -i 4            -o ../result       ../bla.mch
+         *  <application> <enable semantic analysis> <indent of 4> <further ressoucres> <destination for result> <target>
+         *    ./bxml        -a                          -i 4          -I /machine          -o ../result       ../bla.mch
          */
-        ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-a", "-i", "4", "-O",
-                bxmlTarget.toString(),
+        ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-a", "-i", "4",
+                "-I", Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/").toString(),
+                "-O", bxmlTarget.toString(),
                 mchPath.toString());
 
         //Sets needed library path
         Map<String, String> env = pb.environment();
         env.put("LD_LIBRARY_PATH", cuuc.toString());
 
-        pb.start();
+
+        Process bla = pb.start();
 
         return Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/"
                 + machineName + ".bxml");

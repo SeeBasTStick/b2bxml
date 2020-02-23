@@ -40,8 +40,10 @@ public class MachineGeneratorTest extends BXMLBodyGeneratorTest {
                 List.of(new DeclarationNodeStub(IntegerType.getInstance())),
                 new AssignSubstituteNodeStub(), new ArrayList<>());
 
-
         machineNode.setOperations(List.of(operationNode1, operationNode2));
+
+        String result = machineGenerator.generateMachine(machineNode);
+
         assertEquals("<Machine name='TEST' type='abstraction'>\n" +
                 "    <Abstract_Variables>\n" +
                 "    </Abstract_Variables>\n" +
@@ -92,12 +94,13 @@ public class MachineGeneratorTest extends BXMLBodyGeneratorTest {
                 "    </Operations>\n" +
                 "    <TypeInfos>\n" +
                 "        <Type id='2044650'>\n" +
+                "            <Id value='BOOL'/>\n" +
                 "        </Type>\n" +
                 "        <Type id='1618932450'>\n" +
                 "            <Id value='INTEGER'/>\n" +
                 "        </Type>\n" +
                 "    </TypeInfos>\n" +
-                "</Machine>", machineGenerator.generateMachine(machineNode));
+                "</Machine>", result);
     }
 
 }

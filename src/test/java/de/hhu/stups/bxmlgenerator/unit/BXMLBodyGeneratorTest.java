@@ -73,16 +73,6 @@ public class BXMLBodyGeneratorTest {
     }
 
     @Test
-    public void test_visitExprNode_ExpressionOperatorNode() {
-        ExpressionOperatorNode expressionOperatorNode =
-                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance());
-
-        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
-
-        assertEquals("<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>", result);
-    }
-
-    @Test
     public void test_visitExprNode_NumberNode(){
         NumberNode numberNode = new NumberNode(new SourceCodePosition(), BigInteger.ONE);
         BType type = BoolType.getInstance();
@@ -99,18 +89,17 @@ public class BXMLBodyGeneratorTest {
     }
 
     @Test
-    public void test_visitExpressionOperatorNode_Plus()
-    {
+    public void test_visitExprNode_ExpressionOperatorNode_Plus() {
         ExpressionOperatorNode expressionOperatorNode =
                 new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.PLUS, BoolType.getInstance());
 
-        assertEquals(stubGenerator.visitExprNode(expressionOperatorNode, null),
-                "<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>");
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
 
+        assertEquals("<Binary_Exp op='+' typref='2044650'>\n</Binary_Exp>", result);
     }
 
     @Test
-    public void test_visitExpressionOperatorNode_Minus()
+    public void test_visitExprNode_visitExpressionOperatorNode_Minus()
     {
         ExpressionOperatorNode expressionOperatorNode =
                 new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.MINUS, BoolType.getInstance());
@@ -120,12 +109,48 @@ public class BXMLBodyGeneratorTest {
     }
 
     @Test
-    public void test_visitExpressionOperatorNode_NAT()
+    public void test_visitExprNode_visitExpressionOperatorNode_NAT()
     {
         ExpressionOperatorNode expressionOperatorNode =
                 new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.NAT, BoolType.getInstance());
-        assertEquals(stubGenerator.visitExprNode(expressionOperatorNode, null),
-                "<Id value='NAT' typref='631359557'/>");
+
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
+
+        assertEquals( "<Id value='NAT' typref='631359557'/>", result);
+    }
+
+    @Test
+    public void test_visitExprNode_visitExpressionOperatorNode_BOOL()
+    {
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.BOOL, BoolType.getInstance());
+
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
+
+        assertEquals("<Id value='BOOL' typref='2044650'/>", result);
+    }
+
+    @Test
+    public void test_visitExprNode_visitExpressionOperatorNode_TRUE()
+    {
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.TRUE, BoolType.getInstance());
+
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
+
+        assertEquals("<Boolean_Literal value='TRUE' typref='2044650'/>", result);
+
+    }
+
+    @Test
+    public void test_visitExprNode_visitExpressionOperatorNode_FALSE()
+    {
+        ExpressionOperatorNode expressionOperatorNode =
+                new ExprOperatorNodeStub(ExpressionOperatorNode.ExpressionOperator.FALSE, BoolType.getInstance());
+
+        String result = stubGenerator.visitExprNode(expressionOperatorNode, null);
+
+        assertEquals("<Boolean_Literal value='FALSE' typref='2044650'/>", result);
 
     }
 
@@ -300,7 +325,7 @@ public class BXMLBodyGeneratorTest {
     @Test
     public void test_processOperatorPredOperatorExprArgs_EQUAL(){
         assertEquals(stubGenerator.processOperatorPredOperatorExprArgs(
-                PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.EQUAL), "&eq;");
+                PredicateOperatorWithExprArgsNode.PredOperatorExprArgs.EQUAL), "=");
     }
 
     @Test

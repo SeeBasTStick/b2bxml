@@ -1,13 +1,22 @@
 keywords() ::= <<Machine>>
 
-machine(type_info, invariant, abstract_variables, operations, initialisation, machine) ::= <<
+machine(type_info, invariant, abstract_variables, operations, initialisation, machine, references) ::= <<
 \<Machine name='<machine>' type='abstraction'>
+    <references; separator="\n">
     <abstract_variables>
     <invariant>
     <initialisation>
     <operations>
     <type_info>
 \</Machine>
+>>
+
+extends(name) ::=<<
+\<Extends>
+    \<Referenced_Machine>
+        \<Name><name>\</Name>
+    \</Referenced_Machine>
+\</Extends>
 >>
 
 operations(operation) ::=<<
@@ -147,6 +156,10 @@ unary_exp(op, body) ::= <<
 
 integer_literal(val, typref) ::=<<
 \<Integer_Literal value='<val>' typref='<typref>'/>
+>>
+
+boolean_literal(val, typref) ::=<<
+\<Boolean_Literal value='<val>' typref='<typref>'/>
 >>
 
 type_info(types) ::= <<

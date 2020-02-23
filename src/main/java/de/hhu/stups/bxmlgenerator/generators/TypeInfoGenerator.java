@@ -44,6 +44,11 @@ public class TypeInfoGenerator extends BXMLBodyGenerator{
                 TemplateHandler.add(integerTypeGroup, "val", type.toString());
                 result = integerTypeGroup.render();
                 break;
+            case "BoolType":
+                ST boolTypeGroup = getSTGroup().getInstanceOf("id_blank");
+                TemplateHandler.add(boolTypeGroup, "val", type.toString());
+                result = boolTypeGroup.render();
+                break;
             case "SetType":
                 SetType setType = (SetType) type;
                 ST setTypeGroup = getSTGroup().getInstanceOf("unary_exp");

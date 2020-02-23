@@ -26,6 +26,8 @@ public class MachineGenerator {
 
 	private OperationsGenerator operationsGenerator;
 
+	private ReferenceGenerator referenceGenerator;
+
 
 	public MachineGenerator() {
 		this.currentGroup = new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg");
@@ -35,6 +37,7 @@ public class MachineGenerator {
 		this.initialisationGenerator = new InitialisationGenerator(nodeType,  currentGroup);
 		this.operationsGenerator = new OperationsGenerator(nodeType,  currentGroup);
 		this.typeInfoGenerator = new TypeInfoGenerator(nodeType,  currentGroup);
+		this.referenceGenerator = new ReferenceGenerator(nodeType, currentGroup);
 	}
 
 
@@ -47,6 +50,8 @@ public class MachineGenerator {
 
 
 	private void generateBody(MachineNode node, ST machine) {
+
+		TemplateHandler.add(machine, "references", referenceGenerator.generateReferences(node.getMachineReferences()));
 		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateAbstractVariables(node.getVariables()));
 		TemplateHandler.add(machine, "invariant", invariantGenerator.generateInvariants(node.getInvariant()));
 		TemplateHandler.add(machine, "initialisation", initialisationGenerator.generateInitialisation(node.getInitialisation()));

@@ -29,6 +29,11 @@ public class TestBXML {
         BXMLTestUtils.calculateDifference(name);
     }
 
+    @Test
+    public void test_Simple_Extends_Test() throws Exception {
+        String name = "MachineB";
+        BXMLTestUtils.calculateDifference(name);
+    }
 
 
 }
