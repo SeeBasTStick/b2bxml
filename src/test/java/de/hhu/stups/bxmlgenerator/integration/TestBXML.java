@@ -31,7 +31,7 @@ public class TestBXML {
 
     @Test
     public void test_Simple_Extends_Test() throws Exception {
-        String name = "MachineB";
+        String name = "references/extends/MachineB";
         BXMLTestUtils.calculateDifference(name);
     }
 

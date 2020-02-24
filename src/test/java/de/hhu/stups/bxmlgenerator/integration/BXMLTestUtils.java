@@ -28,12 +28,19 @@ public class BXMLTestUtils {
 
     static String projectLocation = System.getProperty("user.dir");
 
-    public static void calculateDifference(String name) throws Exception {
+    public static void calculateDifference(String path) throws Exception {
 
+        String name;
+        //Dealing with nested structures
+        if(path.contains(File.separator)) {
+            name = path.substring(path.lastIndexOf(File.separator)+1);
+        }else{
+            name = path;
+        }
 
-        Path originalPath = generateOriginal(name);
+        Path originalPath = generateOriginal(path, name);
 
-        Path imagePath = generateImage(name);
+        Path imagePath = generateImage(path, name);
 
         File originalFile = new File(originalPath.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -65,27 +72,41 @@ public class BXMLTestUtils {
     }
 
 
-    private static Path generateOriginal(String machineName) throws IOException{
+    private static Path generateOriginal(String pathName, String machineName) throws IOException{
+
+
 
         Path cuuc = Paths.get(":" ,projectLocation , "/src/test/resources/de/hhu/stups/generators/");
 
         Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
-                + machineName + ".mch");
+                + pathName + ".mch");
 
         Path bxml = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/generators/bxml");
 
         Path bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/");
+
+        Path furtherResources;
+
+        //Meaning : If we deal with a file down in the folder tree -> modify string to fit to the deeper location
+        if(!pathName.equals(machineName))
+        {
+            furtherResources =
+                    Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/machine/",
+                            pathName.substring(0, pathName.lastIndexOf(File.separator)));
+        }else{
+            furtherResources = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/");
+        }
 
 
         /*
          * calls the standalone bxml generator contained in atelierB to create an "original" file
          * https://www.atelierb.eu/en/download/
          * Arguments of Process Builder are:
-         *  <application> <enable semantic analysis> <indent of 4> <further ressoucres> <destination for result> <target>
+         *  <application> <enable semantic analysis> <indent of 4> <further resources> <destination for result> <target>
          *    ./bxml        -a                          -i 4          -I /machine          -o ../result       ../bla.mch
          */
         ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-a", "-i", "4",
-                "-I", Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/").toString(),
+                "-I", furtherResources.toString(),
                 "-O", bxmlTarget.toString(),
                 mchPath.toString());
 
@@ -94,20 +115,23 @@ public class BXMLTestUtils {
         env.put("LD_LIBRARY_PATH", cuuc.toString());
 
 
-        Process bla = pb.start();
+        System.out.println(mchPath.toString());
+        pb.start();
+
 
         return Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/"
                 + machineName + ".bxml");
     }
 
-    private static Path generateImage(String machineName) {
+    private static Path generateImage(String pathName, String machineName) {
 
         Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
-                + machineName + ".mch");
+                + pathName + ".mch");
 
         Path target = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/image");
 
         CodeGenerator codeGenerator = new CodeGenerator();
+
         return codeGenerator.generate(mchPath, target);
     }
 
