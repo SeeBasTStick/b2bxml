@@ -391,7 +391,6 @@ public class BXMLBodyGeneratorTest {
     public void test_hashFunction_3(){
         BType type = BoolType.getInstance();
         assertEquals(Math.abs(type.toString().hashCode()), stubGenerator.generateHash(type));
-
     }
 
     @Test

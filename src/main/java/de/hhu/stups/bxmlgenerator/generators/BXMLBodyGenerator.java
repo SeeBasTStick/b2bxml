@@ -105,7 +105,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     {
         int hash = Math.abs(type.toString().hashCode());
         //Need strings here due to the fact that BTypes might be different instances...
-        if(!nodeType.containsKey(hash) || nodeType.containsKey(hash) && nodeType.get(hash).toString().equals(type.toString()))
+        if(!nodeType.containsKey(hash) || nodeType.get(hash).toString().equals(type.toString()))
         {
             return hash;
         }
