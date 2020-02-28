@@ -1,0 +1,22 @@
+
+
+REFINEMENT Lift2
+
+REFINES Lift
+
+
+
+VARIABLES   door_open
+
+INVARIANT   door_open : BOOL
+
+INITIALISATION floors := 0 || door_open := FALSE
+
+OPERATIONS
+
+	inc = PRE floors<100 THEN floors := floors + 1 END ;
+	dec = PRE floors>0 THEN floors := floors - 1 END;
+	open_door = PRE door_open=FALSE THEN door_open := TRUE END ;
+	close_door = PRE door_open=TRUE THEN door_open := FALSE END
+
+END

@@ -19,6 +19,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.FileSystemException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,14 +34,14 @@ public class BXMLTestUtils {
         String name;
         //Dealing with nested structures
         if(path.contains(File.separator)) {
-            name = path.substring(path.lastIndexOf(File.separator)+1);
+            name = path.substring(path.lastIndexOf(File.separator)+1, path.lastIndexOf("."));
         }else{
-            name = path;
+            name = path.substring(0, path.lastIndexOf("."));
         }
 
         Path originalPath = generateOriginal(path, name);
 
-        Path imagePath = generateImage(path, name);
+        Path imagePath = generateImage(path);
 
         File originalFile = new File(originalPath.toString());
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -75,27 +76,41 @@ public class BXMLTestUtils {
     private static Path generateOriginal(String pathName, String machineName) throws IOException{
 
 
-
         Path cuuc = Paths.get(":" ,projectLocation , "/src/test/resources/de/hhu/stups/generators/");
 
         Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
-                + pathName + ".mch");
+                + pathName );
 
         Path bxml = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/generators/bxml");
 
-        Path bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/");
+        Path bxmlTarget;
 
         Path furtherResources;
 
         //Meaning : If we deal with a file down in the folder tree -> modify string to fit to the deeper location
-        if(!pathName.equals(machineName))
+        if(!pathName.contains(File.separator))
         {
             furtherResources =
                     Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/machine/",
-                            pathName.substring(0, pathName.lastIndexOf(File.separator)));
+                            pathName.substring(0, pathName.lastIndexOf(File.separator)+1));
+            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/original/");
+
         }else{
-            furtherResources = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/");
+            String treeBranchName = pathName.substring(0, pathName.lastIndexOf(File.separator));
+            furtherResources = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/",
+                    treeBranchName);
+            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/original/",
+                    treeBranchName);
         }
+
+        File dir = new File(bxmlTarget.toString());
+        if(!dir.exists()){
+            boolean result = dir.mkdirs();
+            if(result){
+                throw new FileSystemException("Folder could not be created while generating original, something bad happend");
+            }
+        }
+
 
 
         /*
@@ -105,30 +120,45 @@ public class BXMLTestUtils {
          *  <application> <enable semantic analysis> <indent of 4> <further resources> <destination for result> <target>
          *    ./bxml        -a                          -i 4          -I /machine          -o ../result       ../bla.mch
          */
+
+
         ProcessBuilder pb = new ProcessBuilder(bxml.toString(),  "-a", "-i", "4",
                 "-I", furtherResources.toString(),
                 "-O", bxmlTarget.toString(),
                 mchPath.toString());
 
+
         //Sets needed library path
         Map<String, String> env = pb.environment();
         env.put("LD_LIBRARY_PATH", cuuc.toString());
 
-
-        System.out.println(mchPath.toString());
         pb.start();
 
-
-        return Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/original/"
-                + machineName + ".bxml");
+        return Paths.get(bxmlTarget.toString(), machineName + ".bxml");
     }
 
-    private static Path generateImage(String pathName, String machineName) {
+    private static Path generateImage(String pathName) throws FileSystemException {
 
-        Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/"
-                + pathName + ".mch");
+        Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/" + pathName );
 
-        Path target = Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/image");
+        Path target;
+
+        if(!pathName.contains(File.separator))
+        {
+            target = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/image/");
+        }else{
+            target =  Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/results/image",
+                    pathName.substring(0, pathName.lastIndexOf(File.separator)));
+        }
+
+        File dir = new File(target.toString());
+        if(!dir.exists()){
+            boolean result = dir.mkdirs();
+
+            if(result){
+                throw new FileSystemException("Folder could not be created while generating image, something bad happend");
+            }
+        }
 
         CodeGenerator codeGenerator = new CodeGenerator();
 

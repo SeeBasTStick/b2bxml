@@ -56,6 +56,7 @@ public class CodeGenerator {
 
 	public Path generate(Path target, Path destination){
 		BProject project = parseProject(target);
+
 		return writeToFile(target, destination, project.getMainMachine());
 	}
 
@@ -96,6 +97,7 @@ public class CodeGenerator {
 		BProject project;
 		try {
 			project = Antlr4BParser.createBProjectFromMainMachineFile(path.toFile());
+
 		} catch (TypeErrorException | ScopeException | IOException e) {
 			e.printStackTrace();
 			throw new CodeGenerationException(e.getMessage());

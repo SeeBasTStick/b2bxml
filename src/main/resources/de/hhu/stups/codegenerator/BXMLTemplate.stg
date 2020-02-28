@@ -1,7 +1,7 @@
 keywords() ::= <<Machine>>
 
-machine(type_info, invariant, abstract_variables, operations, initialisation, machine, references) ::= <<
-\<Machine name='<machine>' type='abstraction'>
+machine(type_info, invariant, abstract_variables, operations, initialisation, machine, references, kind) ::= <<
+\<Machine name='<machine>' type='<kind>'>
     <references; separator="\n">
     <abstract_variables>
     <invariant>

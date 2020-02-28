@@ -1,7 +1,6 @@
 package de.hhu.stups.bxmlgenerator.generators;
 
 
-import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.types.BType;
@@ -48,9 +47,12 @@ public class MachineGenerator {
 		return machine.render();
 	}
 
+	public String generateMachineType(){
+		return "";
+	}
+
 
 	private void generateBody(MachineNode node, ST machine) {
-
 		TemplateHandler.add(machine, "references", referenceGenerator.generateReferences(node.getMachineReferences()));
 		TemplateHandler.add(machine, "abstract_variables", abstractVariablesGenerator.generateAbstractVariables(node.getVariables()));
 		TemplateHandler.add(machine, "invariant", invariantGenerator.generateInvariants(node.getInvariant()));
