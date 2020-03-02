@@ -186,13 +186,14 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
     @Override
     public void caseAVariablesMachineClause(AVariablesMachineClause node)
     {
+        if(node.getIdentifiers() != null) {
+            AbstractVariableGenerator abstractVariableGenerator = new AbstractVariableGenerator(getStGroupFile(),
+                    getStGroupFile().getInstanceOf("abstract_variable"), getNodeType(), getTypechecker(), node);
 
-        AbstractVariableGenerator abstractVariableGenerator = new AbstractVariableGenerator(getStGroupFile(),
-                getStGroupFile().getInstanceOf("abstract_variable"), getNodeType(), getTypechecker(), node);
+            String abstractVariables = abstractVariableGenerator.generateAllExpression();
 
-        String abstractVariables = abstractVariableGenerator.generateAllExpression();
-
-        TemplateHandler.add(getCurrentGroup(), "abstract_variables", abstractVariables);
+            TemplateHandler.add(getCurrentGroup(), "abstract_variables", abstractVariables);
+        }
 
     }
 
@@ -274,12 +275,15 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
     @Override
     public void caseAInvariantMachineClause(AInvariantMachineClause node)
     {
-        inAInvariantMachineClause(node);
         if(node.getPredicates() != null)
         {
-            node.getPredicates().apply(this);
+            InvariantGenerator invariantGenerator = new InvariantGenerator(getStGroupFile(),
+                    getStGroupFile().getInstanceOf("invariant"), getNodeType(), getTypechecker(), node);
+
+            String abstractVariables = invariantGenerator.generateAllExpression();
+
+            TemplateHandler.add(getCurrentGroup(), "invariant", abstractVariables);
         }
-        outAInvariantMachineClause(node);
     }
 
     @Override

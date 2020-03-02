@@ -2,15 +2,20 @@ package de.hhu.stups.bxmlgenerator.sablecc;
 
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
-import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.*;
+import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
+import de.hhu.stups.bxmlgenerator.util.Pair;
+import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class STGroupGenerator extends DepthFirstAdapter {
@@ -59,6 +64,13 @@ public class STGroupGenerator extends DepthFirstAdapter {
         return currentGroup.render();
     }
 
+    /**
+     * @param type BType which is converted to integer hash
+     * @return
+     *
+     * Gets a btype and returns it´s String hash representation while checking if the hash is already taken by an other
+     * type.
+     */
     public int generateHash(BType type) {
         int hash = Math.abs(type.toString().hashCode());
         //Need strings here due to the fact that BTypes might be different instances...
@@ -69,26 +81,145 @@ public class STGroupGenerator extends DepthFirstAdapter {
         }
     }
 
-
     @Override
     public void caseAIdentifierExpression(AIdentifierExpression node)
     {
         TemplateHandler.add(currentGroup, "val", node.toString().replace(" ", ""));
         BType type = typechecker.getType(node);
-        Integer nodeHash = generateHash(type);
+        int nodeHash = generateHash(type);
         nodeType.put(nodeHash, type);
         TemplateHandler.add(currentGroup, "typref", nodeHash);
     }
 
+    @Override
+    public void caseAIntervalExpression(AIntervalExpression node)
+    {
+        TemplateHandler.add(currentGroup, "op", "..");
+
+        BType bType = typechecker.getType(node);
+        int nodeHash = generateHash(bType);
+        nodeType.put(nodeHash, bType);
+        TemplateHandler.add(currentGroup, "typref", nodeHash);
+
+        PExpression left = node.getLeftBorder();
+        PExpression right = node.getRightBorder();
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "body", evaluatedChildren);
+    }
+
+    @Override
+    public void caseAIntegerExpression(AIntegerExpression node)
+    {
+        String value = node.getLiteral().toString().replace(" ", "");
+        TemplateHandler.add(currentGroup, "val", value);
+        BType bType = typechecker.getType(node);
+        int nodeHash = generateHash(bType);
+        TemplateHandler.add(currentGroup, "typref", nodeHash);
+    }
+
+    @Override
+    public void caseAConjunctPredicate(AConjunctPredicate node)
+    {
+        TemplateHandler.add(currentGroup, "op", "&amp;");
+
+        List<PPredicate> expandedConjunction = unfoldConjunction(node);
+
+        List<String> result = expandedConjunction.stream()
+                .map(predicateNode -> new Pair<>(predicateNode, PredicateFinder.findPredicate(predicateNode)))
+                .map(pair -> new STGroupGenerator(stGroupFile,
+            stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey()).generateCurrent())
+                .collect(Collectors.toList());
+
+        TemplateHandler.add(currentGroup, "statements", result);
+    }
+
+    @Override
+    public void caseAGreaterEqualPredicate(AGreaterEqualPredicate node)
+    {
+        TemplateHandler.add(currentGroup, "op", "&gt;=");
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "statements", evaluatedChildren);
+    }
+
+    @Override
+    public void caseALessPredicate(ALessPredicate node)
+    {
+        TemplateHandler.add(currentGroup, "op", "&lt;");
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "statements", evaluatedChildren);
+    }
+
+    @Override
+    public void caseAMemberPredicate(AMemberPredicate node)
+    {
+        TemplateHandler.add(currentGroup, "op", ":");
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "statements", evaluatedChildren);
+    }
+
+    public List<String> visitRightAndLeftExpression(PExpression left, PExpression right){
+
+        String leftPredicate = ExpressionFinder.findExpression(left);
+        String rightPredicate = ExpressionFinder.findExpression(right);
+
+        STGroupGenerator stGroupGeneratorLeft = new STGroupGenerator(stGroupFile,
+                stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left);
+
+        STGroupGenerator stGroupGeneratorRight = new STGroupGenerator(stGroupFile,
+                stGroupFile.getInstanceOf(rightPredicate), nodeType, typechecker, right);
+
+        String leftStatements = stGroupGeneratorLeft.generateCurrent();
+        String rightStatements = stGroupGeneratorRight.generateCurrent();
+
+        return List.of(leftStatements, rightStatements);
+    }
 
 
+    private List<PPredicate> determineInstance(PPredicate node){
+        List<PPredicate> result = new ArrayList<>();
 
+        if(node instanceof AConjunctPredicate){
+            result.addAll(unfoldConjunction((AConjunctPredicate) node));
+        }else{
+            result.add(node);
+        }
+        return result;
+    }
+    /**
+     * @param node the node to unfold
+     * @return return a List with all direct children
+     *
+     * Multiple Conjunctions like \< a : INT & b : INT & c : INT>  are represented with multiple stacked CokunctionPRedicate
+     * nodes. bxml format only uses the term nary_sub to describe any number of conjunctions
+     */
+    public List<PPredicate> unfoldConjunction(AConjunctPredicate node){
+        List<PPredicate> result = new ArrayList<>();
 
+        PPredicate left = node.getLeft();
+        PPredicate right = node.getRight();
 
+        result.addAll(determineInstance(left));
+        result.addAll(determineInstance(right));
 
-
-
-
+        return result;
+    }
 
 
 }
