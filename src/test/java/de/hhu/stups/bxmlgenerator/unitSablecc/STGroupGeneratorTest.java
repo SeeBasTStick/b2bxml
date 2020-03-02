@@ -23,6 +23,25 @@ import static org.junit.Assert.assertEquals;
 
 public class STGroupGeneratorTest {
 
+
+    @Test
+    public void test_caseAIdentifierExpression() throws BCompoundException {
+        String machine = hashTestMachine();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+
+        AIdentifierExpression aIdentifierExpression = (AIdentifierExpression) c.getVariables().get("x");
+
+        String result = new STGroupGeneratorStub(new HashMap<>(), c, aIdentifierExpression).generateCurrent();
+
+        assertEquals("<Id value='x' typref='1618932450'/>", result);
+
+    }
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
