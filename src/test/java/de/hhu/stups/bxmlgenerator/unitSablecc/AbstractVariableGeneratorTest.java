@@ -7,6 +7,7 @@ import de.be4.classicalb.core.parser.node.Start;
 import de.hhu.stups.bxmlgenerator.sablecc.AbstractVariableGenerator;
 import de.hhu.stups.bxmlgenerator.sablecc.MachineGenerator;
 import de.hhu.stups.bxmlgenerator.sablecc.SubGenerator;
+import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -34,7 +35,7 @@ public class AbstractVariableGeneratorTest {
 
         MachineGeneratorStub machineGeneratorStub = new MachineGeneratorStub(c, start);
 
-        List<String> result = machineGeneratorStub.subTreeGenerator.generateSubExpression();
+        List<String> result = machineGeneratorStub.generateSubExpression();
 
         assertEquals("<Id value='x' typref='1618932450'/>", result.get(0));
     }
@@ -52,7 +53,7 @@ public class AbstractVariableGeneratorTest {
 
         MachineGeneratorStub machineGeneratorStub = new MachineGeneratorStub(c, start);
 
-        List<String> result = machineGeneratorStub.subTreeGenerator.generateSubExpression();
+        List<String> result = machineGeneratorStub.generateSubExpression();
 
         assertEquals("<Id value='x' typref='1618932450'/>", result.get(0));
         assertEquals("<Id value='y' typref='1618932450'/>", result.get(1));
@@ -96,6 +97,13 @@ public class AbstractVariableGeneratorTest {
         public String generateAllExpression(){
             getStartNode().apply(this);
             return subTreeGenerator.generateAllExpression();
+        }
+
+        @Override
+        public List<String> generateSubExpression(){
+            getStartNode().apply(this);
+            System.out.println(subTreeGenerator);
+            return subTreeGenerator.generateSubExpression();
         }
 
         @Override

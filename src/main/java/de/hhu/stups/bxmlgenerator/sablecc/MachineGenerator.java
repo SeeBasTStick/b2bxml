@@ -32,10 +32,12 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
     public List<String> generateSubExpression(){
         Start node = (Start) getStartNode();
         AAbstractMachineParseUnit abstractMachineParseUnit = (AAbstractMachineParseUnit) node.getPParseUnit();
-        abstractMachineParseUnit.apply(this);
+
         List<String> result = new ArrayList<>();
+
         for(PMachineClause subElement : abstractMachineParseUnit.getMachineClauses()){
             if(subElement instanceof AVariablesMachineClause){
+                caseAVariablesMachineClause((AVariablesMachineClause) subElement);
                 result.add(getCurrentGroup().getAttribute("abstract_variables").toString());
             }
         }
@@ -184,12 +186,14 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
     @Override
     public void caseAVariablesMachineClause(AVariablesMachineClause node)
     {
+
         AbstractVariableGenerator abstractVariableGenerator = new AbstractVariableGenerator(getStGroupFile(),
                 getStGroupFile().getInstanceOf("abstract_variable"), getNodeType(), getTypechecker(), node);
 
         String abstractVariables = abstractVariableGenerator.generateAllExpression();
 
         TemplateHandler.add(getCurrentGroup(), "abstract_variables", abstractVariables);
+
     }
 
     @Override

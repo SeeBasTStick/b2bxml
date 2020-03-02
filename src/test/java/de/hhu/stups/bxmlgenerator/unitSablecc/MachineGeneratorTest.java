@@ -2,7 +2,6 @@ package de.hhu.stups.bxmlgenerator.unitSablecc;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
-import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
 import de.hhu.stups.bxmlgenerator.sablecc.MachineGenerator;
 import de.hhu.stups.bxmlgenerator.sablecc.SubGenerator;
