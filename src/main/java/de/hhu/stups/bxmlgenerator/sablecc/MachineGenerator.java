@@ -10,18 +10,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MachineGenerator extends STGroupGenerator {
+public class MachineGenerator extends STGroupGenerator implements SubGenerator{
 
     private String machineName = "machine" + this.hashCode();
 
+    private boolean hasRun = false;
+
     public MachineGenerator(STGroupFile stGroupFile, HashMap<Integer, BType> nodeType, Typechecker typeChecker,
-                            Node startNode) {
+                            Start startNode) {
         super(stGroupFile, stGroupFile.getInstanceOf("machine"), nodeType, typeChecker, startNode);
     }
 
-    public String generateMachine(){
-        getStartNode().apply(this);
+    public String generateAllExpression(){
+        if(!hasRun) {
+            getStartNode().apply(this);
+            hasRun = true;
+        }
         return getCurrentGroup().render();
+    }
+
+    public List<String> generateSubExpression(){
+        Start node = (Start) getStartNode();
+        AAbstractMachineParseUnit abstractMachineParseUnit = (AAbstractMachineParseUnit) node.getPParseUnit();
+        abstractMachineParseUnit.apply(this);
+        List<String> result = new ArrayList<>();
+        for(PMachineClause subElement : abstractMachineParseUnit.getMachineClauses()){
+            if(subElement instanceof AVariablesMachineClause){
+                result.add(getCurrentGroup().getAttribute("abstract_variables").toString());
+            }
+        }
+        return result;
     }
 
     public String getMachineName(){
@@ -112,10 +130,9 @@ public class MachineGenerator extends STGroupGenerator {
     @Override
     public void caseAMachineHeader(AMachineHeader node)
     {
-        TemplateHandler.add(getCurrentGroup(), "machine", node.getName().get(0));
+        machineName = node.getName().get(0).toString().replace(" ", "");
 
-        machineName = node.getName().get(0).toString();
-
+        TemplateHandler.add(getCurrentGroup(), "machine", machineName);
 
         List<TIdentifierLiteral> identifierLiteralList = new ArrayList<>(node.getName());
         for(TIdentifierLiteral e : identifierLiteralList)

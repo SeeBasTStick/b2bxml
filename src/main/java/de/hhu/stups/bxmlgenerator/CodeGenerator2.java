@@ -67,7 +67,7 @@ public class CodeGenerator2 {
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"), new HashMap<>(),
                typechecker , node);
 
-        String code = machineGenerator.generateMachine();
+        String code = machineGenerator.generateAllExpression();
 
         String machineName = machineGenerator.getMachineName();
 

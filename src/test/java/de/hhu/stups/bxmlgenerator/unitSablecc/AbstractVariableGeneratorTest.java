@@ -3,7 +3,6 @@ package de.hhu.stups.bxmlgenerator.unitSablecc;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
-import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 import de.hhu.stups.bxmlgenerator.sablecc.AbstractVariableGenerator;
 import de.hhu.stups.bxmlgenerator.sablecc.MachineGenerator;
@@ -73,7 +72,7 @@ public class AbstractVariableGeneratorTest {
 
         MachineGeneratorStub machineGeneratorStub = new MachineGeneratorStub(c, start);
 
-        String result = machineGeneratorStub.subTreeGenerator.generateAllExpression();
+        String result = machineGeneratorStub.generateAllExpression();
 
         assertEquals("<Abstract_Variables>\n" +
                 "    <Id value='x' typref='1618932450'/>\n" +
@@ -86,14 +85,18 @@ public class AbstractVariableGeneratorTest {
 
         protected SubGenerator subTreeGenerator;
 
-        public MachineGeneratorStub(MachineContext ctx, Node startNode) {
+        public MachineGeneratorStub(MachineContext ctx, Start startNode) {
             super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
                     new HashMap<>(),
                     new Typechecker(ctx)
                     , startNode);
-            startNode.apply(this);
         }
 
+        @Override
+        public String generateAllExpression(){
+            getStartNode().apply(this);
+            return subTreeGenerator.generateAllExpression();
+        }
 
         @Override
         public void caseAVariablesMachineClause(AVariablesMachineClause node) {
