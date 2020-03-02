@@ -1,6 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.ReferenceGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.ReferenceGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.MachineReferenceNodeStub;
 import de.prob.parser.ast.nodes.MachineReferenceNode;
 import org.junit.Before;

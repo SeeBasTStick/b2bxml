@@ -1,6 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.MachineGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.MachineGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.expr.ExprOperatorNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.MachineNodeStub;
@@ -14,8 +14,10 @@ import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;
 import de.prob.parser.ast.types.BoolType;
 import de.prob.parser.ast.types.IntegerType;
 import org.junit.Test;
+import org.stringtemplate.v4.STGroupFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -24,7 +26,7 @@ public class MachineGeneratorTest extends BXMLBodyGeneratorTest {
 
     @Test
     public void test_generateMachine(){
-        MachineGenerator machineGenerator = new MachineGenerator();
+        MachineGenerator machineGenerator = new MachineGenerator(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"), new HashMap<>());
         MachineNode machineNode = new MachineNodeStub();
 
         machineNode.setConstants(List.of(new DeclarationNodeStub(IntegerType.getInstance())));

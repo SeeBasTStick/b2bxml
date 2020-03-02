@@ -1,9 +1,11 @@
-package de.hhu.stups.bxmlgenerator.generators;
+package de.hhu.stups.bxmlgenerator.antlr;
+
+import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.*;
 
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.DeclarationNode;
 import de.prob.parser.ast.nodes.Node;
-import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.expression.*;
 import de.prob.parser.ast.nodes.ltl.*;
 import de.prob.parser.ast.nodes.predicate.*;
@@ -20,27 +22,28 @@ import org.stringtemplate.v4.STGroup;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Object> {
+public abstract class BXMLBodyGenerator extends DepthFirstAdapter implements AbstractVisitor<String, Object> {
 
     public Map<Integer, BType> nodeType;
 
 
     public STGroup currentGroup;
 
-    public BXMLBodyGenerator(Map<Integer, BType> nodeType,  STGroup currentGroup)
-    {
+    public BXMLBodyGenerator(Map<Integer, BType> nodeType, STGroup currentGroup) {
         this.nodeType = nodeType;
         this.currentGroup = currentGroup;
     }
 
-    public Map<Integer, BType> getNodeTyp(){
+    public Map<Integer, BType> getNodeTyp() {
         return nodeType;
     }
 
 
-    public STGroup getSTGroup(){ return currentGroup; }
+    public STGroup getSTGroup() {
+        return currentGroup;
+    }
 
-    public String exceptionThrower(Node node){
+    public String exceptionThrower(Node node) {
         try {
             throw new Exception(node.getClass() + " is not implemented yet");
         } catch (Exception e) {
@@ -49,35 +52,34 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return "";
     }
 
-    public String generateOperatorNAry(PredicateOperatorNode node)
-    {
+    public String generateOperatorNAry(PredicateOperatorNode node) {
         return "&amp;";
     }
 
 
-    public String processOperatorPredOperatorExprArgs(PredicateOperatorWithExprArgsNode.PredOperatorExprArgs operator){
+    public String processOperatorPredOperatorExprArgs(PredicateOperatorWithExprArgsNode.PredOperatorExprArgs operator) {
         String result;
-        switch (operator){
+        switch (operator) {
             case LESS:
-                result ="&lt;";
+                result = "&lt;";
                 break;
             case GREATER:
-                result ="&gt;";
+                result = "&gt;";
                 break;
             case EQUAL:
-                result="=";
+                result = "=";
                 break;
             case NOT_EQUAL:
-                result="&neq;";
+                result = "&neq;";
                 break;
             case GREATER_EQUAL:
-                result="&gt;=";
+                result = "&gt;=";
                 break;
             case LESS_EQUAL:
-                result="&lt;=";
+                result = "&lt;=";
                 break;
             case ELEMENT_OF:
-                result=":";
+                result = ":";
                 break;
             default:
                 result = "";
@@ -90,8 +92,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return result;
     }
 
-    public String processDeclarationNode(DeclarationNode node)
-    {
+    public String processDeclarationNode(DeclarationNode node) {
         ST id = currentGroup.getInstanceOf("id");
         TemplateHandler.add(id, "val", node.getName());
 
@@ -101,16 +102,13 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
         return id.render();
     }
 
-    public int generateHash(BType type)
-    {
+    public int generateHash(BType type) {
         int hash = Math.abs(type.toString().hashCode());
         //Need strings here due to the fact that BTypes might be different instances...
-        if(!nodeType.containsKey(hash) || nodeType.get(hash).toString().equals(type.toString()))
-        {
+        if (!nodeType.containsKey(hash) || nodeType.get(hash).toString().equals(type.toString())) {
             return hash;
-        }
-        else{
-            throw new IndexOutOfBoundsException("Hash was already taken! " +type.toString() + " is not " + nodeType.get(hash));
+        } else {
+            throw new IndexOutOfBoundsException("Hash was already taken! " + type.toString() + " is not " + nodeType.get(hash));
         }
     }
 
@@ -118,34 +116,34 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
      * Expr
      */
     @Override
-    public String visitExprOperatorNode(ExpressionOperatorNode node, Object expected){
+    public String visitExprOperatorNode(ExpressionOperatorNode node, Object expected) {
         String result;
         ST st;
 
-        switch (node.getOperator()){
+        switch (node.getOperator()) {
             case INTERVAL:
-                st  = currentGroup.getInstanceOf("binary_exp");
+                st = currentGroup.getInstanceOf("binary_exp");
                 TemplateHandler.add(st, "op", "..");
                 TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                TemplateHandler.add(st, "body", node.getExpressionNodes().stream()
                         .map(workNode -> visitExprNode(workNode, null))
                         .collect(Collectors.toList()));
                 break;
 
             case MINUS:
-                st  = currentGroup.getInstanceOf("binary_exp");
+                st = currentGroup.getInstanceOf("binary_exp");
                 TemplateHandler.add(st, "op", "-");
                 TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                TemplateHandler.add(st, "body", node.getExpressionNodes().stream()
                         .map(workNode -> visitExprNode(workNode, null))
                         .collect(Collectors.toList()));
                 break;
 
             case PLUS:
-                st  = currentGroup.getInstanceOf("binary_exp");
+                st = currentGroup.getInstanceOf("binary_exp");
                 TemplateHandler.add(st, "op", "+");
                 TemplateHandler.add(st, "typref", generateHash(node.getType()));
-                TemplateHandler.add(st, "body",  node.getExpressionNodes().stream()
+                TemplateHandler.add(st, "body", node.getExpressionNodes().stream()
                         .map(workNode -> visitExprNode(workNode, null))
                         .collect(Collectors.toList()));
                 break;
@@ -175,7 +173,7 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
                 break;
 
             default:
-                st  = currentGroup.getInstanceOf("st");
+                st = currentGroup.getInstanceOf("st");
                 try {
                     throw new Exception(node.getOperator() + " not implemented yet");
                 } catch (Exception e) {
@@ -276,12 +274,11 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
 
     @Override
     public String visitPredicateOperatorNode(PredicateOperatorNode node, Object expected) {
-        String result ;
-        if(node.getPredicateArguments().size() == 1){
+        String result;
+        if (node.getPredicateArguments().size() == 1) {
             result = "";
             //ToDo ExprComparision and more
-        }
-        else{
+        } else {
             ST nary_pred = currentGroup.getInstanceOf("nary_pred");
             TemplateHandler.add(nary_pred, "op", generateOperatorNAry(node));
             TemplateHandler.add(nary_pred, "statements", node.getPredicateArguments().stream()
@@ -338,10 +335,9 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
 
         ST nary_sub = currentGroup.getInstanceOf("nary_sub");
 
-        if(node.getOperator() == ListSubstitutionNode.ListOperator.Parallel)
-        {
+        if (node.getOperator() == ListSubstitutionNode.ListOperator.Parallel) {
             TemplateHandler.add(nary_sub, "op", "||");
-        }else{
+        } else {
             TemplateHandler.add(nary_sub, "op", ";");
 
         }
@@ -354,11 +350,9 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     @Override
     public String visitIfOrSelectSubstitutionsNode(IfOrSelectSubstitutionsNode node, Object expected) {
         String result;
-        if(node.getOperator() == IfOrSelectSubstitutionsNode.Operator.IF)
-        {
+        if (node.getOperator() == IfOrSelectSubstitutionsNode.Operator.IF) {
             result = exceptionThrower(node);
-        }
-        else{
+        } else {
 
             ST select = currentGroup.getInstanceOf("select");
             TemplateHandler.add(select, "conditions", node.getConditions().stream()
@@ -373,6 +367,21 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
             result = select.render();
         }
         return result;
+    }
+
+    @Override
+    public void caseAIfElsifSubstitution(AIfElsifSubstitution node)
+    {
+        inAIfElsifSubstitution(node);
+        if(node.getCondition() != null)
+        {
+            node.getCondition().apply(this);
+        }
+        if(node.getThenSubstitution() != null)
+        {
+            node.getThenSubstitution().apply(this);
+        }
+        outAIfElsifSubstitution(node);
     }
 
     @Override
@@ -399,13 +408,12 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
 
     @Override
     public String visitConditionSubstitutionNode(ConditionSubstitutionNode node, Object expected) {
-        if(node.getKind() == ConditionSubstitutionNode.Kind.ASSERT){
+        if (node.getKind() == ConditionSubstitutionNode.Kind.ASSERT) {
             ST assertSub = currentGroup.getInstanceOf("assert_sub");
             TemplateHandler.add(assertSub, "guard", visitPredicateNode(node.getCondition(), null));
             TemplateHandler.add(assertSub, "body", visitSubstitutionNode(node.getSubstitution(), null));
             return assertSub.render();
-        }
-        else{
+        } else {
             /*
              * PRE_sub is a undocumented feature of the bxml standard of atelierB - 20.02.2020
              */
@@ -478,4 +486,6 @@ public abstract class BXMLBodyGenerator implements AbstractVisitor<String, Objec
     public String visitLTLBPredicateNode(LTLBPredicateNode node, Object expected) {
         return null;
     }
+
+
 }

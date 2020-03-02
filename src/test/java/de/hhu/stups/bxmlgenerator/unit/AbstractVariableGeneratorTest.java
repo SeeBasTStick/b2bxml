@@ -1,11 +1,8 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.AbstractVariablesGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.AbstractVariablesGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
-import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.DeclarationNode;
-import de.prob.parser.ast.nodes.MachineNode;
-import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.BoolType;
 import org.junit.Before;
 import org.junit.Test;

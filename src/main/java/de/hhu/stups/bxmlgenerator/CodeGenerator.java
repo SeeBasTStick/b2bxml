@@ -1,12 +1,14 @@
 package de.hhu.stups.bxmlgenerator;
 
+import de.hhu.stups.bxmlgenerator.antlr.GeneratorController;
 import de.hhu.stups.codegenerator.generators.CodeGenerationException;
-import de.hhu.stups.bxmlgenerator.generators.MachineGenerator;
 import de.prob.parser.antlr.Antlr4BParser;
 import de.prob.parser.antlr.BProject;
 import de.prob.parser.antlr.ScopeException;
 import de.prob.parser.ast.nodes.MachineNode;
+import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.visitors.TypeErrorException;
+import org.stringtemplate.v4.STGroupFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -80,9 +83,10 @@ public class CodeGenerator {
 			newPath = Paths.get(destination + File.separator + node.getName() + ".bxml");
 		}
 
-		MachineGenerator generator = new MachineGenerator();
+		GeneratorController generator =
+				new GeneratorController(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"), new HashMap<Integer, BType>());
 
-		String code = generator.generateMachine(node);
+		String code = generator.start(node);
 
 		try {
 			return Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);

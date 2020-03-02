@@ -1,6 +1,5 @@
-package de.hhu.stups.bxmlgenerator.generators;
+package de.hhu.stups.bxmlgenerator.antlr;
 
-import de.hhu.stups.codegenerator.handlers.NameHandler;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.types.BType;

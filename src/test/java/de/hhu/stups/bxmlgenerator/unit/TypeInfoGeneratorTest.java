@@ -1,6 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.TypeInfoGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.TypeInfoGenerator;
 import de.prob.parser.ast.types.BType;
 import de.prob.parser.ast.types.IntegerType;
 import de.prob.parser.ast.types.SetType;

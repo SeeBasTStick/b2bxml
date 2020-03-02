@@ -1,6 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.InitialisationGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.InitialisationGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
 import org.junit.Before;
 import org.junit.Test;

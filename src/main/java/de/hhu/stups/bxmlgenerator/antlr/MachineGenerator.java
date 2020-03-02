@@ -1,19 +1,17 @@
-package de.hhu.stups.bxmlgenerator.generators;
+package de.hhu.stups.bxmlgenerator.antlr;
 
 
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.parser.ast.nodes.MachineNode;
 import de.prob.parser.ast.types.BType;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+
 
 import java.util.HashMap;
 
 
-public class MachineGenerator {
-
-	private STGroup currentGroup;
+public class MachineGenerator extends BXMLBodyGenerator{
 
 	private TypeInfoGenerator typeInfoGenerator;
 
@@ -28,9 +26,8 @@ public class MachineGenerator {
 	private ReferenceGenerator referenceGenerator;
 
 
-	public MachineGenerator() {
-		this.currentGroup = new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg");
-		HashMap<Integer, BType> nodeType = new HashMap<>();
+	public MachineGenerator(STGroupFile stGroupFile, HashMap<Integer, BType> integerBTypeHashMap) {
+		super(integerBTypeHashMap, stGroupFile);
 		this.abstractVariablesGenerator = new AbstractVariablesGenerator(nodeType,  currentGroup);
 		this.invariantGenerator = new InvariantGenerator(nodeType,  currentGroup);
 		this.initialisationGenerator = new InitialisationGenerator(nodeType,  currentGroup);
@@ -43,12 +40,15 @@ public class MachineGenerator {
 	public String generateMachine(MachineNode node) {
 		ST machine = currentGroup.getInstanceOf("machine");
 		TemplateHandler.add(machine, "machine", node.getName());
+		TemplateHandler.add(machine, "kind", generateMachineType());
 		generateBody(node, machine);
 		return machine.render();
 	}
 
+
+
 	public String generateMachineType(){
-		return "";
+		return "abstraction";
 	}
 
 

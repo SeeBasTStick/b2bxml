@@ -1,6 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.BXMLBodyGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.BXMLBodyGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.expr.IdentifierExprNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.predicat.PredicateNodeStub;

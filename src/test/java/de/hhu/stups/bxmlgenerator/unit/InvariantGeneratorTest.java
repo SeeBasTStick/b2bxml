@@ -1,9 +1,8 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.InvariantGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.InvariantGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.expr.ExprOperatorNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.predicat.PredicateOperatorWithExprArgsNodeStub;
-import de.prob.parser.ast.SourceCodePosition;
 import de.prob.parser.ast.nodes.expression.ExpressionOperatorNode;
 import de.prob.parser.ast.nodes.predicate.PredicateNode;
 import de.prob.parser.ast.nodes.predicate.PredicateOperatorWithExprArgsNode;

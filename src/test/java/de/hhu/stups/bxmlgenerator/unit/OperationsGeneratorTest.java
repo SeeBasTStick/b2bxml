@@ -1,15 +1,15 @@
 package de.hhu.stups.bxmlgenerator.unit;
 
-import de.hhu.stups.bxmlgenerator.generators.OperationsGenerator;
+import de.hhu.stups.bxmlgenerator.antlr.OperationsGenerator;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.DeclarationNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.highLevel.OperationNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.AssignSubstituteNodeStub;
 import de.hhu.stups.bxmlgenerator.unit.stubs.substitution.ConditionSubstitutionNodeStub;
+import de.hhu.stups.bxmlgenerator.util.Pair;
 import de.prob.parser.ast.nodes.OperationNode;
 import de.prob.parser.ast.nodes.substitution.ConditionSubstitutionNode;
 import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.parser.ast.types.BoolType;
-import javafx.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.STGroupFile;

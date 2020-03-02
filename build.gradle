@@ -7,6 +7,7 @@ plugins{
     id 'idea'
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id 'jacoco'
+    id "org.openjfx.javafxplugin" version "0.0.8"
 }
 
 
@@ -33,17 +34,23 @@ repositories {
         url 'https://jitpack.io'
     }
 }
+final parserVersion = '2.9.23' // development version: 2.9.24-SNAPSHOT
 
 dependencies {
     antlr "org.antlr:antlr4:4.7"
-    compile group: 'org.antlr', name: 'ST4', version: '4.1'
+    implementation group: 'org.antlr', name: 'ST4', version: '4.1'
     // antlr parser dependency
-    compile 'com.github.hhu-stups:antlr-parser:-SNAPSHOT' // https://github.com/hhu-stups/antlr-parser'
+    implementation 'com.github.hhu-stups:antlr-parser:-SNAPSHOT' // https://github.com/hhu-stups/antlr-parser'
     implementation 'com.github.favu100:b2program:-SNAPSHOT'
     implementation 'org.xmlunit:xmlunit-core:2.6.3' //https://github.com/xmlunit/user-guide
     testImplementation 'junit:junit:4.8.2'
-
+    implementation group: "de.hhu.stups", name: "bparser", version: parserVersion
+    implementation group: "de.hhu.stups", name: "ltlparser", version: parserVersion
+    implementation group: "de.hhu.stups", name: "parserbase", version: parserVersion
+    implementation 'com.github.hhu-stups:probparsers:2.9.22' //Get Typechecker
 }
+
+
 
 jar {
     manifest {
