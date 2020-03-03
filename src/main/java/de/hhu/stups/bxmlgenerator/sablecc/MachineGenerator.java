@@ -29,6 +29,9 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
         return getCurrentGroup().render();
     }
 
+    /**
+     * @return a List with the parts of the \<machine> </machine> clause e.g. invariants, initialisation...
+     */
     public List<String> generateSubExpression(){
         Start node = (Start) getStartNode();
         AAbstractMachineParseUnit abstractMachineParseUnit = (AAbstractMachineParseUnit) node.getPParseUnit();
@@ -39,6 +42,10 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             if(subElement instanceof AVariablesMachineClause){
                 caseAVariablesMachineClause((AVariablesMachineClause) subElement);
                 result.add(getCurrentGroup().getAttribute("abstract_variables").toString());
+            }
+            if(subElement instanceof AInvariantMachineClause){
+                caseAInvariantMachineClause((AInvariantMachineClause) subElement);
+                result.add(getCurrentGroup().getAttribute("invariant").toString());
             }
         }
         return result;

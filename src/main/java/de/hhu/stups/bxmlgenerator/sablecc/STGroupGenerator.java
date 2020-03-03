@@ -99,10 +99,12 @@ public class STGroupGenerator extends DepthFirstAdapter {
         BType bType = typechecker.getType(node);
         int nodeHash = generateHash(bType);
         nodeType.put(nodeHash, bType);
+
         TemplateHandler.add(currentGroup, "typref", nodeHash);
 
         PExpression left = node.getLeftBorder();
         PExpression right = node.getRightBorder();
+
 
         List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
 
@@ -116,6 +118,16 @@ public class STGroupGenerator extends DepthFirstAdapter {
         TemplateHandler.add(currentGroup, "val", value);
         BType bType = typechecker.getType(node);
         int nodeHash = generateHash(bType);
+        TemplateHandler.add(currentGroup, "typref", nodeHash);
+    }
+
+    @Override
+    public void caseANatSetExpression(ANatSetExpression node)
+    {
+        TemplateHandler.add(currentGroup, "val", "NAT");
+        BType type = typechecker.getType(node);
+        int nodeHash = generateHash(type);
+        nodeType.put(nodeHash, type);
         TemplateHandler.add(currentGroup, "typref", nodeHash);
     }
 
@@ -192,11 +204,11 @@ public class STGroupGenerator extends DepthFirstAdapter {
     }
 
 
-    private List<PPredicate> determineInstance(PPredicate node){
+    private static List<PPredicate> unfoldIfNested(STGroupGenerator stGroupGenerator, PPredicate node){
         List<PPredicate> result = new ArrayList<>();
 
         if(node instanceof AConjunctPredicate){
-            result.addAll(unfoldConjunction((AConjunctPredicate) node));
+            result.addAll(stGroupGenerator.unfoldConjunction((AConjunctPredicate) node));
         }else{
             result.add(node);
         }
@@ -215,8 +227,8 @@ public class STGroupGenerator extends DepthFirstAdapter {
         PPredicate left = node.getLeft();
         PPredicate right = node.getRight();
 
-        result.addAll(determineInstance(left));
-        result.addAll(determineInstance(right));
+        result.addAll(unfoldIfNested(this, left));
+        result.addAll(unfoldIfNested(this, right));
 
         return result;
     }
