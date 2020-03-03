@@ -55,6 +55,18 @@ public class MachineGeneratorTest {
                 "        <Id value='x' typref='1618932450'/>\n" +
                 "        <Id value='y' typref='1618932450'/>\n" +
                 "    </Abstract_Variables>\n" +
+                "    <Invariant>\n" +
+                "        <Nary_Pred op='&amp;'>\n" +
+                "            <Exp_Comparison op=':'>\n" +
+                "                <Id value='x' typref='1618932450'/>\n" +
+                "                <Id value='NAT' typref='631359557'/>\n" +
+                "            </Exp_Comparison>\n" +
+                "            <Exp_Comparison op=':'>\n" +
+                "                <Id value='y' typref='1618932450'/>\n" +
+                "                <Id value='NAT' typref='631359557'/>\n" +
+                "            </Exp_Comparison>\n" +
+                "        </Nary_Pred>\n" +
+                "    </Invariant>\n" +
                 "</Machine>", result);
     }
 
