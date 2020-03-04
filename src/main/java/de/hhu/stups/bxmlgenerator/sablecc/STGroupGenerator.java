@@ -6,6 +6,7 @@ import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
 import de.hhu.stups.bxmlgenerator.util.Pair;
 import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
+import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -78,6 +79,32 @@ public class STGroupGenerator extends DepthFirstAdapter {
             return hash;
         } else {
             throw new IndexOutOfBoundsException("Hash was already taken! " + type.toString() + " is not " + nodeType.get(hash));
+        }
+    }
+
+    @Override
+    public void caseAInitialisationMachineClause(AInitialisationMachineClause node)
+    {
+        if(node.getSubstitutions() != null)
+        {
+            //Generate the Body of the initialisation
+            ST initialisationTemplate = getStGroupFile().getInstanceOf("initialisation");
+
+            PSubstitution substitution = node.getSubstitutions();
+
+            String target = SubstitutionFinder.findSubstitution(substitution);
+
+            STGroupGenerator initialisationBodyGenerator =
+                    new STGroupGenerator(getStGroupFile(),
+                            getStGroupFile().getInstanceOf(target),
+                            getNodeType(),
+                            getTypechecker(),
+                            substitution);
+
+            TemplateHandler.add(initialisationTemplate, "body", initialisationBodyGenerator.generateCurrent());
+
+            //Set the body in the machine
+            TemplateHandler.add(getCurrentGroup(), "initialisation", initialisationTemplate.render());
         }
     }
 

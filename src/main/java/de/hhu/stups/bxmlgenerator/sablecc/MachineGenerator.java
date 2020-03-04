@@ -1,9 +1,11 @@
 package de.hhu.stups.bxmlgenerator.sablecc;
 
 import de.be4.classicalb.core.parser.node.*;
+import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
+import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.util.ArrayList;
@@ -266,21 +268,6 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             node.getPredicates().apply(this);
         }
         outAConstraintsMachineClause(node);
-    }
-
-    @Override
-    public void caseAInitialisationMachineClause(AInitialisationMachineClause node)
-    {
-        if(node.getSubstitutions() != null)
-        {
-            InitialisationGenerator initialisationGenerator = new InitialisationGenerator(getStGroupFile(),
-                    getStGroupFile().getInstanceOf("initialisation"), getNodeType(), getTypechecker(), node);
-
-            String initialisation = initialisationGenerator.generateAllExpression();
-
-            TemplateHandler.add(getCurrentGroup(), "initialisation", initialisation);
-
-        }
     }
 
     @Override
