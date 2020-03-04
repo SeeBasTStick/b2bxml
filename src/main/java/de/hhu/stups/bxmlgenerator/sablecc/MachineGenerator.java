@@ -271,12 +271,16 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
     @Override
     public void caseAInitialisationMachineClause(AInitialisationMachineClause node)
     {
-        inAInitialisationMachineClause(node);
         if(node.getSubstitutions() != null)
         {
-            node.getSubstitutions().apply(this);
+            InitialisationGenerator initialisationGenerator = new InitialisationGenerator(getStGroupFile(),
+                    getStGroupFile().getInstanceOf("initialisation"), getNodeType(), getTypechecker(), node);
+
+            String initialisation = initialisationGenerator.generateAllExpression();
+
+            TemplateHandler.add(getCurrentGroup(), "initialisation", initialisation);
+
         }
-        outAInitialisationMachineClause(node);
     }
 
     @Override

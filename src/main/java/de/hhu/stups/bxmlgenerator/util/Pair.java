@@ -25,33 +25,36 @@ public class Pair<K, V> implements Serializable {
     }
 
     public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + (this.key != null ? this.key.hashCode() : 0);
-        hash = 31 * hash + (this.value != null ? this.value.hashCode() : 0);
-        return hash;
+        return Long.valueOf(this.key.hashCode() + this.value.hashCode()).hashCode();
     }
 
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof Pair)) {
-            return false;
-        } else {
-            Pair pair = (Pair) o;
-            if (this.key != null) {
-                if (!this.key.equals(pair.key)) {
-                    return false;
-                }
-            } else if (pair.key != null) {
+        } else{
+            if (!(o instanceof Pair)) {
                 return false;
-            }
-
-            if (this.value != null) {
-                return this.value.equals(pair.value);
             } else {
-                return pair.value == null;
-            }
 
+                Pair pair = (Pair) o;
+
+                if (this.key != null) {
+                    if (!this.key.equals(pair.key)) {
+                        return false;
+                    }
+                } else {
+                    if (pair.key != null) {
+                        return false;
+                    }
+                }
+
+                if (this.value != null) {
+                    return this.value.equals(pair.value);
+                } else {
+                    return pair.value == null;
+                }
+
+            }
         }
     }
 }
