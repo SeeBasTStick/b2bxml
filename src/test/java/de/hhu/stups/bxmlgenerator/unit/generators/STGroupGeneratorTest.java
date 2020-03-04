@@ -1,13 +1,12 @@
-package de.hhu.stups.bxmlgenerator.unitSablecc;
+package de.hhu.stups.bxmlgenerator.unit.generators;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.*;
-import de.hhu.stups.bxmlgenerator.sablecc.STGroupGenerator;
+import de.hhu.stups.bxmlgenerator.generators.STGroupGenerator;
 import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
 import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
 import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
-import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -509,7 +508,7 @@ public class STGroupGeneratorTest {
                     new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg").getInstanceOf("id"),
                     nodeType,
                     new Typechecker(ctx),
-                    startNode);
+                    startNode, "");
         }
 
         public STGroupGeneratorStub(Typechecker typechecker, PExpression startNode) {
@@ -518,7 +517,7 @@ public class STGroupGeneratorTest {
                             .getInstanceOf(ExpressionFinder.findExpression(startNode)),
                     new HashMap<>(),
                     typechecker,
-                    startNode);
+                    startNode, "");
         }
 
         public STGroupGeneratorStub(Typechecker typechecker, PPredicate startNode) {
@@ -527,7 +526,7 @@ public class STGroupGeneratorTest {
                             .getInstanceOf(PredicateFinder.findPredicate(startNode)),
                     new HashMap<>(),
                     typechecker,
-                    startNode);
+                    startNode, "");
         }
 
         public STGroupGeneratorStub(Typechecker typechecker, PSubstitution startNode) {
@@ -536,7 +535,7 @@ public class STGroupGeneratorTest {
                             .getInstanceOf(SubstitutionFinder.findSubstitution(startNode)),
                     new HashMap<>(),
                     typechecker,
-                    startNode);
+                    startNode, "");
         }
 
         public STGroupGeneratorStub(Typechecker typechecker, AInitialisationMachineClause startNode) {
@@ -545,7 +544,7 @@ public class STGroupGeneratorTest {
                             .getInstanceOf("machine"),
                     new HashMap<>(),
                     typechecker,
-                    startNode);
+                    startNode, "");
         }
 
 

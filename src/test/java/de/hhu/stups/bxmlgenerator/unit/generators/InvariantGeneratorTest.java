@@ -1,25 +1,10 @@
-package de.hhu.stups.bxmlgenerator.unitSablecc;
-
-import de.be4.classicalb.core.parser.BParser;
-import de.be4.classicalb.core.parser.exceptions.BCompoundException;
-import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
-import de.be4.classicalb.core.parser.node.Start;
-import de.hhu.stups.bxmlgenerator.sablecc.InvariantGenerator;
-import de.hhu.stups.bxmlgenerator.sablecc.MachineGenerator;
-import de.hhu.stups.bxmlgenerator.sablecc.SubGenerator;
-import de.prob.typechecker.MachineContext;
-import de.prob.typechecker.Typechecker;
-import de.prob.typechecker.btypes.BType;
-import org.junit.Test;
-import org.stringtemplate.v4.STGroupFile;
-
-import java.util.HashMap;
-import java.util.List;
+package de.hhu.stups.bxmlgenerator.unit.generators;
 
 import static org.junit.Assert.assertEquals;
 
 public class InvariantGeneratorTest {
 
+    /*
     @Test
     public void test_generate_1_Invariant() throws BCompoundException {
 
@@ -116,4 +101,6 @@ public class InvariantGeneratorTest {
         }
 
     }
+    */
+
 }

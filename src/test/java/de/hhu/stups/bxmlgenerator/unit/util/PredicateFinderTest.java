@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator.unitSablecc.util;
+package de.hhu.stups.bxmlgenerator.unit.util;
 
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;

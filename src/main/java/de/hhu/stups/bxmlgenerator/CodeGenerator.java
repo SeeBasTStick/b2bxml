@@ -1,13 +1,12 @@
 package de.hhu.stups.bxmlgenerator;
 
-import de.hhu.stups.bxmlgenerator.antlr.GeneratorController;
+import de.be4.classicalb.core.parser.BParser;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
+import de.be4.classicalb.core.parser.node.Start;
+import de.hhu.stups.bxmlgenerator.generators.STGroupGenerator;
 import de.hhu.stups.codegenerator.generators.CodeGenerationException;
-import de.prob.parser.antlr.Antlr4BParser;
-import de.prob.parser.antlr.BProject;
-import de.prob.parser.antlr.ScopeException;
-import de.prob.parser.ast.nodes.MachineNode;
-import de.prob.parser.ast.types.BType;
-import de.prob.parser.ast.visitors.TypeErrorException;
+import de.prob.typechecker.MachineContext;
+import de.prob.typechecker.Typechecker;
 import org.stringtemplate.v4.STGroupFile;
 
 import java.io.File;
@@ -24,93 +23,97 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 public class CodeGenerator {
 
-	private List<Path> paths = new ArrayList<>();
+    private List<Path> paths = new ArrayList<>();
 
-	/*
-	 * [0] Target
-	 * [1] Destination (optional) e.g ~/Desktop/
-	 */
-	public static void main(String[] args) throws CodeGenerationException {
-		if(args.length < 1) {
-			System.err.println("Wrong number of arguments: " + args.length);
-			return;
-		}
+    /*
+     * [0] Target
+     * [1] Destination (optional) e.g ~/Desktop/
+     */
+    public static void main(String[] args) throws CodeGenerationException, IOException, BCompoundException {
+        if (args.length < 1) {
+            System.err.println("Wrong number of arguments: " + args.length);
+            return;
+        }
 
-		Path path = Paths.get(args[0]);
-		checkPath(path);
+        Path path = Paths.get(args[0]);
+        checkPath(path);
 
-		Path destination;
-		if(args.length == 2) {
-			destination = Paths.get(args[1]);
-			checkPath(destination);
-		}else {
-			destination = path;
-		}
+        Path destination;
+        if (args.length == 2) {
+            destination = Paths.get(args[1]);
+            checkPath(destination);
+        } else {
+            destination = path;
+        }
 
-		BProject project = parseProject(path);
-		writeToFile(path, destination, project.getMainMachine());
-	}
+        writeToFile(path, destination, parseProject(path));
+    }
 
-	private static void checkPath(Path path) {
-		if(path == null) {
-			throw new RuntimeException("File not found");
-		}
-	}
+    private static void checkPath(Path path) {
+        if (path == null) {
+            throw new RuntimeException("File not found");
+        }
+    }
 
-	public Path generate(Path target, Path destination){
-		BProject project = parseProject(target);
+    private static Path writeToFile(Path target, Path destination, Start node) {
 
-		return writeToFile(target, destination, project.getMainMachine());
-	}
+        String machineName = target.toString().substring(target.toString().lastIndexOf(File.separator)+1, target.toString().lastIndexOf(".mch"));
 
-	public Path generate(Path target){
-		BProject project = parseProject(target);
-		return writeToFile(target, Paths.get(target.toString().substring(0, target.toString().lastIndexOf(File.separator)+1)), project.getMainMachine());
-	}
+        MachineContext machineContext = new MachineContext(machineName, node);
 
+        machineContext.analyseMachine();
 
-	private static Path writeToFile(Path target, Path destination,  MachineNode node) {
+        Typechecker typechecker = new Typechecker(machineContext);
 
-		Path newPath;
+        STGroupFile stGroupFile =  new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg");
 
-		if(target.toString().equals(destination.toString()))
-		{
-			int lastIndexSlash = target.toString().lastIndexOf(File.separator);
+        STGroupGenerator machineGenerator = new STGroupGenerator(stGroupFile
+               , stGroupFile.getInstanceOf("machine"), new HashMap<>(),
+               typechecker , node, machineName );
 
-			newPath = Paths.get(target.toString().substring(0, lastIndexSlash + 1)  + node.getName() + ".bxml");
-		}
-		else{
-			newPath = Paths.get(destination + File.separator + node.getName() + ".bxml");
-		}
+        String code = machineGenerator.generateCurrent();
 
-		GeneratorController generator =
-				new GeneratorController(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"), new HashMap<Integer, BType>());
+        Path newPath;
 
-		String code = generator.start(node);
+        if (target.toString().equals(destination.toString())) {
+            int lastIndexSlash = target.toString().lastIndexOf(File.separator);
 
-		try {
-			return Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
+            newPath = Paths.get(target.toString().substring(0, lastIndexSlash + 1) + machineName + ".bxml");
+        } else {
+            newPath = Paths.get(destination + File.separator + machineName + ".bxml");
+        }
 
 
-	private static BProject parseProject(Path path) throws CodeGenerationException {
-		BProject project;
-		try {
-			project = Antlr4BParser.createBProjectFromMainMachineFile(path.toFile());
+        try {
+            return Files.write(newPath, code.getBytes(), Files.exists(newPath) ? TRUNCATE_EXISTING : CREATE_NEW);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
-		} catch (TypeErrorException | ScopeException | IOException e) {
-			e.printStackTrace();
-			throw new CodeGenerationException(e.getMessage());
-		}
-		return project;
-	}
+    private static Start parseProject(Path path) throws IOException, BCompoundException {
+        BParser bParser = new BParser();
+        File bFile = new File(path.toString());
+        return bParser.parseFile(bFile, false);
+    }
 
-	public List<Path> getPaths() {
-		return paths;
-	}
+    public Path generate(Path target, Path destination) throws IOException, BCompoundException {
+
+
+        return writeToFile(target, destination, parseProject(target));
+    }
+
+    public Path generate(Path target) throws IOException, BCompoundException {
+
+        return writeToFile(target,
+                Paths.get(target.toString().substring(0, target.toString().lastIndexOf(File.separator) + 1)),
+                parseProject(target));
+    }
+
+    public List<Path> getPaths() {
+        return paths;
+    }
 
 }
+

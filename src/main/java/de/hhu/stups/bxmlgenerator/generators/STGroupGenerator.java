@@ -1,12 +1,9 @@
-package de.hhu.stups.bxmlgenerator.sablecc;
+package de.hhu.stups.bxmlgenerator.generators;
 
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
-import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
-import de.hhu.stups.bxmlgenerator.util.Pair;
-import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
-import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
+import de.hhu.stups.bxmlgenerator.util.*;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -31,12 +28,15 @@ public class STGroupGenerator extends DepthFirstAdapter {
 
     private STGroupFile stGroupFile;
 
-    public STGroupGenerator(STGroupFile stGroupFile, ST group, HashMap<Integer, BType> nodeType, Typechecker typeChecker, Node startNode){
+    private String machineName;
+
+    public STGroupGenerator(STGroupFile stGroupFile, ST group, HashMap<Integer, BType> nodeType, Typechecker typeChecker, Node startNode, String machineName){
         this.currentGroup = group;
         this.nodeType = nodeType;
         this.typechecker = typeChecker;
         this.startNode = startNode;
         this.stGroupFile = stGroupFile;
+        this.machineName = machineName;
     }
 
     public ST getCurrentGroup(){
@@ -83,6 +83,90 @@ public class STGroupGenerator extends DepthFirstAdapter {
     }
 
     @Override
+    public void caseAAbstractMachineParseUnit(AAbstractMachineParseUnit node)
+    {
+        TemplateHandler.add(currentGroup, "kind", "abstraction");
+
+
+        if(node.getVariant() != null)
+        {
+            node.getVariant().apply(this);
+        }
+        if(node.getHeader() != null)
+        {
+            node.getHeader().apply(this);
+        }
+
+        visitMachineClause(node.getMachineClauses());
+    }
+
+    @Override
+    public void caseAImplementationMachineParseUnit(AImplementationMachineParseUnit node)
+    {
+        TemplateHandler.add(currentGroup, "kind", "implementation");
+
+        if(node.getHeader() != null)
+        {
+            node.getHeader().apply(this);
+        }
+        if(node.getRefMachine() != null)
+        {
+            node.getRefMachine().apply(this);
+        }
+
+        visitMachineClause(node.getMachineClauses());
+    }
+
+    @Override
+    public void caseARefinementMachineParseUnit(ARefinementMachineParseUnit node) {
+        TemplateHandler.add(currentGroup, "kind", "refinement");
+
+        if (node.getHeader() != null) {
+            node.getHeader().apply(this);
+        }
+        if (node.getRefMachine() != null) {
+            node.getRefMachine().apply(this);
+        }
+
+        visitMachineClause(node.getMachineClauses());
+
+    }
+
+    public void visitMachineClause(List<PMachineClause> list){
+        for (PMachineClause machineClause : list) {
+            Pair<String, String> templateTarget = MachineClauseFinder.findMachineClause(machineClause);
+            String machinePlaceHolder = templateTarget.getKey();
+            String subTemplate = templateTarget.getValue();
+            TemplateHandler.add(getCurrentGroup(), machinePlaceHolder,
+                    new STGroupGenerator(
+                            getStGroupFile(),
+                            getStGroupFile().getInstanceOf(subTemplate),
+                            getNodeType(),
+                            getTypechecker(),
+                            machineClause, "").generateCurrent());
+        }
+    }
+
+    @Override
+    public void caseAMachineHeader(AMachineHeader node)
+    {
+
+        TemplateHandler.add(getCurrentGroup(), "machine", machineName);
+
+        List<TIdentifierLiteral> identifierLiteralList = new ArrayList<>(node.getName());
+        for(TIdentifierLiteral e : identifierLiteralList)
+        {
+            e.apply(this);
+        }
+
+        List<PExpression> pExpressionList = new ArrayList<>(node.getParameters());
+        for(PExpression e : pExpressionList)
+        {
+            e.apply(this);
+        }
+    }
+
+    @Override
     public void caseAVariablesMachineClause(AVariablesMachineClause node)
     {
         if(node.getIdentifiers() != null) {
@@ -92,7 +176,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
             for (PExpression e : copy) {
                 result.add(
                         new STGroupGenerator(getStGroupFile(),
-                                getStGroupFile().getInstanceOf("id"), getNodeType(), getTypechecker(), e)
+                                getStGroupFile().getInstanceOf("id"), getNodeType(), getTypechecker(), e, "")
                                 .generateCurrent());
             }
 
@@ -107,7 +191,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
 
         STGroupGenerator stGroupGenerator = new STGroupGenerator(getStGroupFile(),
                 getStGroupFile().getInstanceOf(PredicateFinder.findPredicate(predicate)),
-                getNodeType(), getTypechecker(), predicate);
+                getNodeType(), getTypechecker(), predicate, "");
 
         TemplateHandler.add(getCurrentGroup(), "body",  stGroupGenerator.generateCurrent());
     }
@@ -126,7 +210,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
                             getStGroupFile().getInstanceOf(target),
                             getNodeType(),
                             getTypechecker(),
-                            substitution);
+                            substitution, "");
 
             TemplateHandler.add(currentGroup, "body", initialisationBodyGenerator.generateCurrent());
 
@@ -219,7 +303,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
         List<String> result = expandedConjunction.stream()
                 .map(predicateNode -> new Pair<>(predicateNode, PredicateFinder.findPredicate(predicateNode)))
                 .map(pair -> new STGroupGenerator(stGroupFile,
-            stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey()).generateCurrent())
+            stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey(), "").generateCurrent())
                 .collect(Collectors.toList());
 
         TemplateHandler.add(currentGroup, "statements", result);
@@ -284,7 +368,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
         return list.stream()
                 .map(expression -> new Pair<>(expression, ExpressionFinder.findExpression(expression)))
                 .map(pair -> new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(pair.getValue()),
-                        nodeType, typechecker, pair.getKey()).generateCurrent())
+                        nodeType, typechecker, pair.getKey(), "").generateCurrent())
                 .collect(Collectors.toList());
     }
 
@@ -294,10 +378,10 @@ public class STGroupGenerator extends DepthFirstAdapter {
         String rightPredicate = ExpressionFinder.findExpression(right);
 
         STGroupGenerator stGroupGeneratorLeft = new STGroupGenerator(stGroupFile,
-                stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left);
+                stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left, "");
 
         STGroupGenerator stGroupGeneratorRight = new STGroupGenerator(stGroupFile,
-                stGroupFile.getInstanceOf(rightPredicate), nodeType, typechecker, right);
+                stGroupFile.getInstanceOf(rightPredicate), nodeType, typechecker, right, "");
 
         String leftStatements = stGroupGeneratorLeft.generateCurrent();
         String rightStatements = stGroupGeneratorRight.generateCurrent();

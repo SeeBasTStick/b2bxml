@@ -1,4 +1,4 @@
-package de.hhu.stups.bxmlgenerator.unitSablecc.util;
+package de.hhu.stups.bxmlgenerator.unit.util;
 
 import de.hhu.stups.bxmlgenerator.util.Pair;
 import org.junit.Test;

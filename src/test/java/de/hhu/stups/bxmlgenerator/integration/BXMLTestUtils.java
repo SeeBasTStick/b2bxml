@@ -1,5 +1,6 @@
 package de.hhu.stups.bxmlgenerator.integration;
 
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.hhu.stups.bxmlgenerator.CodeGenerator;
 import org.junit.Assert;
 import org.w3c.dom.Attr;
@@ -93,13 +94,13 @@ public class BXMLTestUtils {
             furtherResources =
                     Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/machine/",
                             pathName.substring(0, pathName.lastIndexOf(File.separator)+1));
-            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/original/");
+            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/sablecc/original/");
 
         }else{
             String treeBranchName = pathName.substring(0, pathName.lastIndexOf(File.separator));
             furtherResources = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/",
                     treeBranchName);
-            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/original/",
+            bxmlTarget = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/sablecc/original/",
                     treeBranchName);
         }
 
@@ -137,7 +138,7 @@ public class BXMLTestUtils {
         return Paths.get(bxmlTarget.toString(), machineName + ".bxml");
     }
 
-    private static Path generateImage(String pathName) throws FileSystemException {
+    private static Path generateImage(String pathName) throws IOException, BCompoundException {
 
         Path mchPath = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/machine/" + pathName );
 
@@ -145,9 +146,9 @@ public class BXMLTestUtils {
 
         if(!pathName.contains(File.separator))
         {
-            target = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/image/");
+            target = Paths.get(projectLocation , "/src/test/resources/de/hhu/stups/results/sablecc/image/");
         }else{
-            target =  Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/results/image",
+            target =  Paths.get(projectLocation, "/src/test/resources/de/hhu/stups/results/sablecc/image",
                     pathName.substring(0, pathName.lastIndexOf(File.separator)));
         }
 
