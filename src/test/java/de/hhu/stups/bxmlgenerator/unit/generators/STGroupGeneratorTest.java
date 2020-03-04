@@ -4,9 +4,6 @@ import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.generators.STGroupGenerator;
-import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
-import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
-import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -16,7 +13,6 @@ import de.prob.typechecker.btypes.SetType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.stringtemplate.v4.STGroupFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +21,190 @@ import static org.junit.Assert.assertEquals;
 
 public class STGroupGeneratorTest {
 
+    @Test
+    public void test_generateAbstractVariable_1_Variable() throws BCompoundException {
+
+        String machine = "MACHINE test \n" + "VARIABLES x\n"
+                + "INVARIANT x : NAT \n" + "INITIALISATION x := 1 \n" + "END";
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker typechecker = new Typechecker(c);
+
+        AVariablesMachineClause aVariablesMachineClause = new AVariablesMachineClause();
+
+        AIdentifierExpression aIdentifierExpression = generateIdentifierExpression("a", typechecker, IntegerType.getInstance());
+
+        aVariablesMachineClause.setIdentifiers(List.of(aIdentifierExpression));
+
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause);
+
+        String result = stGroupGeneratorStub.generateCurrent();
+
+        assertEquals("<Abstract_Variables>\n" +
+                "    <Id value='a' typref='1618932450'/>\n" +
+                "</Abstract_Variables>", result);
+    }
+
+    @Test
+    public void test_generateAbstractVariable_2_Variable() throws BCompoundException {
+
+        String machine = "MACHINE test \n" + "VARIABLES x\n"
+                + "INVARIANT x : NAT \n" + "INITIALISATION x := 1 \n" + "END";
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker typechecker = new Typechecker(c);
+
+        AVariablesMachineClause aVariablesMachineClause = new AVariablesMachineClause();
+
+        AIdentifierExpression aIdentifierExpression = generateIdentifierExpression("a", typechecker, IntegerType.getInstance());
+
+        AIdentifierExpression aIdentifierExpression2 = generateIdentifierExpression("a", typechecker, IntegerType.getInstance());
+
+
+        aVariablesMachineClause.setIdentifiers(List.of(aIdentifierExpression, aIdentifierExpression2));
+
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause);
+
+        String result = stGroupGeneratorStub.generateCurrent();
+
+        assertEquals("<Abstract_Variables>\n" +
+                "    <Id value='a' typref='1618932450'/>\n" +
+                "    <Id value='a' typref='1618932450'/>\n" +
+                "</Abstract_Variables>", result);
+
+    }
+
+    @Test
+    public void test_generate_1_Invariant() throws BCompoundException {
+
+        String machine = "MACHINE test \n" + "VARIABLES x\n"
+                + "INVARIANT x : NAT \n" + "INITIALISATION x := 1 \n" + "END";
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker typechecker = new Typechecker(c);
+
+        AInvariantMachineClause aInvariantMachineClause = new AInvariantMachineClause();
+
+        ALessPredicate aLessPredicate = generateLessPredicate("a", 3, typechecker, IntegerType.getInstance());
+
+        aInvariantMachineClause.setPredicates(aLessPredicate);
+
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause);
+
+        String result = stGroupGeneratorStub.generateCurrent();
+
+        assertEquals("<Invariant>\n" +
+                "    <Exp_Comparison op='&lt;'>\n" +
+                "        <Id value='a' typref='1618932450'/>\n" +
+                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "    </Exp_Comparison>\n" +
+                "</Invariant>", result);
+    }
+
+    @Test
+    public void test_generate_3_Invariant() throws BCompoundException {
+
+        String machine = "MACHINE test \n" + "VARIABLES x, y, z\n"
+                + "INVARIANT x : NAT & y : NAT & z : NAT \n" + "INITIALISATION x := 1 \n" + "END";
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker typechecker = new Typechecker(c);
+
+        AInvariantMachineClause aInvariantMachineClause = new AInvariantMachineClause();
+
+        ALessPredicate aLessPredicate = generateLessPredicate("a", 3, typechecker, IntegerType.getInstance());
+
+        ALessPredicate aLessPredicate2 = generateLessPredicate("b", 3, typechecker, IntegerType.getInstance());
+
+        ALessPredicate aLessPredicate3 = generateLessPredicate("c", 3, typechecker, IntegerType.getInstance());
+
+
+        aInvariantMachineClause.setPredicates(generateConjunctPredicate(aLessPredicate3, generateConjunctPredicate(aLessPredicate, aLessPredicate2)));
+
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause);
+
+        String result = stGroupGeneratorStub.generateCurrent();
+
+        assertEquals("<Invariant>\n" +
+                "    <Nary_Pred op='&amp;'>\n" +
+                "        <Exp_Comparison op='&lt;'>\n" +
+                "            <Id value='c' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "        <Exp_Comparison op='&lt;'>\n" +
+                "            <Id value='a' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "        <Exp_Comparison op='&lt;'>\n" +
+                "            <Id value='b' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "    </Nary_Pred>\n" +
+                "</Invariant>", result);
+    }
+
+
+    @Test
+    public void test_MachineGeneration() throws BCompoundException {
+        String machine = "MACHINE test \n" + "VARIABLES x, y\n"
+                + "INVARIANT x : NAT & y : NAT \n" + "INITIALISATION x, y:=2 ,1\n" + "END";
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        STGroupGenerator stGroupGenerator = new STGroupGeneratorStub(new HashMap<>(), c, start);
+
+        String result = stGroupGenerator.generateCurrent();
+
+        assertEquals("<Machine name='' type='abstraction'>\n" +
+                "    <Abstract_Variables>\n" +
+                "        <Id value='x' typref='1618932450'/>\n" +
+                "        <Id value='y' typref='1618932450'/>\n" +
+                "    </Abstract_Variables>\n" +
+                "    <Invariant>\n" +
+                "        <Nary_Pred op='&amp;'>\n" +
+                "            <Exp_Comparison op=':'>\n" +
+                "                <Id value='x' typref='1618932450'/>\n" +
+                "                <Id value='NAT' typref='631359557'/>\n" +
+                "            </Exp_Comparison>\n" +
+                "            <Exp_Comparison op=':'>\n" +
+                "                <Id value='y' typref='1618932450'/>\n" +
+                "                <Id value='NAT' typref='631359557'/>\n" +
+                "            </Exp_Comparison>\n" +
+                "        </Nary_Pred>\n" +
+                "    </Invariant>\n" +
+                "    <Initialisation>\n" +
+                "        <Assignement_Sub>\n" +
+                "            <Variables>\n" +
+                "                <Id value='x' typref='1618932450'/>\n" +
+                "                <Id value='y' typref='1618932450'/>\n" +
+                "            </Variables>\n" +
+                "            <Values>\n" +
+                "                <Integer_Literal value='2' typref='1618932450'/>\n" +
+                "                <Integer_Literal value='1' typref='1618932450'/>\n" +
+                "            </Values>\n" +
+                "        </Assignement_Sub>\n" +
+                "    </Initialisation>\n" +
+                "</Machine>", result);
+    }
 
     @Test
     public void test_caseAIdentifierExpression() throws BCompoundException {
@@ -35,9 +215,14 @@ public class STGroupGeneratorTest {
         MachineContext c = new MachineContext(null, start);
         c.analyseMachine();
 
+        Typechecker typechecker = new Typechecker(c);
+
+
         AIdentifierExpression aIdentifierExpression = (AIdentifierExpression) c.getVariables().get("x");
 
-        String result = new STGroupGeneratorStub(new HashMap<>(), c, aIdentifierExpression).generateCurrent();
+        typechecker.setType(aIdentifierExpression, IntegerType.getInstance());
+
+        String result = new STGroupGeneratorStub(typechecker, aIdentifierExpression).generateCurrent();
 
         assertEquals("<Id value='x' typref='1618932450'/>", result);
 
@@ -282,14 +467,16 @@ public class STGroupGeneratorTest {
 
         String result = new STGroupGeneratorStub(customTypeChecker, aInitialisationMachineClause).generateCurrent();
 
-        assertEquals("<Assignement_Sub>\n" +
-                "    <Variables>\n" +
-                "        <Id value='a' typref='1618932450'/>\n" +
-                "    </Variables>\n" +
-                "    <Values>\n" +
-                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
-                "    </Values>\n" +
-                "</Assignement_Sub>", result);
+        assertEquals("<Initialisation>\n" +
+                "    <Assignement_Sub>\n" +
+                "        <Variables>\n" +
+                "            <Id value='a' typref='1618932450'/>\n" +
+                "        </Variables>\n" +
+                "        <Values>\n" +
+                "            <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "        </Values>\n" +
+                "    </Assignement_Sub>\n" +
+                "</Initialisation>", result);
     }
 
 
@@ -498,59 +685,4 @@ public class STGroupGeneratorTest {
         assertEquals(hash, result);
 
     }
-
-
-
-    class STGroupGeneratorStub extends STGroupGenerator {
-
-        public STGroupGeneratorStub(HashMap<Integer, BType> nodeType, MachineContext ctx, Node startNode) {
-            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
-                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg").getInstanceOf("id"),
-                    nodeType,
-                    new Typechecker(ctx),
-                    startNode, "");
-        }
-
-        public STGroupGeneratorStub(Typechecker typechecker, PExpression startNode) {
-            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
-                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
-                            .getInstanceOf(ExpressionFinder.findExpression(startNode)),
-                    new HashMap<>(),
-                    typechecker,
-                    startNode, "");
-        }
-
-        public STGroupGeneratorStub(Typechecker typechecker, PPredicate startNode) {
-            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
-                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
-                            .getInstanceOf(PredicateFinder.findPredicate(startNode)),
-                    new HashMap<>(),
-                    typechecker,
-                    startNode, "");
-        }
-
-        public STGroupGeneratorStub(Typechecker typechecker, PSubstitution startNode) {
-            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
-                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
-                            .getInstanceOf(SubstitutionFinder.findSubstitution(startNode)),
-                    new HashMap<>(),
-                    typechecker,
-                    startNode, "");
-        }
-
-        public STGroupGeneratorStub(Typechecker typechecker, AInitialisationMachineClause startNode) {
-            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
-                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
-                            .getInstanceOf("machine"),
-                    new HashMap<>(),
-                    typechecker,
-                    startNode, "");
-        }
-
-
-    }
-
-
-
-
 }
