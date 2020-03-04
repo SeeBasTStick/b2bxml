@@ -83,13 +83,40 @@ public class STGroupGenerator extends DepthFirstAdapter {
     }
 
     @Override
+    public void caseAVariablesMachineClause(AVariablesMachineClause node)
+    {
+        if(node.getIdentifiers() != null) {
+            List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+
+            List<String> result = new ArrayList<>();
+            for (PExpression e : copy) {
+                result.add(
+                        new STGroupGenerator(getStGroupFile(),
+                                getStGroupFile().getInstanceOf("id"), getNodeType(), getTypechecker(), e)
+                                .generateCurrent());
+            }
+
+            TemplateHandler.add(getCurrentGroup(), "ids", result);
+        }
+    }
+
+    @Override
+    public void caseAInvariantMachineClause(AInvariantMachineClause node)
+    {
+        PPredicate predicate = node.getPredicates();
+
+        STGroupGenerator stGroupGenerator = new STGroupGenerator(getStGroupFile(),
+                getStGroupFile().getInstanceOf(PredicateFinder.findPredicate(predicate)),
+                getNodeType(), getTypechecker(), predicate);
+
+        TemplateHandler.add(getCurrentGroup(), "body",  stGroupGenerator.generateCurrent());
+    }
+
+    @Override
     public void caseAInitialisationMachineClause(AInitialisationMachineClause node)
     {
         if(node.getSubstitutions() != null)
         {
-            //Generate the Body of the initialisation
-            ST initialisationTemplate = getStGroupFile().getInstanceOf("initialisation");
-
             PSubstitution substitution = node.getSubstitutions();
 
             String target = SubstitutionFinder.findSubstitution(substitution);
@@ -101,11 +128,35 @@ public class STGroupGenerator extends DepthFirstAdapter {
                             getTypechecker(),
                             substitution);
 
-            TemplateHandler.add(initialisationTemplate, "body", initialisationBodyGenerator.generateCurrent());
+            TemplateHandler.add(currentGroup, "body", initialisationBodyGenerator.generateCurrent());
 
-            //Set the body in the machine
-            TemplateHandler.add(getCurrentGroup(), "initialisation", initialisationTemplate.render());
         }
+    }
+
+    @Override
+    public void caseALocalOperationsMachineClause(ALocalOperationsMachineClause node)
+    {
+        {
+            List<POperation> copy = new ArrayList<POperation>(node.getOperations());
+            for(POperation e : copy)
+            {
+                //           e.apply(this);
+            }
+        }
+    }
+
+    @Override
+    public void caseAOperationsMachineClause(AOperationsMachineClause node)
+    {
+        inAOperationsMachineClause(node);
+        {
+            List<POperation> copy = new ArrayList<POperation>(node.getOperations());
+            for(POperation e : copy)
+            {
+                //         e.apply(this);
+            }
+        }
+        outAOperationsMachineClause(node);
     }
 
     @Override

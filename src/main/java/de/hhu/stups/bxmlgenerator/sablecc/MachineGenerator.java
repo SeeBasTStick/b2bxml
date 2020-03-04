@@ -1,6 +1,8 @@
 package de.hhu.stups.bxmlgenerator.sablecc;
 
 import de.be4.classicalb.core.parser.node.*;
+import de.hhu.stups.bxmlgenerator.util.MachineClauseFinder;
+import de.hhu.stups.bxmlgenerator.util.Pair;
 import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
 import de.hhu.stups.codegenerator.handlers.TemplateHandler;
 import de.prob.typechecker.Typechecker;
@@ -67,18 +69,12 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
         {
             node.getVariant().apply(this);
         }
-
         if(node.getHeader() != null)
         {
-
             node.getHeader().apply(this);
         }
 
-        List<PMachineClause> copy = new ArrayList<>(node.getMachineClauses());
-        for(PMachineClause e : copy)
-        {
-            e.apply(this);
-        }
+        visitMachineClause(node.getMachineClauses());
     }
 
     @Override
@@ -95,11 +91,7 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             node.getRefMachine().apply(this);
         }
 
-        List<PMachineClause> copy = new ArrayList<>(node.getMachineClauses());
-        for(PMachineClause e : copy)
-        {
-           e.apply(this);
-        }
+        visitMachineClause(node.getMachineClauses());
     }
 
     @Override
@@ -113,29 +105,23 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             node.getRefMachine().apply(this);
         }
 
-        List<PMachineClause> copy = new ArrayList<>(node.getMachineClauses());
-        for (PMachineClause e : copy) {
-           e.apply(this);
+        visitMachineClause(node.getMachineClauses());
+
+    }
+
+    public void visitMachineClause(List<PMachineClause> list){
+        for (PMachineClause machineClause : list) {
+            Pair<String, String> templateTarget = MachineClauseFinder.findMachineClause(machineClause);
+            String machinePlaceHolder = templateTarget.getKey();
+            String subTemplate = templateTarget.getValue();
+            TemplateHandler.add(getCurrentGroup(), machinePlaceHolder,
+                    new STGroupGenerator(
+                            getStGroupFile(),
+                            getStGroupFile().getInstanceOf(subTemplate),
+                            getNodeType(),
+                            getTypechecker(),
+                            machineClause).generateCurrent());
         }
-
-    }
-
-    @Override
-    public void caseAMachineMachineVariant(AMachineMachineVariant node)
-    {
-
-    }
-
-    @Override
-    public void caseAModelMachineVariant(AModelMachineVariant node)
-    {
-
-    }
-
-    @Override
-    public void caseASystemMachineVariant(ASystemMachineVariant node)
-    {
-
     }
 
     @Override
@@ -158,239 +144,9 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
         }
     }
 
-    @Override
-    public void caseAMachineClauseParseUnit(AMachineClauseParseUnit node)
-    {
-        if(node.getMachineClause() != null)
-        {
-            node.getMachineClause().apply(this);
-        }
-    }
 
 
-    @Override
-    public void caseASetsMachineClause(ASetsMachineClause node)
-    {
-        inASetsMachineClause(node);
-        {
-            List<PSet> copy = new ArrayList<PSet>(node.getSetDefinitions());
-            for(PSet e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outASetsMachineClause(node);
-    }
 
-    @Override
-    public void caseAFreetypesMachineClause(AFreetypesMachineClause node)
-    {
-            List<PFreetype> copy = new ArrayList<>(node.getFreetypes());
-            for(PFreetype e : copy)
-            {
-                e.apply(this);
-            }
-    }
 
-    @Override
-    public void caseAVariablesMachineClause(AVariablesMachineClause node)
-    {
-        if(node.getIdentifiers() != null) {
-            AbstractVariableGenerator abstractVariableGenerator = new AbstractVariableGenerator(getStGroupFile(),
-                    getStGroupFile().getInstanceOf("abstract_variable"), getNodeType(), getTypechecker(), node);
-
-            String abstractVariables = abstractVariableGenerator.generateAllExpression();
-
-            TemplateHandler.add(getCurrentGroup(), "abstract_variables", abstractVariables);
-        }
-
-    }
-
-    @Override
-    public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node)
-    {
-        inAConcreteVariablesMachineClause(node);
-        {
-            List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
-            for(PExpression e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAConcreteVariablesMachineClause(node);
-    }
-
-    @Override
-    public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node)
-    {
-        inAAbstractConstantsMachineClause(node);
-        {
-            List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
-            for(PExpression e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAAbstractConstantsMachineClause(node);
-    }
-
-    @Override
-    public void caseAConstantsMachineClause(AConstantsMachineClause node)
-    {
-        inAConstantsMachineClause(node);
-        {
-            List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
-            for(PExpression e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAConstantsMachineClause(node);
-    }
-
-    @Override
-    public void caseAPropertiesMachineClause(APropertiesMachineClause node)
-    {
-        inAPropertiesMachineClause(node);
-        if(node.getPredicates() != null)
-        {
-            node.getPredicates().apply(this);
-        }
-        outAPropertiesMachineClause(node);
-    }
-
-    @Override
-    public void caseAConstraintsMachineClause(AConstraintsMachineClause node)
-    {
-        inAConstraintsMachineClause(node);
-        if(node.getPredicates() != null)
-        {
-            node.getPredicates().apply(this);
-        }
-        outAConstraintsMachineClause(node);
-    }
-
-    @Override
-    public void caseAInvariantMachineClause(AInvariantMachineClause node)
-    {
-        if(node.getPredicates() != null)
-        {
-            InvariantGenerator invariantGenerator = new InvariantGenerator(getStGroupFile(),
-                    getStGroupFile().getInstanceOf("invariant"), getNodeType(), getTypechecker(), node);
-
-            String abstractVariables = invariantGenerator.generateAllExpression();
-
-            TemplateHandler.add(getCurrentGroup(), "invariant", abstractVariables);
-        }
-    }
-
-    @Override
-    public void caseAAssertionsMachineClause(AAssertionsMachineClause node)
-    {
-        inAAssertionsMachineClause(node);
-        {
-            List<PPredicate> copy = new ArrayList<PPredicate>(node.getPredicates());
-            for(PPredicate e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAAssertionsMachineClause(node);
-    }
-
-    @Override
-    public void caseAValuesMachineClause(AValuesMachineClause node)
-    {
-        inAValuesMachineClause(node);
-        {
-            List<PValuesEntry> copy = new ArrayList<PValuesEntry>(node.getEntries());
-            for(PValuesEntry e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAValuesMachineClause(node);
-    }
-
-    @Override
-    public void caseALocalOperationsMachineClause(ALocalOperationsMachineClause node)
-    {
-        inALocalOperationsMachineClause(node);
-        {
-            List<POperation> copy = new ArrayList<POperation>(node.getOperations());
-            for(POperation e : copy)
-            {
-     //           e.apply(this);
-            }
-        }
-        outALocalOperationsMachineClause(node);
-    }
-
-    @Override
-    public void caseAOperationsMachineClause(AOperationsMachineClause node)
-    {
-        inAOperationsMachineClause(node);
-        {
-            List<POperation> copy = new ArrayList<POperation>(node.getOperations());
-            for(POperation e : copy)
-            {
-       //         e.apply(this);
-            }
-        }
-        outAOperationsMachineClause(node);
-    }
-
-    @Override
-    public void caseAReferencesMachineClause(AReferencesMachineClause node)
-    {
-        inAReferencesMachineClause(node);
-        {
-            List<PMachineReference> copy = new ArrayList<PMachineReference>(node.getMachineReferences());
-            for(PMachineReference e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAReferencesMachineClause(node);
-    }
-
-    @Override
-    public void caseAInvalidOperationsClauseMachineClause(AInvalidOperationsClauseMachineClause node)
-    {
-        inAInvalidOperationsClauseMachineClause(node);
-        if(node.getSemicolon() != null)
-        {
-            node.getSemicolon().apply(this);
-        }
-        outAInvalidOperationsClauseMachineClause(node);
-    }
-
-    @Override
-    public void caseAExpressionsMachineClause(AExpressionsMachineClause node)
-    {
-        inAExpressionsMachineClause(node);
-        {
-            List<PExpressionDefinition> copy = new ArrayList<PExpressionDefinition>(node.getExpressions());
-            for(PExpressionDefinition e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAExpressionsMachineClause(node);
-    }
-
-    @Override
-    public void caseAPredicatesMachineClause(APredicatesMachineClause node)
-    {
-        inAPredicatesMachineClause(node);
-        {
-            List<PPredicateDefinition> copy = new ArrayList<PPredicateDefinition>(node.getPredicates());
-            for(PPredicateDefinition e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAPredicatesMachineClause(node);
-    }
 
 }

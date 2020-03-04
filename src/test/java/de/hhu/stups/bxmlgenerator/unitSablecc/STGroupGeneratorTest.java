@@ -6,6 +6,8 @@ import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.sablecc.STGroupGenerator;
 import de.hhu.stups.bxmlgenerator.util.ExpressionFinder;
 import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
+import de.hhu.stups.bxmlgenerator.util.SubstitutionFinder;
+import de.prob.parser.ast.nodes.substitution.SubstitutionNode;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -261,6 +263,98 @@ public class STGroupGeneratorTest {
                 "</Exp_Comparison>", result);
     }
 
+    @Test
+    public void test_caseAInitialisationMachineClause() throws BCompoundException {
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
+        aAssignSubstitution.setLhsExpression(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
+        aAssignSubstitution.setRhsExpressions(List.of(generateIntegerExpression(3, customTypeChecker)));
+
+        AInitialisationMachineClause aInitialisationMachineClause = new AInitialisationMachineClause();
+        aInitialisationMachineClause.setSubstitutions(aAssignSubstitution);
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aInitialisationMachineClause).generateCurrent();
+
+        assertEquals("<Assignement_Sub>\n" +
+                "    <Variables>\n" +
+                "        <Id value='a' typref='1618932450'/>\n" +
+                "    </Variables>\n" +
+                "    <Values>\n" +
+                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "    </Values>\n" +
+                "</Assignement_Sub>", result);
+    }
+
+
+    @Test
+    public void test_caseAAssignSubstitution_1_Substitution() throws BCompoundException {
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
+        aAssignSubstitution.setLhsExpression(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
+        aAssignSubstitution.setRhsExpressions(List.of(generateIntegerExpression(3, customTypeChecker)));
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution).generateCurrent();
+
+        assertEquals("<Assignement_Sub>\n" +
+                "    <Variables>\n" +
+                "        <Id value='a' typref='1618932450'/>\n" +
+                "    </Variables>\n" +
+                "    <Values>\n" +
+                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "    </Values>\n" +
+                "</Assignement_Sub>", result);
+    }
+
+    @Test
+    public void test_caseAAssignSubstitution_2_Substitution() throws BCompoundException {
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
+        aAssignSubstitution.setLhsExpression(
+                List.of(generateIdentifierExpression("b", customTypeChecker, IntegerType.getInstance()),
+                        generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
+        aAssignSubstitution.setRhsExpressions(List.of(
+                generateIntegerExpression(5, customTypeChecker),
+                generateIntegerExpression(3, customTypeChecker)));
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution).generateCurrent();
+
+        assertEquals("<Assignement_Sub>\n" +
+                "    <Variables>\n" +
+                "        <Id value='b' typref='1618932450'/>\n" +
+                "        <Id value='a' typref='1618932450'/>\n" +
+                "    </Variables>\n" +
+                "    <Values>\n" +
+                "        <Integer_Literal value='5' typref='1618932450'/>\n" +
+                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
+                "    </Values>\n" +
+                "</Assignement_Sub>", result);
+    }
+
+
     public ALessPredicate generateLessPredicate(String left, int right, Typechecker typechecker, BType typeLeft){
         ALessPredicate aLessPredicate = new ALessPredicate();
 
@@ -294,6 +388,8 @@ public class STGroupGeneratorTest {
 
         return aConjunctPredicate;
     }
+
+
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -404,6 +500,8 @@ public class STGroupGeneratorTest {
 
     }
 
+
+
     class STGroupGeneratorStub extends STGroupGenerator {
 
         public STGroupGeneratorStub(HashMap<Integer, BType> nodeType, MachineContext ctx, Node startNode) {
@@ -427,6 +525,24 @@ public class STGroupGeneratorTest {
             super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
                     new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
                             .getInstanceOf(PredicateFinder.findPredicate(startNode)),
+                    new HashMap<>(),
+                    typechecker,
+                    startNode);
+        }
+
+        public STGroupGeneratorStub(Typechecker typechecker, PSubstitution startNode) {
+            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
+                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
+                            .getInstanceOf(SubstitutionFinder.findSubstitution(startNode)),
+                    new HashMap<>(),
+                    typechecker,
+                    startNode);
+        }
+
+        public STGroupGeneratorStub(Typechecker typechecker, AInitialisationMachineClause startNode) {
+            super(new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg"),
+                    new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg")
+                            .getInstanceOf("machine"),
                     new HashMap<>(),
                     typechecker,
                     startNode);
