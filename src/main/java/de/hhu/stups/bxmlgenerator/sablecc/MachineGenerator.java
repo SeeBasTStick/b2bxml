@@ -333,7 +333,7 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             List<POperation> copy = new ArrayList<POperation>(node.getOperations());
             for(POperation e : copy)
             {
-                e.apply(this);
+     //           e.apply(this);
             }
         }
         outALocalOperationsMachineClause(node);
@@ -347,7 +347,7 @@ public class MachineGenerator extends STGroupGenerator implements SubGenerator{
             List<POperation> copy = new ArrayList<POperation>(node.getOperations());
             for(POperation e : copy)
             {
-                e.apply(this);
+       //         e.apply(this);
             }
         }
         outAOperationsMachineClause(node);

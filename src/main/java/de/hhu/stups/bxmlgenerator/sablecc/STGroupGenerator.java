@@ -186,6 +186,30 @@ public class STGroupGenerator extends DepthFirstAdapter {
         TemplateHandler.add(currentGroup, "statements", evaluatedChildren);
     }
 
+    @Override
+    public void caseAAssignSubstitution(AAssignSubstitution node)
+    {
+        List<PExpression> leftSide = new ArrayList<>(node.getLhsExpression());
+
+        List<String> leftSideResult = visitMultipleExpressions(leftSide);
+
+        TemplateHandler.add(currentGroup, "body1", leftSideResult);
+
+        List<PExpression> rightSide = new ArrayList<>(node.getRhsExpressions());
+
+        List<String> rightSideResult = visitMultipleExpressions(rightSide);
+
+        TemplateHandler.add(currentGroup, "body2", rightSideResult);
+    }
+
+    public List<String> visitMultipleExpressions(List<PExpression> list){
+        return list.stream()
+                .map(expression -> new Pair<>(expression, ExpressionFinder.findExpression(expression)))
+                .map(pair -> new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(pair.getValue()),
+                        nodeType, typechecker, pair.getKey()).generateCurrent())
+                .collect(Collectors.toList());
+    }
+
     public List<String> visitRightAndLeftExpression(PExpression left, PExpression right){
 
         String leftPredicate = ExpressionFinder.findExpression(left);

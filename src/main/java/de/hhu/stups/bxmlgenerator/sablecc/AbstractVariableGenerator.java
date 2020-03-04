@@ -24,8 +24,6 @@ public class AbstractVariableGenerator extends STGroupGenerator implements SubGe
 
 
     public String generateAllExpression(){
-
-        System.out.println(getStGroupFile());
         TemplateHandler.add(getCurrentGroup(), "ids", generateSubExpression());
         return getCurrentGroup().render();
     }
