@@ -50,7 +50,7 @@ output_parameters(body) ::=<<
 
 
 
-select(conditions, then) ::= <<
+select(conditions, then, elseC) ::= <<
 \<Select>
     \<When_Clauses>
         \<When>
@@ -62,7 +62,14 @@ select(conditions, then) ::= <<
             \</Then>
         \</When>
     \</When_Clauses>
+    <elseC>
 \</Select>
+>>
+
+elseC(body) ::=<<
+\<Else>
+    <body>
+\</Else>
 >>
 
 initialisation(body) ::= <<
@@ -71,7 +78,7 @@ initialisation(body) ::= <<
 \</Initialisation>
 >>
 
-abstract_variable(ids, attrs) ::= <<
+abstract_variables(ids, attrs) ::= <<
 \<Abstract_Variables>
     <ids; separator="\n">
 \</Abstract_Variables>
