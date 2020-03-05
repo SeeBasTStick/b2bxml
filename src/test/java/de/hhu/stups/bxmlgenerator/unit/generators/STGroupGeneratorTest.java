@@ -24,6 +24,7 @@ public class STGroupGeneratorTest {
     @Test
     public void test_generateAbstractVariable_1_Variable() throws BCompoundException {
 
+
         String machine = "MACHINE test \n" + "VARIABLES x\n"
                 + "INVARIANT x : NAT \n" + "INITIALISATION x := 1 \n" + "END";
 
