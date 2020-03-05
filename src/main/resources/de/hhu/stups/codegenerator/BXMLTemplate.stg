@@ -25,10 +25,10 @@ operations(operation) ::=<<
 \</Operations>
 >>
 
-operation(name, output_parameters, parameter, precondition, body) ::=<<
+operation(name, output_parameters, input_parameters, precondition, body) ::=<<
 \<Operation name='<name>'>
     <output_parameters>
-    <parameter>
+    <input_parameters>
     <precondition>
     \<Body>
         <body; separator="\n">
@@ -48,6 +48,11 @@ output_parameters(body) ::=<<
 \</Output_Parameters>
 >>
 
+input_parameter(body) ::=<<
+\<Input_Parameters>
+    <body>
+\</Input_Parameters>
+>>
 
 
 select(conditions, then, elseC) ::= <<
