@@ -1,9 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit.util;
 
-import de.be4.classicalb.core.parser.node.AConjunctPredicate;
-import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
-import de.be4.classicalb.core.parser.node.ALessPredicate;
-import de.be4.classicalb.core.parser.node.AMemberPredicate;
+import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.util.PredicateFinder;
 import org.junit.Test;
 
@@ -50,5 +47,16 @@ public class PredicateFinderTest implements PredicateFinder{
         String result = findPredicate(aConjunctPredicate);
 
         assertEquals("nary_pred", result);
+    }
+
+    @Test
+    public void test_AGreaterPredicate(){
+        AGreaterPredicate aGreaterPredicate = new AGreaterPredicate();
+
+
+        String result = findPredicate(aGreaterPredicate);
+
+
+        assertEquals("exp_comparision", result);
     }
 }

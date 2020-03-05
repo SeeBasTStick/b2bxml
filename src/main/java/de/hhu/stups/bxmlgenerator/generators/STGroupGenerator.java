@@ -229,7 +229,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
             TemplateHandler.add(currentGroup, "output_parameters", filledReturnValuesTemplate);
         }
 
-
+        /*
         List<PExpression> parameterValues = node.getParameters();
         if(!parameterValues.isEmpty()){
             List<String> expandedParameterValues = visitMultipleNodes(returnValues);
@@ -239,14 +239,14 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
             String filledReturnValuesTemplate = parameterValueTemplate.render();
             TemplateHandler.add(currentGroup, "input_parameter", filledReturnValuesTemplate);
         }
-
+        */
 
         if(node.getOperationBody() instanceof APreconditionSubstitution){
 
-            ((APreconditionSubstitution) node.getOperationBody()).getPredicate().apply(this);
 
+            node.getOperationBody().apply(this);
 
-            PSubstitution substitution = ((APreconditionSubstitution) node.getOperationBody()).getSubstitution();
+            PSubstitution substitution =  ((APreconditionSubstitution) node.getOperationBody()).getSubstitution();
             String unfoldedSubstitution = makeGenerator(substitution, find(substitution) ).generateCurrent();
 
             TemplateHandler.add(currentGroup, "body", unfoldedSubstitution);
@@ -446,13 +446,15 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
     @Override
     public void caseAPreconditionSubstitution(APreconditionSubstitution node)
     {
-        if(currentGroup.equals(stGroupFile.getInstanceOf("operation"))){
-            ST precondition = stGroupFile.getInstanceOf("precondition");
-            String expandedPrecondition = makeGenerator(node.getPredicate(), "precondition").generateCurrent();
+        if(currentGroup.toString().equals("/operation()")){
 
+            ST precondition = stGroupFile.getInstanceOf("precondition");
+            String expandedPrecondition = makeGenerator(node.getPredicate(), find(node.getPredicate())).generateCurrent();
+            System.out.println(expandedPrecondition);
             TemplateHandler.add(precondition, "body", expandedPrecondition);
 
             TemplateHandler.add(currentGroup, "precondition", precondition.render());
+
         }
     }
 
@@ -473,11 +475,14 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         }
 
 
+        /*
         if(node.getElse() != null)
         {
             String elseC = makeGenerator(node.getElse(), "elseC").generateCurrent();
             TemplateHandler.add(currentGroup, "elseC", elseC);
         }
+        */
+
     }
 
 

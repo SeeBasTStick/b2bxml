@@ -3,6 +3,7 @@ package de.hhu.stups.bxmlgenerator.unit.generators;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.*;
+import de.be4.eventbalg.core.parser.node.PPrecondition;
 import de.hhu.stups.bxmlgenerator.generators.STGroupGenerator;
 import de.hhu.stups.bxmlgenerator.util.AbstractFinder;
 import de.prob.typechecker.MachineContext;
@@ -20,7 +21,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class STGroupGeneratorTest implements AbstractFinder {
+public class STGroupGeneratorTest implements AbstractFinder, STGroupGeneratorTestUtils {
 
     @Test
     public void test_generateAbstractVariable_1_Variable() throws BCompoundException {
@@ -99,8 +100,9 @@ public class STGroupGeneratorTest implements AbstractFinder {
 
         AInvariantMachineClause aInvariantMachineClause = new AInvariantMachineClause();
 
-        ALessPredicate aLessPredicate = generateLessPredicate("a", 3, typechecker, IntegerType.getInstance());
-
+        ALessPredicate aLessPredicate = generateALessPredicate(
+                generateIdentifierExpression("a", typechecker, IntegerType.getInstance()),
+                generateIntegerExpression(3, typechecker), typechecker, IntegerType.getInstance(), IntegerType.getInstance());
         aInvariantMachineClause.setPredicates(aLessPredicate);
 
         STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause, find(aInvariantMachineClause));
@@ -130,12 +132,17 @@ public class STGroupGeneratorTest implements AbstractFinder {
 
         AInvariantMachineClause aInvariantMachineClause = new AInvariantMachineClause();
 
-        ALessPredicate aLessPredicate = generateLessPredicate("a", 3, typechecker, IntegerType.getInstance());
+        ALessPredicate aLessPredicate = generateALessPredicate(
+                generateIdentifierExpression("a", typechecker, IntegerType.getInstance()),
+                generateIntegerExpression(3, typechecker), typechecker, IntegerType.getInstance(), IntegerType.getInstance());
 
-        ALessPredicate aLessPredicate2 = generateLessPredicate("b", 3, typechecker, IntegerType.getInstance());
+        ALessPredicate aLessPredicate2 =generateALessPredicate(
+                generateIdentifierExpression("b", typechecker, IntegerType.getInstance()),
+                generateIntegerExpression(3, typechecker), typechecker, IntegerType.getInstance(), IntegerType.getInstance());
 
-        ALessPredicate aLessPredicate3 = generateLessPredicate("c", 3, typechecker, IntegerType.getInstance());
-
+        ALessPredicate aLessPredicate3 = generateALessPredicate(
+                generateIdentifierExpression("c", typechecker, IntegerType.getInstance()),
+                generateIntegerExpression(3, typechecker), typechecker, IntegerType.getInstance(), IntegerType.getInstance());
 
         aInvariantMachineClause.setPredicates(generateConjunctPredicate(aLessPredicate3, generateConjunctPredicate(aLessPredicate, aLessPredicate2)));
 
@@ -208,389 +215,8 @@ public class STGroupGeneratorTest implements AbstractFinder {
                 "</Machine>", result);
     }
 
-    @Test
-    public void test_caseAIdentifierExpression() throws BCompoundException {
-        String machine = hashTestMachine();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker typechecker = new Typechecker(c);
-
-
-        AIdentifierExpression aIdentifierExpression = (AIdentifierExpression) c.getVariables().get("x");
-
-        typechecker.setType(aIdentifierExpression, IntegerType.getInstance());
-
-        String result = new STGroupGeneratorStub(typechecker, aIdentifierExpression, find(aIdentifierExpression)).generateCurrent();
-
-        assertEquals("<Id value='x' typref='1618932450'/>", result);
-
-    }
-
-    @Test
-    public void test_caseAIntervalExpression() throws BCompoundException {
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AIntervalExpression aIntervalExpression = new AIntervalExpression();
-
-        AIntegerExpression left = generateIntegerExpression(1, customTypeChecker);
-        AIntegerExpression right = generateIntegerExpression(2,customTypeChecker );
-
-        aIntervalExpression.setLeftBorder(left);
-        aIntervalExpression.setRightBorder(right);
-
-        customTypeChecker.setType(aIntervalExpression, new SetType(IntegerType.getInstance()));
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aIntervalExpression, find(aIntervalExpression)).generateCurrent();
-
-        assertEquals("<Binary_Exp op='..' typref='631359557'>\n" +
-                "    <Integer_Literal value='1' typref='1618932450'/>\n" +
-                "    <Integer_Literal value='2' typref='1618932450'/>\n" +
-                "</Binary_Exp>", result);
-    }
-
-    @Test
-    public void test_caseAIntegerExpression() throws BCompoundException {
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AIntegerExpression integerExpression = generateIntegerExpression(1, customTypeChecker);
-
-        String result = new STGroupGeneratorStub(customTypeChecker, integerExpression, find(integerExpression)).generateCurrent();
-
-        assertEquals("<Integer_Literal value='1' typref='1618932450'/>", result);
-    }
-
-    @Test
-    public void test_caseANatSetExpression() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        ANatSetExpression aNatSetExpression = new ANatSetExpression();
-
-        customTypeChecker.setType(aNatSetExpression, IntegerType.getInstance());
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aNatSetExpression, find(aNatSetExpression)).generateCurrent();
-
-        assertEquals("<Id value='NAT' typref='1618932450'/>", result);
-    }
-
-    @Test
-    public void test_caseAConjunctPredicate_simple() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-
-        ALessPredicate aLessPredicate = generateLessPredicate("test", 4, customTypeChecker, IntegerType.getInstance());
-
-        ALessPredicate aLessPredicate2 = generateLessPredicate("test2", 4, customTypeChecker, IntegerType.getInstance());
-
-        AConjunctPredicate aConjunctPredicate = generateConjunctPredicate(aLessPredicate, aLessPredicate2);
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate, find(aConjunctPredicate)).generateCurrent();
-        assertEquals("<Nary_Pred op='&amp;'>\n" +
-                "    <Exp_Comparison op='&lt;'>\n" +
-                "        <Id value='test' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='4' typref='1618932450'/>\n" +
-                "    </Exp_Comparison>\n" +
-                "    <Exp_Comparison op='&lt;'>\n" +
-                "        <Id value='test2' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='4' typref='1618932450'/>\n" +
-                "    </Exp_Comparison>\n" +
-                "</Nary_Pred>", result);
-    }
-
-    @Test
-    public void test_caseAConjunctPredicate_complex() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        ALessPredicate aLessPredicate = generateLessPredicate("test", 4, customTypeChecker, IntegerType.getInstance());
-
-        ALessPredicate aLessPredicate2 = generateLessPredicate("test2", 4, customTypeChecker, IntegerType.getInstance());
-
-        ALessPredicate aLessPredicate3 = generateLessPredicate("test3", 4, customTypeChecker, IntegerType.getInstance());
-
-        AConjunctPredicate aConjunctPredicate = generateConjunctPredicate(aLessPredicate, aLessPredicate2);
-
-        AConjunctPredicate aConjunctPredicate2 = generateConjunctPredicate(aConjunctPredicate, aLessPredicate3);
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate2, find(aConjunctPredicate)).generateCurrent();
-        assertEquals("<Nary_Pred op='&amp;'>\n" +
-                "    <Exp_Comparison op='&lt;'>\n" +
-                "        <Id value='test' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='4' typref='1618932450'/>\n" +
-                "    </Exp_Comparison>\n" +
-                "    <Exp_Comparison op='&lt;'>\n" +
-                "        <Id value='test2' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='4' typref='1618932450'/>\n" +
-                "    </Exp_Comparison>\n" +
-                "    <Exp_Comparison op='&lt;'>\n" +
-                "        <Id value='test3' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='4' typref='1618932450'/>\n" +
-                "    </Exp_Comparison>\n" +
-                "</Nary_Pred>", result);
-    }
-
-    @Test
-    public void test_caseAGreaterEqualPredicate() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AIdentifierExpression aIdentifierExpression = generateIdentifierExpression("test",  customTypeChecker, IntegerType.getInstance());
-        customTypeChecker.setType(aIdentifierExpression, IntegerType.getInstance());
-
-        AIntegerExpression aIntegerExpression = generateIntegerExpression(2, customTypeChecker);
-        customTypeChecker.setType(aIntegerExpression, IntegerType.getInstance());
-
-        AGreaterEqualPredicate aGreaterEqualPredicate = new AGreaterEqualPredicate();
-
-        aGreaterEqualPredicate.setLeft(aIdentifierExpression);
-        aGreaterEqualPredicate.setRight(aIntegerExpression);
-
-        customTypeChecker.setType(aGreaterEqualPredicate, IntegerType.getInstance());
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aGreaterEqualPredicate, find(aGreaterEqualPredicate)).generateCurrent();
-
-        assertEquals("<Exp_Comparison op='&gt;='>\n" +
-                "    <Id value='test' typref='1618932450'/>\n" +
-                "    <Integer_Literal value='2' typref='1618932450'/>\n" +
-                "</Exp_Comparison>", result);
-    }
-
-    @Test
-    public void test_caseALessPredicate() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        ALessPredicate aLessPredicate = generateLessPredicate("test", 2, customTypeChecker, IntegerType.getInstance());
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aLessPredicate, find(aLessPredicate)).generateCurrent();
-
-        assertEquals("<Exp_Comparison op='&lt;'>\n" +
-                "    <Id value='test' typref='1618932450'/>\n" +
-                "    <Integer_Literal value='2' typref='1618932450'/>\n" +
-                "</Exp_Comparison>", result);
-    }
-
-    @Test
-    public void test_caseAMemberPredicate() throws BCompoundException{
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AIdentifierExpression aIdentifierExpression = generateIdentifierExpression("test", customTypeChecker, IntegerType.getInstance());
-
-        AIntegerExpression aIntegerExpression = generateIntegerExpression(2, customTypeChecker);
-
-        AMemberPredicate aMemberPredicate = new AMemberPredicate();
-
-        aMemberPredicate.setLeft(aIdentifierExpression);
-        aMemberPredicate.setRight(aIntegerExpression);
-
-        customTypeChecker.setType(aMemberPredicate, IntegerType.getInstance());
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aMemberPredicate, find(aMemberPredicate)).generateCurrent();
-
-        assertEquals("<Exp_Comparison op=':'>\n" +
-                "    <Id value='test' typref='1618932450'/>\n" +
-                "    <Integer_Literal value='2' typref='1618932450'/>\n" +
-                "</Exp_Comparison>", result);
-    }
-
-    @Test
-    public void test_caseAInitialisationMachineClause() throws BCompoundException {
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
-        aAssignSubstitution.setLhsExpression(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
-        aAssignSubstitution.setRhsExpressions(List.of(generateIntegerExpression(3, customTypeChecker)));
-
-        AInitialisationMachineClause aInitialisationMachineClause = new AInitialisationMachineClause();
-        aInitialisationMachineClause.setSubstitutions(aAssignSubstitution);
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aInitialisationMachineClause, find(aInitialisationMachineClause)).generateCurrent();
-
-        assertEquals("<Initialisation>\n" +
-                "    <Assignement_Sub>\n" +
-                "        <Variables>\n" +
-                "            <Id value='a' typref='1618932450'/>\n" +
-                "        </Variables>\n" +
-                "        <Values>\n" +
-                "            <Integer_Literal value='3' typref='1618932450'/>\n" +
-                "        </Values>\n" +
-                "    </Assignement_Sub>\n" +
-                "</Initialisation>", result);
-    }
-
-
-    @Test
-    public void test_caseAAssignSubstitution_1_Substitution() throws BCompoundException {
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
-        aAssignSubstitution.setLhsExpression(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
-        aAssignSubstitution.setRhsExpressions(List.of(generateIntegerExpression(3, customTypeChecker)));
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution, find(aAssignSubstitution)).generateCurrent();
-
-        assertEquals("<Assignement_Sub>\n" +
-                "    <Variables>\n" +
-                "        <Id value='a' typref='1618932450'/>\n" +
-                "    </Variables>\n" +
-                "    <Values>\n" +
-                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
-                "    </Values>\n" +
-                "</Assignement_Sub>", result);
-    }
-
-    @Test
-    public void test_caseAAssignSubstitution_2_Substitution() throws BCompoundException {
-        String machine =  machineWithInterval();
-
-        BParser parser = new BParser("Test");
-        Start start = parser.parse(machine, false);
-        MachineContext c = new MachineContext(null, start);
-        c.analyseMachine();
-
-        Typechecker customTypeChecker = new Typechecker(c);
-
-        AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
-        aAssignSubstitution.setLhsExpression(
-                List.of(generateIdentifierExpression("b", customTypeChecker, IntegerType.getInstance()),
-                        generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
-        aAssignSubstitution.setRhsExpressions(List.of(
-                generateIntegerExpression(5, customTypeChecker),
-                generateIntegerExpression(3, customTypeChecker)));
-
-        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution, find(aAssignSubstitution)).generateCurrent();
-
-        assertEquals("<Assignement_Sub>\n" +
-                "    <Variables>\n" +
-                "        <Id value='b' typref='1618932450'/>\n" +
-                "        <Id value='a' typref='1618932450'/>\n" +
-                "    </Variables>\n" +
-                "    <Values>\n" +
-                "        <Integer_Literal value='5' typref='1618932450'/>\n" +
-                "        <Integer_Literal value='3' typref='1618932450'/>\n" +
-                "    </Values>\n" +
-                "</Assignement_Sub>", result);
-    }
-
-
-    public ALessPredicate generateLessPredicate(String left, int right, Typechecker typechecker, BType typeLeft){
-        ALessPredicate aLessPredicate = new ALessPredicate();
-
-        aLessPredicate.setLeft(generateIdentifierExpression(left, typechecker, typeLeft ));
-        aLessPredicate.setRight(generateIntegerExpression(right, typechecker));
-
-        typechecker.setType(aLessPredicate, IntegerType.getInstance());
-
-        return aLessPredicate;
-    }
-
-
-    public AIntegerExpression generateIntegerExpression(int value, Typechecker typechecker){
-        AIntegerExpression integerExpression = new AIntegerExpression();
-        integerExpression.setLiteral(new TIntegerLiteral(String.valueOf(value)));
-        typechecker.setType(integerExpression, IntegerType.getInstance());
-        return integerExpression;
-    }
-
-    public AIdentifierExpression generateIdentifierExpression(String id, Typechecker typechecker, BType type){
-        AIdentifierExpression aIdentifierExpression = new AIdentifierExpression();
-        aIdentifierExpression.setIdentifier(List.of(new TIdentifierLiteral(id)));
-        typechecker.setType(aIdentifierExpression, type);
-        return aIdentifierExpression;
-    }
-
-    public AConjunctPredicate generateConjunctPredicate(PPredicate left, PPredicate right){
-        AConjunctPredicate aConjunctPredicate = new AConjunctPredicate(left, right);
-        aConjunctPredicate.setLeft(left);
-        aConjunctPredicate.setRight(right);
-
-        return aConjunctPredicate;
-    }
-
-
-
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-
-    public String machineWithInterval() {
-        return "MACHINE test \n" + "VARIABLES x, y\n"
-                + "INVARIANT x : 1..2 & y : NAT  & y >= 4\n" + "INITIALISATION x := 1 ; y:=2\n" + "END";
-    }
-
-    public String hashTestMachine() {
-        return "MACHINE test \n" + "VARIABLES x, y\n"
-                + "INVARIANT x : NAT & y : NAT \n" + "INITIALISATION x := 1 ; y:=2\n" + "END";
-    }
 
     @Test
     public void test_hashFunction_1() throws BCompoundException {
@@ -687,4 +313,252 @@ public class STGroupGeneratorTest implements AbstractFinder {
         assertEquals(hash, result);
 
     }
+
+    @Test
+    public void test_caseAOperation() throws BCompoundException {
+
+
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
+        aParallelSubstitution.setSubstitutions(
+                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker),
+                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker)));
+
+
+        AOperation aOperation = new AOperation();
+        aOperation.setOpName(List.of(new TIdentifierLiteral("a")));
+        aOperation.setOperationBody(aParallelSubstitution);
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aOperation, "operation").generateCurrent();
+
+        assertEquals("<Operation name='a'>\n" +
+                "    <Body>\n" +
+                "        <Nary_Sub op='||'>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='a' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='b' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "        </Nary_Sub>\n" +
+                "    </Body>\n" +
+                "</Operation>", result);
+    }
+
+    @Test
+    public void test_caseAOperation_with_OutputParameters() throws BCompoundException {
+
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AOperation aOperation = dummyOperation(customTypeChecker);
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aOperation, "operation").generateCurrent();
+
+        assertEquals("<Operation name='a'>\n" +
+                "    <Output_Parameters>\n" +
+                "        <Id value='a' typref='1618932450'/>\n" +
+                "    </Output_Parameters>\n" +
+                "    <Body>\n" +
+                "        <Nary_Sub op='||'>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='a' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='b' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "        </Nary_Sub>\n" +
+                "    </Body>\n" +
+                "</Operation>", result);
+    }
+
+    @Test
+    public void test_caseAOperation_with_PreCondition() throws BCompoundException {
+
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+        AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
+        aParallelSubstitution.setSubstitutions(
+                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker),
+                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker)));
+
+        APreconditionSubstitution aPreconditionSubstitution = new APreconditionSubstitution();
+
+        aPreconditionSubstitution.setPredicate(generateALessPredicate(generateIntegerExpression(1, customTypeChecker),
+                generateIntegerExpression(2, customTypeChecker),
+                customTypeChecker,
+                IntegerType.getInstance(),
+                IntegerType.getInstance()));
+
+        aPreconditionSubstitution.setSubstitution(aParallelSubstitution);
+
+
+
+        AOperation aOperation = new AOperation();
+        aOperation.setOpName(List.of(new TIdentifierLiteral("a")));
+        aOperation.setOperationBody(aPreconditionSubstitution);
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aOperation, "operation").generateCurrent();
+
+        assertEquals("<Operation name='a'>\n" +
+                "    <Precondition>\n" +
+                "        <Exp_Comparison op='&lt;'>\n" +
+                "            <Integer_Literal value='1' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='2' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "    </Precondition>\n" +
+                "    <Body>\n" +
+                "        <Nary_Sub op='||'>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='a' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "            <Assignement_Sub>\n" +
+                "                <Variables>\n" +
+                "                    <Id value='b' typref='1618932450'/>\n" +
+                "                </Variables>\n" +
+                "                <Values>\n" +
+                "                    <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                </Values>\n" +
+                "            </Assignement_Sub>\n" +
+                "        </Nary_Sub>\n" +
+                "    </Body>\n" +
+                "</Operation>", result);
+    }
+
+    @Test
+    public void test_caseAOperationsMachineClause() throws BCompoundException {
+
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+
+        Typechecker customTypeChecker = new Typechecker(c);
+
+       AOperationsMachineClause aOperationsMachineClause = new AOperationsMachineClause();
+       aOperationsMachineClause.setOperations(List.of(dummyOperation(customTypeChecker), dummyOperation(customTypeChecker)));
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aOperationsMachineClause, "operations").generateCurrent();
+
+        assertEquals("<Operations>\n" +
+                "    <Operation name='a'>\n" +
+                "        <Output_Parameters>\n" +
+                "            <Id value='a' typref='1618932450'/>\n" +
+                "        </Output_Parameters>\n" +
+                "        <Body>\n" +
+                "            <Nary_Sub op='||'>\n" +
+                "                <Assignement_Sub>\n" +
+                "                    <Variables>\n" +
+                "                        <Id value='a' typref='1618932450'/>\n" +
+                "                    </Variables>\n" +
+                "                    <Values>\n" +
+                "                        <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                    </Values>\n" +
+                "                </Assignement_Sub>\n" +
+                "                <Assignement_Sub>\n" +
+                "                    <Variables>\n" +
+                "                        <Id value='b' typref='1618932450'/>\n" +
+                "                    </Variables>\n" +
+                "                    <Values>\n" +
+                "                        <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                    </Values>\n" +
+                "                </Assignement_Sub>\n" +
+                "            </Nary_Sub>\n" +
+                "        </Body>\n" +
+                "    </Operation>\n" +
+                "    <Operation name='a'>\n" +
+                "        <Output_Parameters>\n" +
+                "            <Id value='a' typref='1618932450'/>\n" +
+                "        </Output_Parameters>\n" +
+                "        <Body>\n" +
+                "            <Nary_Sub op='||'>\n" +
+                "                <Assignement_Sub>\n" +
+                "                    <Variables>\n" +
+                "                        <Id value='a' typref='1618932450'/>\n" +
+                "                    </Variables>\n" +
+                "                    <Values>\n" +
+                "                        <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                    </Values>\n" +
+                "                </Assignement_Sub>\n" +
+                "                <Assignement_Sub>\n" +
+                "                    <Variables>\n" +
+                "                        <Id value='b' typref='1618932450'/>\n" +
+                "                    </Variables>\n" +
+                "                    <Values>\n" +
+                "                        <Integer_Literal value='4' typref='1618932450'/>\n" +
+                "                    </Values>\n" +
+                "                </Assignement_Sub>\n" +
+                "            </Nary_Sub>\n" +
+                "        </Body>\n" +
+                "    </Operation>\n" +
+                "</Operations>", result);
+    }
+
+
+    public AOperation dummyOperation(Typechecker customTypeChecker){
+        AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
+        aParallelSubstitution.setSubstitutions(
+                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker),
+                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker)));
+
+
+        AOperation aOperation = new AOperation();
+        aOperation.setOpName(List.of(new TIdentifierLiteral("a")));
+        aOperation.setOperationBody(aParallelSubstitution);
+
+        aOperation.setReturnValues(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
+
+        return aOperation;
+    }
+
+
 }
+
