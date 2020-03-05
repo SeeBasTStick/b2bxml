@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class STGroupGenerator extends DepthFirstAdapter {
+public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinder {
 
     private ST currentGroup;
 
@@ -134,13 +134,11 @@ public class STGroupGenerator extends DepthFirstAdapter {
 
     public void visitMachineClause(List<PMachineClause> list){
         for (PMachineClause machineClause : list) {
-            Pair<String, String> templateTarget = MachineClauseFinder.findMachineClause(machineClause);
-            String machinePlaceHolder = templateTarget.getKey();
-            String subTemplate = templateTarget.getValue();
-            TemplateHandler.add(getCurrentGroup(), machinePlaceHolder,
+            String templateTarget = find(machineClause);
+            TemplateHandler.add(getCurrentGroup(), templateTarget,
                     new STGroupGenerator(
                             getStGroupFile(),
-                            getStGroupFile().getInstanceOf(subTemplate),
+                            getStGroupFile().getInstanceOf(templateTarget),
                             getNodeType(),
                             getTypechecker(),
                             machineClause, "").generateCurrent());
@@ -190,7 +188,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
         PPredicate predicate = node.getPredicates();
 
         STGroupGenerator stGroupGenerator = new STGroupGenerator(getStGroupFile(),
-                getStGroupFile().getInstanceOf(PredicateFinder.findPredicate(predicate)),
+                getStGroupFile().getInstanceOf(find(predicate)),
                 getNodeType(), getTypechecker(), predicate, "");
 
         TemplateHandler.add(getCurrentGroup(), "body",  stGroupGenerator.generateCurrent());
@@ -203,7 +201,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
         {
             PSubstitution substitution = node.getSubstitutions();
 
-            String target = SubstitutionFinder.findSubstitution(substitution);
+            String target = find(substitution);
 
             STGroupGenerator initialisationBodyGenerator =
                     new STGroupGenerator(getStGroupFile(),
@@ -301,7 +299,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
         List<PPredicate> expandedConjunction = unfoldConjunction(node);
 
         List<String> result = expandedConjunction.stream()
-                .map(predicateNode -> new Pair<>(predicateNode, PredicateFinder.findPredicate(predicateNode)))
+                .map(predicateNode -> new Pair<>(predicateNode, find(predicateNode)))
                 .map(pair -> new STGroupGenerator(stGroupFile,
             stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey(), "").generateCurrent())
                 .collect(Collectors.toList());
@@ -366,7 +364,7 @@ public class STGroupGenerator extends DepthFirstAdapter {
 
     public List<String> visitMultipleExpressions(List<PExpression> list){
         return list.stream()
-                .map(expression -> new Pair<>(expression, ExpressionFinder.findExpression(expression)))
+                .map(expression -> new Pair<>(expression, find(expression)))
                 .map(pair -> new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(pair.getValue()),
                         nodeType, typechecker, pair.getKey(), "").generateCurrent())
                 .collect(Collectors.toList());
@@ -374,8 +372,8 @@ public class STGroupGenerator extends DepthFirstAdapter {
 
     public List<String> visitRightAndLeftExpression(PExpression left, PExpression right){
 
-        String leftPredicate = ExpressionFinder.findExpression(left);
-        String rightPredicate = ExpressionFinder.findExpression(right);
+        String leftPredicate = find(left);
+        String rightPredicate = find(right);
 
         STGroupGenerator stGroupGeneratorLeft = new STGroupGenerator(stGroupFile,
                 stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left, "");

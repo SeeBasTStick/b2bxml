@@ -2,20 +2,19 @@ package de.hhu.stups.bxmlgenerator.util;
 
 import de.be4.classicalb.core.parser.node.*;
 
-public class MachineClauseFinder {
-    
-    public static Pair<String, String> findMachineClause(PMachineClause machineClause){
+public interface MachineClauseFinder {
+    default String findMachineClause(PMachineClause machineClause){
         if(machineClause instanceof AInvariantMachineClause){
-            return new Pair<>("invariant", "invariant");
+            return "invariant";
         }
         if(machineClause instanceof AVariablesMachineClause){
-            return new Pair<>("abstract_variables", "abstract_variable");
+            return "abstract_variables";
         }
         if(machineClause instanceof AInitialisationMachineClause){
-            return new Pair<>("initialisation", "initialisation");
+            return "initialisation";
         }
         if(machineClause instanceof AOperationsMachineClause){
-            return new Pair<>("operations", "operations");
+            return "operations";
         }
 
         throw new NullPointerException("MachineClause not found"  + machineClause.getClass());

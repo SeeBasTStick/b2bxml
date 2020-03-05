@@ -9,13 +9,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExpressionFinderTest {
+public class ExpressionFinderTest implements ExpressionFinder{
 
     @Test
     public void test_id_aIdentifierExpression(){
         AIdentifierExpression aIdentifierExpression = new AIdentifierExpression();
 
-        String result = ExpressionFinder.findExpression(aIdentifierExpression);
+        String result = findExpression(aIdentifierExpression);
 
         assertEquals("id", result);
     }
@@ -24,7 +24,7 @@ public class ExpressionFinderTest {
     public void test_id_aNatSetExpression(){
         ANatSetExpression aNatSetExpression = new ANatSetExpression();
 
-        String result = ExpressionFinder.findExpression(aNatSetExpression);
+        String result = findExpression(aNatSetExpression);
 
         assertEquals("id", result);
     }
@@ -33,7 +33,7 @@ public class ExpressionFinderTest {
     public void test_binary_exp_aIntervalExpression(){
         AIntervalExpression aIntervalExpression = new AIntervalExpression();
 
-        String result = ExpressionFinder.findExpression(aIntervalExpression);
+        String result = findExpression(aIntervalExpression);
 
         assertEquals("binary_exp", result);
     }
@@ -42,7 +42,7 @@ public class ExpressionFinderTest {
     public void test_integer_literal_aIntegerExpression(){
         AIntegerExpression aIntegerExpression = new AIntegerExpression();
 
-        String result = ExpressionFinder.findExpression(aIntegerExpression);
+        String result = findExpression(aIntegerExpression);
 
         assertEquals("integer_literal", result);
     }

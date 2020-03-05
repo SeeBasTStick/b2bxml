@@ -2,13 +2,8 @@ package de.hhu.stups.bxmlgenerator.util;
 
 import de.be4.classicalb.core.parser.node.*;
 
-/**
- * Gets a Predicate Node and Returns the corresponding template name
- */
-
-public class PredicateFinder {
-
-    public static String findPredicate(PPredicate predicate){
+public interface PredicateFinder {
+    default String findPredicate(PPredicate predicate){
 
         if(predicate instanceof AConjunctPredicate){
             return "nary_pred";

@@ -10,14 +10,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class MachineClauseFinderTest {
+public class MachineClauseFinderTest implements MachineClauseFinder {
 
     @Test
     public void test_invariant(){
 
-        Pair<String, String> toAssert = new Pair<>("invariant","invariant");
+        String toAssert = "invariant";
 
-        Pair<String, String> result = MachineClauseFinder.findMachineClause(new AInvariantMachineClause());
+        String result = findMachineClause(new AInvariantMachineClause());
 
         assertEquals(toAssert, result);
     }
@@ -25,9 +25,9 @@ public class MachineClauseFinderTest {
     @Test
     public void test_initialisation(){
 
-        Pair<String, String> toAssert = new Pair<>("initialisation","initialisation");
+      String toAssert = "initialisation";
 
-        Pair<String, String> result = MachineClauseFinder.findMachineClause(new AInitialisationMachineClause());
+        String result = findMachineClause(new AInitialisationMachineClause());
 
         assertEquals(toAssert, result);
     }
@@ -35,9 +35,9 @@ public class MachineClauseFinderTest {
     @Test
     public void test_variables(){
 
-        Pair<String, String> toAssert = new Pair<>("abstract_variables","abstract_variable");
+        String toAssert = "abstract_variables";
 
-        Pair<String, String> result = MachineClauseFinder.findMachineClause(new AVariablesMachineClause());
+        String result = findMachineClause(new AVariablesMachineClause());
 
         assertEquals(toAssert, result);
     }
@@ -45,9 +45,9 @@ public class MachineClauseFinderTest {
     @Test
     public void test_operations(){
 
-        Pair<String, String> toAssert = new Pair<>("operation","operations");
+        String toAssert = "operations";
 
-        Pair<String, String> result = MachineClauseFinder.findMachineClause(new AOperationsMachineClause());
+        String result = findMachineClause(new AOperationsMachineClause());
 
         assertEquals(toAssert, result);
     }

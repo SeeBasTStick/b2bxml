@@ -4,6 +4,7 @@ import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.generators.STGroupGenerator;
+import de.hhu.stups.bxmlgenerator.util.AbstractFinder;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
@@ -19,7 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class STGroupGeneratorTest {
+public class STGroupGeneratorTest implements AbstractFinder {
 
     @Test
     public void test_generateAbstractVariable_1_Variable() throws BCompoundException {
@@ -41,7 +42,7 @@ public class STGroupGeneratorTest {
 
         aVariablesMachineClause.setIdentifiers(List.of(aIdentifierExpression));
 
-        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause);
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause, find(aVariablesMachineClause));
 
         String result = stGroupGeneratorStub.generateCurrent();
 
@@ -72,7 +73,7 @@ public class STGroupGeneratorTest {
 
         aVariablesMachineClause.setIdentifiers(List.of(aIdentifierExpression, aIdentifierExpression2));
 
-        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause);
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker,  aVariablesMachineClause, find(aVariablesMachineClause));
 
         String result = stGroupGeneratorStub.generateCurrent();
 
@@ -102,7 +103,7 @@ public class STGroupGeneratorTest {
 
         aInvariantMachineClause.setPredicates(aLessPredicate);
 
-        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause);
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause, find(aInvariantMachineClause));
 
         String result = stGroupGeneratorStub.generateCurrent();
 
@@ -138,7 +139,7 @@ public class STGroupGeneratorTest {
 
         aInvariantMachineClause.setPredicates(generateConjunctPredicate(aLessPredicate3, generateConjunctPredicate(aLessPredicate, aLessPredicate2)));
 
-        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause);
+        STGroupGeneratorStub stGroupGeneratorStub = new STGroupGeneratorStub(typechecker, aInvariantMachineClause, find(aInvariantMachineClause));
 
         String result = stGroupGeneratorStub.generateCurrent();
 
@@ -223,7 +224,7 @@ public class STGroupGeneratorTest {
 
         typechecker.setType(aIdentifierExpression, IntegerType.getInstance());
 
-        String result = new STGroupGeneratorStub(typechecker, aIdentifierExpression).generateCurrent();
+        String result = new STGroupGeneratorStub(typechecker, aIdentifierExpression, find(aIdentifierExpression)).generateCurrent();
 
         assertEquals("<Id value='x' typref='1618932450'/>", result);
 
@@ -250,7 +251,7 @@ public class STGroupGeneratorTest {
 
         customTypeChecker.setType(aIntervalExpression, new SetType(IntegerType.getInstance()));
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aIntervalExpression).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aIntervalExpression, find(aIntervalExpression)).generateCurrent();
 
         assertEquals("<Binary_Exp op='..' typref='631359557'>\n" +
                 "    <Integer_Literal value='1' typref='1618932450'/>\n" +
@@ -271,7 +272,7 @@ public class STGroupGeneratorTest {
 
         AIntegerExpression integerExpression = generateIntegerExpression(1, customTypeChecker);
 
-        String result = new STGroupGeneratorStub(customTypeChecker, integerExpression).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, integerExpression, find(integerExpression)).generateCurrent();
 
         assertEquals("<Integer_Literal value='1' typref='1618932450'/>", result);
     }
@@ -291,7 +292,7 @@ public class STGroupGeneratorTest {
 
         customTypeChecker.setType(aNatSetExpression, IntegerType.getInstance());
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aNatSetExpression).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aNatSetExpression, find(aNatSetExpression)).generateCurrent();
 
         assertEquals("<Id value='NAT' typref='1618932450'/>", result);
     }
@@ -314,7 +315,7 @@ public class STGroupGeneratorTest {
 
         AConjunctPredicate aConjunctPredicate = generateConjunctPredicate(aLessPredicate, aLessPredicate2);
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate, find(aConjunctPredicate)).generateCurrent();
         assertEquals("<Nary_Pred op='&amp;'>\n" +
                 "    <Exp_Comparison op='&lt;'>\n" +
                 "        <Id value='test' typref='1618932450'/>\n" +
@@ -348,7 +349,7 @@ public class STGroupGeneratorTest {
 
         AConjunctPredicate aConjunctPredicate2 = generateConjunctPredicate(aConjunctPredicate, aLessPredicate3);
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate2).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aConjunctPredicate2, find(aConjunctPredicate)).generateCurrent();
         assertEquals("<Nary_Pred op='&amp;'>\n" +
                 "    <Exp_Comparison op='&lt;'>\n" +
                 "        <Id value='test' typref='1618932450'/>\n" +
@@ -389,7 +390,7 @@ public class STGroupGeneratorTest {
 
         customTypeChecker.setType(aGreaterEqualPredicate, IntegerType.getInstance());
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aGreaterEqualPredicate).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aGreaterEqualPredicate, find(aGreaterEqualPredicate)).generateCurrent();
 
         assertEquals("<Exp_Comparison op='&gt;='>\n" +
                 "    <Id value='test' typref='1618932450'/>\n" +
@@ -410,7 +411,7 @@ public class STGroupGeneratorTest {
 
         ALessPredicate aLessPredicate = generateLessPredicate("test", 2, customTypeChecker, IntegerType.getInstance());
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aLessPredicate).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aLessPredicate, find(aLessPredicate)).generateCurrent();
 
         assertEquals("<Exp_Comparison op='&lt;'>\n" +
                 "    <Id value='test' typref='1618932450'/>\n" +
@@ -440,7 +441,7 @@ public class STGroupGeneratorTest {
 
         customTypeChecker.setType(aMemberPredicate, IntegerType.getInstance());
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aMemberPredicate).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aMemberPredicate, find(aMemberPredicate)).generateCurrent();
 
         assertEquals("<Exp_Comparison op=':'>\n" +
                 "    <Id value='test' typref='1618932450'/>\n" +
@@ -466,7 +467,7 @@ public class STGroupGeneratorTest {
         AInitialisationMachineClause aInitialisationMachineClause = new AInitialisationMachineClause();
         aInitialisationMachineClause.setSubstitutions(aAssignSubstitution);
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aInitialisationMachineClause).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aInitialisationMachineClause, find(aInitialisationMachineClause)).generateCurrent();
 
         assertEquals("<Initialisation>\n" +
                 "    <Assignement_Sub>\n" +
@@ -496,7 +497,7 @@ public class STGroupGeneratorTest {
         aAssignSubstitution.setLhsExpression(List.of(generateIdentifierExpression("a", customTypeChecker, IntegerType.getInstance())));
         aAssignSubstitution.setRhsExpressions(List.of(generateIntegerExpression(3, customTypeChecker)));
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution, find(aAssignSubstitution)).generateCurrent();
 
         assertEquals("<Assignement_Sub>\n" +
                 "    <Variables>\n" +
@@ -527,7 +528,7 @@ public class STGroupGeneratorTest {
                 generateIntegerExpression(5, customTypeChecker),
                 generateIntegerExpression(3, customTypeChecker)));
 
-        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution).generateCurrent();
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution, find(aAssignSubstitution)).generateCurrent();
 
         assertEquals("<Assignement_Sub>\n" +
                 "    <Variables>\n" +

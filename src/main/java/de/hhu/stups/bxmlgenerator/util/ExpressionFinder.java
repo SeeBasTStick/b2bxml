@@ -2,9 +2,9 @@ package de.hhu.stups.bxmlgenerator.util;
 
 import de.be4.classicalb.core.parser.node.*;
 
-public class ExpressionFinder {
+public interface ExpressionFinder {
 
-    public static String findExpression(PExpression pExpression){
+    default String findExpression(PExpression pExpression){
 
         if(pExpression instanceof AIdentifierExpression || pExpression instanceof ANatSetExpression){
             return "id";
