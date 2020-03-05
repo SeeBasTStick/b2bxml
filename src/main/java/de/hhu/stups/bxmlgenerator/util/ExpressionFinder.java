@@ -10,7 +10,8 @@ public interface ExpressionFinder {
             return "id";
         }
 
-        if(pExpression instanceof AIntervalExpression){
+        if(pExpression instanceof AIntervalExpression || pExpression instanceof AAddExpression ||
+        pExpression instanceof AMinusOrSetSubtractExpression){
             return "binary_exp";
         }
 

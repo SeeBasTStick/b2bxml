@@ -1,6 +1,7 @@
 package de.hhu.stups.bxmlgenerator.util;
 
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
+import de.be4.classicalb.core.parser.node.AParallelSubstitution;
 import de.be4.classicalb.core.parser.node.ASelectSubstitution;
 import de.be4.classicalb.core.parser.node.PSubstitution;
 
@@ -10,7 +11,10 @@ public interface SubstitutionFinder {
             return "assignment_sub";
         }
         if(substitution instanceof ASelectSubstitution){
-            return "assignment_sub";
+            return "select";
+        }
+        if(substitution instanceof AParallelSubstitution){
+            return "nary_sub";
         }
 
         throw new NullPointerException("Substitution not found"  + substitution.getClass());

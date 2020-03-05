@@ -168,15 +168,9 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
     public void caseAVariablesMachineClause(AVariablesMachineClause node)
     {
         if(node.getIdentifiers() != null) {
-            List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+            List<PExpression> ids = node.getIdentifiers();
 
-            List<String> result = new ArrayList<>();
-            for (PExpression e : copy) {
-                result.add(
-                        new STGroupGenerator(getStGroupFile(),
-                                getStGroupFile().getInstanceOf("id"), getNodeType(), getTypechecker(), e, "")
-                                .generateCurrent());
-            }
+            List<String> result = visitMultipleNodes(ids);
 
             TemplateHandler.add(getCurrentGroup(), "ids", result);
         }
@@ -201,29 +195,9 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         {
             PSubstitution substitution = node.getSubstitutions();
 
-            String target = find(substitution);
-
-            STGroupGenerator initialisationBodyGenerator =
-                    new STGroupGenerator(getStGroupFile(),
-                            getStGroupFile().getInstanceOf(target),
-                            getNodeType(),
-                            getTypechecker(),
-                            substitution, "");
+            STGroupGenerator initialisationBodyGenerator = makeGenerator(substitution, find(substitution));
 
             TemplateHandler.add(currentGroup, "body", initialisationBodyGenerator.generateCurrent());
-
-        }
-    }
-
-    @Override
-    public void caseALocalOperationsMachineClause(ALocalOperationsMachineClause node)
-    {
-        {
-            List<POperation> copy = new ArrayList<POperation>(node.getOperations());
-            for(POperation e : copy)
-            {
-                //           e.apply(this);
-            }
         }
     }
 
@@ -236,7 +210,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
                 operation -> makeGenerator(operation, "operation").generateCurrent())
                 .collect(Collectors.toList());
 
-        TemplateHandler.add(currentGroup, "operations", operationsExpanded);
+        TemplateHandler.add(currentGroup, "operation", operationsExpanded);
     }
 
     @Override
@@ -247,7 +221,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
         List<PExpression> returnValues = node.getReturnValues();
         if(!returnValues.isEmpty()){
-            List<String> expandedReturnValues = visitMultipleExpressions(returnValues);
+            List<String> expandedReturnValues = visitMultipleNodes(returnValues);
             ST returnValueTemplate = stGroupFile.getInstanceOf("output_parameters");
             TemplateHandler.add(returnValueTemplate, "body", expandedReturnValues);
 
@@ -258,7 +232,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
         List<PExpression> parameterValues = node.getParameters();
         if(!parameterValues.isEmpty()){
-            List<String> expandedParameterValues = visitMultipleExpressions(returnValues);
+            List<String> expandedParameterValues = visitMultipleNodes(returnValues);
             ST parameterValueTemplate = stGroupFile.getInstanceOf("input_parameters");
             TemplateHandler.add(parameterValueTemplate, "body", expandedParameterValues);
 
@@ -278,23 +252,10 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
             TemplateHandler.add(currentGroup, "body", unfoldedSubstitution);
 
             }else{
-                String unfoldedSubstitution = makeGenerator(node, find(node.getOperationBody()) ).generateCurrent();
+                String unfoldedSubstitution = makeGenerator(node.getOperationBody(), find(node.getOperationBody()) ).generateCurrent();
                 TemplateHandler.add(currentGroup, "body", unfoldedSubstitution);
             }
 
-    }
-
-    @Override
-    public void caseAPreconditionSubstitution(APreconditionSubstitution node)
-    {
-        if(currentGroup.equals(stGroupFile.getInstanceOf("operation"))){
-            ST precondition = stGroupFile.getInstanceOf("precondition");
-            String expandedPrecondition = makeGenerator(node.getPredicate(), "precondition").generateCurrent();
-
-            TemplateHandler.add(precondition, "body", expandedPrecondition);
-
-            TemplateHandler.add(currentGroup, "precondition", precondition.render());
-        }
     }
 
     @Override
@@ -326,6 +287,47 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
         TemplateHandler.add(currentGroup, "body", evaluatedChildren);
     }
+
+    @Override
+    public void caseAAddExpression(AAddExpression node)
+    {
+        TemplateHandler.add(currentGroup, "op", "+");
+
+        BType bType = typechecker.getType(node);
+        int nodeHash = generateHash(bType);
+        nodeType.put(nodeHash, bType);
+
+        TemplateHandler.add(currentGroup, "typref", nodeHash);
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "body", evaluatedChildren);
+    }
+
+    @Override
+    public void caseAMinusOrSetSubtractExpression(AMinusOrSetSubtractExpression node)
+    {
+        TemplateHandler.add(currentGroup, "op", "-");
+
+        BType bType = typechecker.getType(node);
+        int nodeHash = generateHash(bType);
+        nodeType.put(nodeHash, bType);
+
+        TemplateHandler.add(currentGroup, "typref", nodeHash);
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "body", evaluatedChildren);
+    }
+
 
     @Override
     public void caseAIntegerExpression(AIntegerExpression node)
@@ -390,6 +392,19 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
     }
 
     @Override
+    public void caseAGreaterPredicate(AGreaterPredicate node)
+    {
+        TemplateHandler.add(currentGroup, "op", "&gt;");
+
+        PExpression left = node.getLeft();
+        PExpression right = node.getRight();
+
+        List<String> evaluatedChildren = visitRightAndLeftExpression(left, right);
+
+        TemplateHandler.add(currentGroup, "statements", evaluatedChildren);
+    }
+
+    @Override
     public void caseAMemberPredicate(AMemberPredicate node)
     {
         TemplateHandler.add(currentGroup, "op", ":");
@@ -405,24 +420,73 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
     @Override
     public void caseAAssignSubstitution(AAssignSubstitution node)
     {
-        List<PExpression> leftSide = new ArrayList<>(node.getLhsExpression());
+        List<PExpression> leftSide = node.getLhsExpression();
 
-        List<String> leftSideResult = visitMultipleExpressions(leftSide);
+        List<String> leftSideResult = visitMultipleNodes(leftSide);
 
         TemplateHandler.add(currentGroup, "body1", leftSideResult);
 
-        List<PExpression> rightSide = new ArrayList<>(node.getRhsExpressions());
+        List<PExpression> rightSide = node.getRhsExpressions();
 
-        List<String> rightSideResult = visitMultipleExpressions(rightSide);
+        List<String> rightSideResult = visitMultipleNodes(rightSide);
 
         TemplateHandler.add(currentGroup, "body2", rightSideResult);
     }
 
-    public List<String> visitMultipleExpressions(List<PExpression> list){
-        return list.stream()
-                .map(expression -> new Pair<>(expression, find(expression)))
+    @Override
+    public void caseAParallelSubstitution(AParallelSubstitution node)
+    {
+            List<PSubstitution> substitutions = node.getSubstitutions();
+            List<String> unfoldedSubstitutions = visitMultipleNodes(substitutions);
+            TemplateHandler.add(currentGroup, "op" , "||");
+            TemplateHandler.add(currentGroup, "statements", unfoldedSubstitutions);
+    }
+
+
+    @Override
+    public void caseAPreconditionSubstitution(APreconditionSubstitution node)
+    {
+        if(currentGroup.equals(stGroupFile.getInstanceOf("operation"))){
+            ST precondition = stGroupFile.getInstanceOf("precondition");
+            String expandedPrecondition = makeGenerator(node.getPredicate(), "precondition").generateCurrent();
+
+            TemplateHandler.add(precondition, "body", expandedPrecondition);
+
+            TemplateHandler.add(currentGroup, "precondition", precondition.render());
+        }
+    }
+
+    @Override
+    public void caseASelectSubstitution(ASelectSubstitution node)
+    {
+        String conditions = makeGenerator(node.getCondition(), find(node.getCondition())).generateCurrent();
+        TemplateHandler.add(currentGroup, "conditions", conditions);
+
+        String then = makeGenerator(node.getThen(), find(node.getThen())).generateCurrent();
+        TemplateHandler.add(currentGroup, "then", then);
+
+
+        List<PSubstitution> copy = node.getWhenSubstitutions();
+        for(PSubstitution e : copy)
+        {
+                System.out.println(e.getClass());
+        }
+
+
+        if(node.getElse() != null)
+        {
+            String elseC = makeGenerator(node.getElse(), "elseC").generateCurrent();
+            TemplateHandler.add(currentGroup, "elseC", elseC);
+        }
+    }
+
+
+
+    private List<String> visitMultipleNodes(List<? extends Node> nodes){
+        return nodes.stream()
+                .map(node -> new Pair<>(node, find(node)))
                 .map(pair -> new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(pair.getValue()),
-                        nodeType, typechecker, pair.getKey(), "").generateCurrent())
+                        nodeType, typechecker, pair.getKey(), machineName).generateCurrent())
                 .collect(Collectors.toList());
     }
 

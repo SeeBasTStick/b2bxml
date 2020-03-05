@@ -9,7 +9,8 @@ public interface PredicateFinder {
             return "nary_pred";
         }
 
-        if(predicate instanceof AMemberPredicate || predicate instanceof AGreaterEqualPredicate || predicate instanceof ALessPredicate){
+        if(predicate instanceof AMemberPredicate || predicate instanceof AGreaterEqualPredicate ||
+                predicate instanceof ALessPredicate || predicate instanceof AGreaterPredicate){
             return "exp_comparision";
         }
 
