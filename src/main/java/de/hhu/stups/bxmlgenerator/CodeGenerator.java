@@ -69,7 +69,7 @@ public class CodeGenerator {
 
         STGroupGenerator machineGenerator = new STGroupGenerator(stGroupFile
                , stGroupFile.getInstanceOf("machine"), new HashMap<>(),
-               typechecker , node, machineName );
+               typechecker , node);
 
         String code = machineGenerator.generateCurrent();
 

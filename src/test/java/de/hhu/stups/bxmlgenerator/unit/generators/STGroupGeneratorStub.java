@@ -17,7 +17,7 @@ class STGroupGeneratorStub extends STGroupGenerator implements AbstractFinder {
                 new STGroupFile("de/hhu/stups/codegenerator/BXMLTemplate.stg").getInstanceOf("machine"),
                 nodeType,
                 new Typechecker(ctx),
-                startNode, "");
+                startNode);
     }
 
     public STGroupGeneratorStub(Typechecker typechecker, Node startNode, String templateTarget) {
@@ -26,7 +26,7 @@ class STGroupGeneratorStub extends STGroupGenerator implements AbstractFinder {
                         .getInstanceOf(templateTarget),
                 new HashMap<>(),
                 typechecker,
-                startNode, "");
+                startNode);
     }
 
 

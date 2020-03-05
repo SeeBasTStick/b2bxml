@@ -28,15 +28,14 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     private STGroupFile stGroupFile;
 
-    private String machineName;
+    private TypeInfoGenerator typeInfoGenerator;
 
-    public STGroupGenerator(STGroupFile stGroupFile, ST group, HashMap<Integer, BType> nodeType, Typechecker typeChecker, Node startNode, String machineName){
+    public STGroupGenerator(STGroupFile stGroupFile, ST group, HashMap<Integer, BType> nodeType, Typechecker typeChecker, Node startNode){
         this.currentGroup = group;
         this.nodeType = nodeType;
         this.typechecker = typeChecker;
         this.startNode = startNode;
         this.stGroupFile = stGroupFile;
-        this.machineName = machineName;
     }
 
     public ST getCurrentGroup(){
@@ -62,6 +61,11 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     public String generateCurrent(){
         startNode.apply(this);
+        if(startNode instanceof Start)
+        {
+            typeInfoGenerator = new TypeInfoGenerator(stGroupFile, nodeType);
+            TemplateHandler.add(currentGroup, "type_info",typeInfoGenerator.generateTypeInfo());
+        }
         return currentGroup.render();
     }
 
@@ -81,6 +85,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
             throw new IndexOutOfBoundsException("Hash was already taken! " + type.toString() + " is not " + nodeType.get(hash));
         }
     }
+
 
     @Override
     public void caseAAbstractMachineParseUnit(AAbstractMachineParseUnit node)
@@ -141,7 +146,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
                             getStGroupFile().getInstanceOf(templateTarget),
                             getNodeType(),
                             getTypechecker(),
-                            machineClause, "").generateCurrent());
+                            machineClause).generateCurrent());
         }
     }
 
@@ -149,13 +154,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
     public void caseAMachineHeader(AMachineHeader node)
     {
 
-        TemplateHandler.add(getCurrentGroup(), "machine", machineName);
-
-        List<TIdentifierLiteral> identifierLiteralList = new ArrayList<>(node.getName());
-        for(TIdentifierLiteral e : identifierLiteralList)
-        {
-            e.apply(this);
-        }
+        TemplateHandler.add(getCurrentGroup(), "machine", node.getName().get(0).toString().replace(" ", ""));
 
         List<PExpression> pExpressionList = new ArrayList<>(node.getParameters());
         for(PExpression e : pExpressionList)
@@ -183,7 +182,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
         STGroupGenerator stGroupGenerator = new STGroupGenerator(getStGroupFile(),
                 getStGroupFile().getInstanceOf(find(predicate)),
-                getNodeType(), getTypechecker(), predicate, "");
+                getNodeType(), getTypechecker(), predicate);
 
         TemplateHandler.add(getCurrentGroup(), "body",  stGroupGenerator.generateCurrent());
     }
@@ -359,7 +358,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         List<String> result = expandedConjunction.stream()
                 .map(predicateNode -> new Pair<>(predicateNode, find(predicateNode)))
                 .map(pair -> new STGroupGenerator(stGroupFile,
-            stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey(), "").generateCurrent())
+            stGroupFile.getInstanceOf(pair.getValue()), nodeType, typechecker, pair.getKey()).generateCurrent())
                 .collect(Collectors.toList());
 
         TemplateHandler.add(currentGroup, "statements", result);
@@ -491,7 +490,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         return nodes.stream()
                 .map(node -> new Pair<>(node, find(node)))
                 .map(pair -> new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(pair.getValue()),
-                        nodeType, typechecker, pair.getKey(), machineName).generateCurrent())
+                        nodeType, typechecker, pair.getKey()).generateCurrent())
                 .collect(Collectors.toList());
     }
 
@@ -501,10 +500,10 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         String rightPredicate = find(right);
 
         STGroupGenerator stGroupGeneratorLeft = new STGroupGenerator(stGroupFile,
-                stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left, "");
+                stGroupFile.getInstanceOf(leftPredicate), nodeType, typechecker, left);
 
         STGroupGenerator stGroupGeneratorRight = new STGroupGenerator(stGroupFile,
-                stGroupFile.getInstanceOf(rightPredicate), nodeType, typechecker, right, "");
+                stGroupFile.getInstanceOf(rightPredicate), nodeType, typechecker, right);
 
         String leftStatements = stGroupGeneratorLeft.generateCurrent();
         String rightStatements = stGroupGeneratorRight.generateCurrent();
@@ -544,7 +543,7 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     private STGroupGenerator makeGenerator(Node startNode, String templateTarget){
         return new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(templateTarget),
-                nodeType, typechecker, startNode, machineName);
+                nodeType, typechecker, startNode);
     }
 
 
