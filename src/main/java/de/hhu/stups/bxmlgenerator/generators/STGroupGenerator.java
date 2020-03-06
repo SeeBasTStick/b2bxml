@@ -28,8 +28,6 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     private STGroupFile stGroupFile;
 
-    private TypeInfoGenerator typeInfoGenerator;
-
     public STGroupGenerator(STGroupFile stGroupFile, ST group, HashMap<Integer, BType> nodeType, Typechecker typeChecker, Node startNode){
         this.currentGroup = group;
         this.nodeType = nodeType;
@@ -63,8 +61,8 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         startNode.apply(this);
         if(startNode instanceof Start)
         {
-            typeInfoGenerator = new TypeInfoGenerator(stGroupFile, nodeType);
-            TemplateHandler.add(currentGroup, "type_info",typeInfoGenerator.generateTypeInfo());
+            TypeInfoGenerator typeInfoGenerator = new TypeInfoGenerator(stGroupFile, nodeType);
+            TemplateHandler.add(currentGroup, "type_info", typeInfoGenerator.generateTypeInfo());
         }
         return currentGroup.render();
     }
@@ -448,12 +446,16 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
         if(currentGroup.toString().equals("/operation()")){
 
             ST precondition = stGroupFile.getInstanceOf("precondition");
-            String expandedPrecondition = makeGenerator(node.getPredicate(), find(node.getPredicate())).generateCurrent();
-            System.out.println(expandedPrecondition);
+            String expandedPrecondition = makeGenerator(node.getPredicate()).generateCurrent();
             TemplateHandler.add(precondition, "body", expandedPrecondition);
 
             TemplateHandler.add(currentGroup, "precondition", precondition.render());
+        }else{
+            String precondition = makeGenerator(node.getPredicate()).generateCurrent();
+            String body = makeGenerator(node.getSubstitution()).generateCurrent();
 
+            TemplateHandler.add(currentGroup, "precondition", precondition);
+            TemplateHandler.add(currentGroup, "body", body);
         }
     }
 
@@ -484,7 +486,21 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     }
 
+    @Override
+    public void caseASkipSubstitution(ASkipSubstitution node)
+    {
+        //Nothing to do
+    }
 
+    @Override
+    public void caseAAssertionSubstitution(AAssertionSubstitution node)
+    {
+            String guard = makeGenerator(node.getPredicate()).generateCurrent();
+            String body = makeGenerator(node.getSubstitution()).generateCurrent();
+
+            TemplateHandler.add(currentGroup, "guard", guard);
+            TemplateHandler.add(currentGroup, "body", body);
+    }
 
     private List<String> visitMultipleNodes(List<? extends Node> nodes){
         return nodes.stream()
@@ -543,6 +559,11 @@ public class STGroupGenerator extends DepthFirstAdapter implements AbstractFinde
 
     private STGroupGenerator makeGenerator(Node startNode, String templateTarget){
         return new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(templateTarget),
+                nodeType, typechecker, startNode);
+    }
+
+    private STGroupGenerator makeGenerator(Node startNode){
+        return new STGroupGenerator(stGroupFile, stGroupFile.getInstanceOf(find(startNode)),
                 nodeType, typechecker, startNode);
     }
 

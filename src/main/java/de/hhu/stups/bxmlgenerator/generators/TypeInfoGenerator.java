@@ -39,7 +39,6 @@ public class TypeInfoGenerator  {
     public String generateTypeInformation(BType type)
     {
         String result;
-
         switch (type.getClass().getSimpleName())
         {
             case "IntegerType":

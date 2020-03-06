@@ -6,26 +6,90 @@ import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.util.AbstractFinder;
 import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
-import de.prob.typechecker.btypes.BType;
-import de.prob.typechecker.btypes.BoolType;
 import de.prob.typechecker.btypes.IntegerType;
-import de.prob.typechecker.btypes.SetType;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUtils, AbstractFinder {
 
+    @Test
+    public void test_caseASkipSubstitution() throws BCompoundException {
+
+        Typechecker customTypeChecker = stubSetup();
+
+        ASkipSubstitution aAssignSubstitution = new ASkipSubstitution();
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssignSubstitution, find(aAssignSubstitution)).generateCurrent();
+
+        assertEquals("<Skip/>", result);
+    }
+
+    @Test
+    public void test_caseAAssertionSubstitution() throws BCompoundException {
+
+        Typechecker customTypeChecker = stubSetup();
+
+        AAssertionSubstitution aAssertionSubstitution = new AAssertionSubstitution();
+
+        aAssertionSubstitution.setPredicate(generateAGreaterPredicate(
+                generateIntegerExpression(1, customTypeChecker),
+                generateIntegerExpression(2, customTypeChecker),
+                customTypeChecker, IntegerType.getInstance(), IntegerType.getInstance()));
+
+        aAssertionSubstitution.setSubstitution(new ASkipSubstitution());
+
+        String result = new STGroupGeneratorStub(customTypeChecker, aAssertionSubstitution, find(aAssertionSubstitution)).generateCurrent();
+
+        assertEquals("<Assert_Sub>\n" +
+                "    <Guard>\n" +
+                "        <Exp_Comparison op='&gt;'>\n" +
+                "            <Integer_Literal value='1' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='2' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "    </Guard>\n" +
+                "    <Body>\n" +
+                "        <Skip/>\n" +
+                "    </Body>\n" +
+                "</Assert_Sub>", result);
+
+    }
+
+    @Test
+    public void test_APreconditionSubstitution() throws BCompoundException {
+        Typechecker typechecker = stubSetup();
+
+        APreconditionSubstitution aPreconditionSubstitution = new APreconditionSubstitution();
+
+        aPreconditionSubstitution.setPredicate(generateAGreaterPredicate(
+                generateIntegerExpression(1, typechecker),
+                generateIntegerExpression(2, typechecker),
+                typechecker, IntegerType.getInstance(), IntegerType.getInstance()));
+
+        aPreconditionSubstitution.setSubstitution(new ASkipSubstitution());
+
+        String result = new STGroupGeneratorStub(typechecker, aPreconditionSubstitution, find(aPreconditionSubstitution)).generateCurrent();
+
+        assertEquals("<PRE_Sub>\n" +
+                "    <Precondition>\n" +
+                "        <Exp_Comparison op='&gt;'>\n" +
+                "            <Integer_Literal value='1' typref='1618932450'/>\n" +
+                "            <Integer_Literal value='2' typref='1618932450'/>\n" +
+                "        </Exp_Comparison>\n" +
+                "    </Precondition>\n" +
+                "    <Body>\n" +
+                "        <Skip/>\n" +
+                "    </Body>\n" +
+                "</PRE_Sub>", result);
+
+    }
 
     @Test
     public void test_caseAAssignSubstitution_1_Substitution() throws BCompoundException {
-        String machine =  machineWithInterval();
+        String machine = machineWithInterval();
 
         BParser parser = new BParser("Test");
         Start start = parser.parse(machine, false);
@@ -52,7 +116,7 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
 
     @Test
     public void test_caseAAssignSubstitution_2_Substitution() throws BCompoundException {
-        String machine =  machineWithInterval();
+        String machine = machineWithInterval();
 
         BParser parser = new BParser("Test");
         Start start = parser.parse(machine, false);
@@ -86,7 +150,7 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
 
     @Test
     public void test_caseAParallelSubstitution() throws BCompoundException {
-        String machine =  machineWithInterval();
+        String machine = machineWithInterval();
 
         BParser parser = new BParser("Test");
         Start start = parser.parse(machine, false);
@@ -97,9 +161,8 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
 
         AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
         aParallelSubstitution.setSubstitutions(
-                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker),
-                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker)));
-
+                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker), IntegerType.getInstance(), customTypeChecker),
+                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker), IntegerType.getInstance(), customTypeChecker)));
 
 
         String result = new STGroupGeneratorStub(customTypeChecker, aParallelSubstitution, find(aParallelSubstitution)).generateCurrent();
@@ -126,14 +189,14 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
 
     @Ignore
     @Test
-    public void test_caseAPreconditionSubstitution(){
+    public void test_caseAPreconditionSubstitution() {
 
     }
 
     @Test
     public void test_caseASelectSubstitution() throws BCompoundException {
 
-        String machine =  machineWithInterval();
+        String machine = machineWithInterval();
 
         BParser parser = new BParser("Test");
         Start start = parser.parse(machine, false);
@@ -151,8 +214,8 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
 
         AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
         aParallelSubstitution.setSubstitutions(
-                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker),
-                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker) , IntegerType.getInstance(), customTypeChecker)));
+                List.of(generateAAssignSubstitution("a", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker), IntegerType.getInstance(), customTypeChecker),
+                        generateAAssignSubstitution("b", IntegerType.getInstance(), generateIntegerExpression(4, customTypeChecker), IntegerType.getInstance(), customTypeChecker)));
 
         aSelectSubstitution.setThen(aParallelSubstitution);
 
@@ -192,8 +255,6 @@ public class STGroupGeneratorTestSubstitutions implements STGroupGeneratorTestUt
                 "    </When_Clauses>\n" +
                 "</Select>", result);
     }
-
-
 
 
 }

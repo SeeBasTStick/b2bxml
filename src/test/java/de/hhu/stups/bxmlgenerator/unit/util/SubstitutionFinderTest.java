@@ -1,9 +1,6 @@
 package de.hhu.stups.bxmlgenerator.unit.util;
 
-import de.be4.classicalb.core.parser.node.AAssignSubstitution;
-import de.be4.classicalb.core.parser.node.AGreaterPredicate;
-import de.be4.classicalb.core.parser.node.AParallelSubstitution;
-import de.be4.classicalb.core.parser.node.ASelectSubstitution;
+import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.bxmlgenerator.util.AbstractFinder;
 import org.junit.Test;
 
@@ -12,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 public class SubstitutionFinderTest implements AbstractFinder {
 
     @Test
-    public void test_AAssignSubstitution(){
+    public void test_AAssignSubstitution() {
         AAssignSubstitution aAssignSubstitution = new AAssignSubstitution();
 
 
@@ -23,7 +20,7 @@ public class SubstitutionFinderTest implements AbstractFinder {
     }
 
     @Test
-    public void test_ASelectSubstitution(){
+    public void test_ASelectSubstitution() {
         ASelectSubstitution aSelectSubstitution = new ASelectSubstitution();
 
 
@@ -34,14 +31,46 @@ public class SubstitutionFinderTest implements AbstractFinder {
     }
 
     @Test
-    public void test_AParallelSubstitution(){
+    public void test_AParallelSubstitution() {
         AParallelSubstitution aParallelSubstitution = new AParallelSubstitution();
-
 
         String result = find(aParallelSubstitution);
 
-
         assertEquals("nary_sub", result);
     }
+
+    @Test
+    public void test_ASkipSubstitution() {
+        ASkipSubstitution aSkipSubstitution = new ASkipSubstitution();
+
+
+        String result = find(aSkipSubstitution);
+
+
+        assertEquals("skip", result);
+    }
+
+    @Test
+    public void test_AAssertionSubstitution() {
+        AAssertionSubstitution aAssertionSubstitution = new AAssertionSubstitution();
+
+
+        String result = find(aAssertionSubstitution);
+
+
+        assertEquals("assert_sub", result);
+    }
+
+    @Test
+    public void test_APreconditionSubstitution() {
+        APreconditionSubstitution aPreconditionSubstitution = new APreconditionSubstitution();
+
+
+        String result = find(aPreconditionSubstitution);
+
+
+        assertEquals("pre_sub", result);
+    }
+
 
 }

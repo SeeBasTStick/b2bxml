@@ -31,4 +31,5 @@ class STGroupGeneratorStub extends STGroupGenerator implements AbstractFinder {
 
 
 
+
 }

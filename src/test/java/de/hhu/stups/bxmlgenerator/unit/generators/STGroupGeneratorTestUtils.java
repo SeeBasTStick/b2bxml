@@ -1,6 +1,9 @@
 package de.hhu.stups.bxmlgenerator.unit.generators;
 
+import de.be4.classicalb.core.parser.BParser;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.*;
+import de.prob.typechecker.MachineContext;
 import de.prob.typechecker.Typechecker;
 import de.prob.typechecker.btypes.BType;
 import de.prob.typechecker.btypes.IntegerType;
@@ -57,6 +60,15 @@ public interface STGroupGeneratorTestUtils {
     }
 
 
+    default Typechecker stubSetup() throws BCompoundException {
+        String machine =  machineWithInterval();
+
+        BParser parser = new BParser("Test");
+        Start start = parser.parse(machine, false);
+        MachineContext c = new MachineContext(null, start);
+        c.analyseMachine();
+        return new Typechecker(c);
+    }
 
 
     default AIntegerExpression generateIntegerExpression(int value, Typechecker typechecker){

@@ -183,7 +183,7 @@ public class STGroupGeneratorTest implements AbstractFinder, STGroupGeneratorTes
 
         String result = stGroupGenerator.generateCurrent();
 
-        assertEquals("<Machine name='' type='abstraction'>\n" +
+        assertEquals("<Machine name='test' type='abstraction'>\n" +
                 "    <Abstract_Variables>\n" +
                 "        <Id value='x' typref='1618932450'/>\n" +
                 "        <Id value='y' typref='1618932450'/>\n" +
@@ -212,6 +212,16 @@ public class STGroupGeneratorTest implements AbstractFinder, STGroupGeneratorTes
                 "            </Values>\n" +
                 "        </Assignement_Sub>\n" +
                 "    </Initialisation>\n" +
+                "    <TypeInfos>\n" +
+                "        <Type id='631359557'>\n" +
+                "            <Unary_Exp op='POW'>\n" +
+                "                <Id value='INTEGER'/>\n" +
+                "            </Unary_Exp>\n" +
+                "        </Type>\n" +
+                "        <Type id='1618932450'>\n" +
+                "            <Id value='INTEGER'/>\n" +
+                "        </Type>\n" +
+                "    </TypeInfos>\n" +
                 "</Machine>", result);
     }
 
